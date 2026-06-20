@@ -1,0 +1,87 @@
+/*
+ * qualification.css
+ * Styles for the contact form qualification prompts, error states,
+ * and the honeypot field.
+ *
+ * Linked from contact.html only. Does not affect other pages.
+ */
+
+/* ── Honeypot: invisible to humans, visible to bots ────────────────────────
+ * Do not use display:none or visibility:hidden — some bots skip those.
+ * Clip to a 1px box off-screen instead.
+ * aria-hidden="true" on the wrapper keeps screen readers from announcing it.
+ * tabindex="-1" on the input keeps keyboard users from reaching it.
+ * ──────────────────────────────────────────────────────────────────────── */
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  top:  -9999px;
+  width:  1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Inline form error ──────────────────────────────────────────────────── */
+.form-error {
+  background: #fff2f2;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  color: #842029;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+}
+
+/* ── Security/privacy notice ────────────────────────────────────────────── */
+.notice-security {
+  background: #f8f9fa;
+  border-left: 3px solid #ccc;
+  border-radius: 0 4px 4px 0;
+  color: #555;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin: 0.75rem 0;
+  padding: 0.5rem 0.75rem;
+}
+
+/* ── Qualification prompt card ──────────────────────────────────────────── */
+.qual-prompt {
+  background: #f0f7ff;
+  border: 1px solid #b8d4f0;
+  border-radius: 6px;
+  margin: 0.25rem 0 0.75rem;
+  padding: 0.875rem 1rem;
+}
+
+.qual-prompt[hidden] {
+  display: none;
+}
+
+.qual-prompt-heading {
+  color: #1a3a5c;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.qual-prompt-list {
+  color: #2c4a6e;
+  font-size: 0.875rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.qual-prompt-list li {
+  margin-bottom: 0.3rem;
+}
+
+.qual-prompt-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Contact page: notice block spacing ─────────────────────────────────── */
+.contact-notice {
+  margin-top: 1.25rem;
+}
