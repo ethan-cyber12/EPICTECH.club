@@ -4,9 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self' mailto:; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="description" content="Contact EPIC TECH LLC to schedule a small-business technology assessment.">
   <title>Contact | EPIC TECH LLC</title>
   <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/qualification.css">
 </head>
 <body>
 <header class="site-header">
@@ -25,27 +27,50 @@
     </nav>
   </div>
 </header>
+
 <main>
   <section class="page-hero">
     <div class="container">
       <span class="eyebrow">Start here</span>
       <h1>Schedule a technology assessment.</h1>
-      <p class="lead">Tell me what is going on with your Wi-Fi, firewall, website, IT setup, or app idea. I will reply with the next step and whether an assessment is the right fit.</p>
+      <p class="lead">Tell us what is going on and we will reply with the right next step. The more detail you include, the more useful our reply will be.</p>
     </div>
   </section>
+
   <section class="section">
     <div class="container grid-2">
-      <form class="card" data-mailto-form>
+
+      <form class="card" data-mailto-form novalidate>
+
+        <div class="hp-field" aria-hidden="true">
+          <label for="hp-field">Website</label>
+          <input type="text" id="hp-field" name="_hp" tabindex="-1" autocomplete="off" maxlength="100">
+        </div>
+
         <div class="contact-box">
-          <label class="field">Name
-            <input name="name" maxlength="80" autocomplete="name" required>
+          <label class="field">
+            Name
+            <input name="name" id="field-name" maxlength="80" autocomplete="name" required>
           </label>
-          <label class="field">Email
-            <input name="email" type="email" maxlength="120" autocomplete="email" required>
+          <label class="field">
+            Email
+            <input name="email" id="field-email" type="email" maxlength="120" autocomplete="email" required>
           </label>
         </div>
-        <label class="field">What are you interested in?
-          <select name="service" required>
+
+        <label class="field">
+          Business name <span class="muted">(optional)</span>
+          <input name="business" id="field-business" maxlength="80" autocomplete="organization">
+        </label>
+
+        <label class="field">
+          Phone <span class="muted">(optional)</span>
+          <input name="phone" id="field-phone" type="tel" maxlength="30" autocomplete="tel" placeholder="For faster response on urgent issues">
+        </label>
+
+        <label class="field">
+          What are you interested in?
+          <select name="service" id="field-service" required>
             <option value="" disabled selected>Select what you need help with</option>
             <option>Website Launch</option>
             <option>Website Refresh</option>
@@ -58,12 +83,22 @@
             <option>Not sure yet</option>
           </select>
         </label>
-        <label class="field">What is the problem or goal?
-          <textarea name="message" maxlength="900" required placeholder="Example: Our office Wi-Fi is unreliable, we need a guest network, and I want the firewall cleaned up."></textarea>
+
+        <div id="qual-prompt" class="qual-prompt" hidden></div>
+
+        <label class="field">
+          What is the problem or goal?
+          <textarea name="message" maxlength="900" required
+            placeholder="Describe what you need help with. The more detail you include, the more useful my reply will be."></textarea>
         </label>
+
+        <p class="notice-security">Please do not send passwords, API keys, payment information, or private client data through this form. If sensitive access is required, EPIC TECH will provide a safer method.</p>
+
         <button class="btn btn-primary" type="submit">Open email request</button>
-        <p class="fine">This site does not store form submissions. The button opens your email client and sends the request to info@epictech.club</p>
+        <p class="fine">This opens your email client with your information pre-filled. Nothing is sent until you click Send in your email app. EPIC TECH does not store form submissions on this site.</p>
+
       </form>
+
       <div class="card">
         <h2>What happens next?</h2>
         <div class="steps">
@@ -71,31 +106,37 @@
             <span class="step-number">1</span>
             <div>
               <strong>Quick reply</strong>
-              <p class="muted">I confirm the problem, location, rough timeline, and whether it fits EPIC TECH.</p>
+              <p class="muted">We confirm the problem, location, rough timeline, and whether it fits EPIC TECH — usually within 1 business day.</p>
             </div>
           </div>
           <div class="step">
             <span class="step-number">2</span>
             <div>
               <strong>Assessment</strong>
-              <p class="muted">We review the network, website, firewall, app idea, or setup and define the actual scope.</p>
+              <p class="muted">We review the network, website, firewall, app idea, or setup and define the actual scope and risk.</p>
             </div>
           </div>
           <div class="step">
             <span class="step-number">3</span>
             <div>
               <strong>Written plan</strong>
-              <p class="muted">You get a clear plan, exact scope, and price before implementation starts.</p>
+              <p class="muted">You get a clear plan, exact scope, and price before implementation starts. Nothing begins without your approval.</p>
             </div>
           </div>
         </div>
+        <div class="notice contact-notice">
+          <strong>What not to include:</strong> Do not send passwords, network credentials, API keys, payment details, or client data. EPIC TECH will provide a secure way to share anything sensitive if the project requires it.
+        </div>
       </div>
+
     </div>
   </section>
 </main>
+
 <footer class="site-footer">
   <div class="container">© <span data-year></span> EPIC TECH LLC</div>
 </footer>
 <script src="assets/js/main.js" defer></script>
+<script src="assets/js/qualification.js" defer></script>
 </body>
 </html>
