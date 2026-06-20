@@ -1,14 +1,7 @@
 'use strict';
 
-// qualification.js
-// Shows service-specific qualification prompts below the message field
-// when a service is selected from the contact form dropdown.
-// No form data is stored. No requests are made. No innerHTML used.
-
 (function () {
 
-  // What to include in the message for each service.
-  // Shown as helper text — not required fields.
   var PROMPTS = {
     'Website Launch': [
       'Whether you have an existing website, or are starting from scratch',
@@ -68,13 +61,10 @@
     ]
   };
 
-  // Build and insert the prompt card using safe DOM methods only.
-  // No innerHTML. No eval. No external requests.
   function renderPrompt(service) {
     var container = document.getElementById('qual-prompt');
     if (!container) return;
 
-    // Clear previous prompt
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
@@ -111,7 +101,6 @@
       renderPrompt(select.value);
     });
 
-    // If a service is already selected on load, show its prompt.
     if (select.value) {
       renderPrompt(select.value);
     }
