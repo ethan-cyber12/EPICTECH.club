@@ -67,3 +67,33 @@
 .contact-notice {
   margin-top: 1.25rem;
 }
+
+/* Inline submission status (set by main.js, no inline styles needed). */
+.form-status {
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+}
+.form-status:empty {
+  display: none;
+}
+.form-status[data-kind="ok"] {
+  background: #e8f6ee;
+  border: 1px solid #b6e0c6;
+  color: #14622f;
+}
+.form-status[data-kind="error"] {
+  background: #fff2f2;
+  border: 1px solid #f5c6cb;
+  color: #842029;
+}
+.form-status[data-kind="info"] {
+  background: #f0f7ff;
+  border: 1px solid #b8d4f0;
+  color: #1a3a5c;
+}
+
+.cf-turnstile {
+  margin: 0.75rem 0;
+}
