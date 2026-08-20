@@ -29,36 +29,36 @@
   }
 
   function renderGoogle(google) {
-    var container = document.querySelector('[data-google-reviews]');
-    if (!container) return;
-    container.textContent = '';
+    var summaryEl = document.querySelector('[data-google-summary]');
+    var listEl = document.querySelector('[data-google-reviews]');
+    var linkEl = document.querySelector('[data-google-link]');
+    if (summaryEl) summaryEl.textContent = '';
+    if (listEl) listEl.textContent = '';
 
     if (!google) {
-      container.appendChild(el('p', 'reviews-empty', 'Google reviews are not available right now.'));
+      if (summaryEl) summaryEl.appendChild(el('p', 'muted', 'Live rating loads here once connected to our Google Business Profile.'));
       return;
     }
 
-    var summary = el('div', 'reviews-summary');
-    if (typeof google.rating === 'number') {
-      summary.appendChild(el('span', 'rating-number', google.rating.toFixed(1)));
-      summary.appendChild(el('span', 'stars', starString(google.rating)));
+    if (summaryEl) {
+      var summary = el('div', 'reviews-summary');
+      if (typeof google.rating === 'number') {
+        summary.appendChild(el('span', 'rating-number', google.rating.toFixed(1)));
+        summary.appendChild(el('span', 'stars', starString(google.rating)));
+      }
+      if (typeof google.totalRatings === 'number') {
+        summary.appendChild(el('span', 'muted', 'Based on ' + google.totalRatings + ' Google review' + (google.totalRatings === 1 ? '' : 's')));
+      }
+      summaryEl.appendChild(summary);
     }
-    if (typeof google.totalRatings === 'number') {
-      summary.appendChild(el('span', 'muted', 'Based on ' + google.totalRatings + ' Google review' + (google.totalRatings === 1 ? '' : 's')));
-    }
-    container.appendChild(summary);
 
-    if (google.googleReviewUrl) {
-      var link = el('a', 'btn btn-secondary', 'Leave us a review on Google');
-      link.href = google.googleReviewUrl;
-      link.rel = 'noopener';
-      var linkWrap = el('p');
-      linkWrap.appendChild(link);
-      container.appendChild(linkWrap);
+    if (linkEl && google.googleReviewUrl) {
+      linkEl.href = google.googleReviewUrl;
+      linkEl.textContent = 'Leave us a review on Google';
     }
 
     var list = google.reviews || [];
-    if (list.length) {
+    if (listEl && list.length) {
       var grid = el('div', 'grid-3');
       for (var i = 0; i < list.length; i++) {
         var r = list[i];
@@ -69,7 +69,7 @@
         if (r.relativeTime) card.appendChild(el('div', 'review-date', r.relativeTime));
         grid.appendChild(card);
       }
-      container.appendChild(grid);
+      listEl.appendChild(grid);
     }
   }
 
@@ -79,7 +79,10 @@
     container.textContent = '';
 
     if (!reviews || !reviews.length) {
-      container.appendChild(el('p', 'reviews-empty', 'No reviews yet — be the first to leave one below.'));
+      var empty = el('div', 'card reviews-empty');
+      empty.appendChild(el('p', null, 'No on-site reviews yet.'));
+      empty.appendChild(el('p', 'muted', 'Worked with us recently? Be the first to leave one below.'));
+      container.appendChild(empty);
       return;
     }
 
@@ -101,10 +104,10 @@
   }
 
   function loadReviews() {
-    var googleContainer = document.querySelector('[data-google-reviews]');
+    var summaryEl = document.querySelector('[data-google-summary]');
     var onsiteContainer = document.querySelector('[data-onsite-reviews]');
-    if (googleContainer) googleContainer.textContent = '';
-    if (googleContainer) googleContainer.appendChild(el('p', 'reviews-loading', 'Loading reviews…'));
+    if (summaryEl) summaryEl.textContent = '';
+    if (summaryEl) summaryEl.appendChild(el('p', 'reviews-loading', 'Loading rating…'));
     if (onsiteContainer) onsiteContainer.textContent = '';
     if (onsiteContainer) onsiteContainer.appendChild(el('p', 'reviews-loading', 'Loading reviews…'));
 
