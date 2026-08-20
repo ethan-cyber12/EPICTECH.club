@@ -182,7 +182,8 @@
     if (btn) btn.disabled = true;
     setStatus(form, 'Sending…', 'info');
 
-    fetch(ENDPOINT_BASE + '/review-intake', {
+    var endpoint = form.getAttribute('data-endpoint') || (ENDPOINT_BASE + '/review-intake');
+    fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
