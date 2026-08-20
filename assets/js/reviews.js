@@ -4,7 +4,6 @@
 
   var ENDPOINT_BASE = 'https://intake.epictech.club';
 
-  // ── Helpers (mirrors main.js's conventions) ─────────────────────────────
   function clean(value, max) {
     return String(value == null ? '' : value)
       .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
@@ -29,7 +28,6 @@
     return '★'.repeat(r) + '☆'.repeat(5 - r);
   }
 
-  // ── Render: Google summary + snippets ───────────────────────────────────
   function renderGoogle(google) {
     var container = document.querySelector('[data-google-reviews]');
     if (!container) return;
@@ -75,7 +73,6 @@
     }
   }
 
-  // ── Render: on-site reviews ──────────────────────────────────────────────
   function renderOnsite(reviews) {
     var container = document.querySelector('[data-onsite-reviews]');
     if (!container) return;
@@ -126,7 +123,6 @@
       });
   }
 
-  // ── Submission form ──────────────────────────────────────────────────────
   function setStatus(form, msg, kind) {
     var elStatus = form.querySelector('.form-status');
     if (!elStatus) {
@@ -151,7 +147,6 @@
     var form = event.currentTarget;
     var data = new FormData(form);
 
-    // Honeypot: pretend success without hitting the network.
     if (String(data.get('_hp') || '').length > 0) {
       setStatus(form, 'Thanks for your review.', 'ok');
       return;
@@ -214,7 +209,6 @@
     setStatus(form, msg, 'error');
   }
 
-  // ── Init ──────────────────────────────────────────────────────────────────
   function init() {
     loadReviews();
     var form = document.querySelector('[data-review-form]');
