@@ -35,12 +35,18 @@ into a small router (`/lead-intake` unchanged) and add:
   `sendEmail()` helper with the review content plus signed Approve/Reject
   links. Email failure returns 500 (fail loud, matches lead-intake — a review
   nobody gets notified about is as bad as a lost lead).
-- `GET /review-approve` / `GET /review-reject` — verifies an HMAC signature
-  over the review id using `crypto.subtle.verify` (constant-time, not a
-  manual string compare). Valid + found → moves `pending` → `published`
+- `GET|POST /review-approve` / `GET|POST /review-reject` — verifies an HMAC
+  signature over `id.action.expiresAt` using `crypto.subtle.verify`
+  (constant-time, action bound into the signature so the link can't be
+  replayed against the other action). **GET only renders a confirmation
+  page — it never mutates anything**, since email clients/security scanners
+  open links automatically via GET. Only a **POST** from that confirmation
+  page (re-verifying the same signature) moves `pending` → `published`
   (stripping email/client-hash, since published entries are public) or
   deletes it. Not found (already actioned, or past the 30-day TTL) → a plain
-  "already processed" HTML page, not an error.
+  "already processed" HTML page, not an error. If email delivery fails after
+  the pending KV record is written, the record is deleted before returning
+  500 (no orphaned un-notified pending reviews on retry).
 - `GET /reviews` — public. Returns published on-site reviews plus cached
   Google Places data (rating, total count, up to 5 snippets, and a
   `googleReviewUrl` built server-side from `GOOGLE_PLACE_ID` — so the
@@ -48,6 +54,11 @@ into a small router (`/lead-intake` unchanged) and add:
   from the Places API when it's >24h old; on API failure, serves the last
   good cache instead of erroring; if there's no cache yet, that field is
   simply omitted.
+
+Field limits enforced server-side: name 2–100 chars, email ≤254 chars, review
+text 10–2,000 chars, rating an integer 1–5, request body ≤16,000 bytes. The
+HTML notification email HTML-escapes every visitor-controlled value; the
+public page never uses `innerHTML` for review content either.
 
 New secrets/vars you'll need to add in Cloudflare (I won't ask you to paste
 these to me — add directly via `wrangler secret put` / the dashboard):
@@ -70,10 +81,11 @@ check, POST to `/review-intake`, show a "submitted — will appear once
 approved" message (must not imply it's live immediately).
 
 ## Task 5 — Nav + footer
-Add a "Reviews" link to `nav-links` and the footer `mini-links` on every page:
-`index.html`, `about.html`, `pricing.html`, `contact.html`,
-`services/index.html` and each `services/*.html`. `privacy.html` has no nav
-(minimal page) — leave it as-is.
+Add a "Reviews" link to `nav-links` on every page: `index.html`, `about.html`,
+`pricing.html`, `contact.html`, `services/index.html` and each
+`services/*.html`. Only `index.html` has a footer `mini-links` section (every
+other page's footer is link-free) — added there too. `privacy.html` has no
+nav (minimal page) — leave it as-is.
 
 ## Task 6 — CSS
 Add to `assets/css/styles.css`: a read-only star-rating display, an
