@@ -47,28 +47,84 @@
       <div class="container">
         <span class="eyebrow">What customers say</span>
         <h1>Reviews.</h1>
-        <p class="lead">Real feedback from small businesses we've worked with in Orlando and Central Florida &mdash; straight from Google and from clients directly.</p>
+        <p class="lead">Real feedback from small businesses we've worked with in Orlando and Central Florida, straight from Google and directly from clients.</p>
+        <div class="trust-strip">
+          <div class="pill"><strong>Verified only</strong><span class="muted">Every on-site review is checked before it goes live.</span></div>
+          <div class="pill"><strong>Real Google reviews</strong><span class="muted">Pulled directly from our Google Business Profile.</span></div>
+          <div class="pill"><strong>No fake reviews</strong><span class="muted">We never edit, filter, or buy reviews.</span></div>
+          <div class="pill"><strong>Veteran owned</strong><span class="muted">Family operated, Central Florida based.</span></div>
+        </div>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
-        <h2>Google reviews</h2>
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Google Business Profile</span>
+            <h2>Google reviews</h2>
+          </div>
+        </div>
+        <div class="card">
+          <div data-google-summary></div>
+          <p class="muted">Read our full review history or leave your own directly on Google.</p>
+          <a class="btn btn-secondary" data-google-link href="https://www.google.com/search?q=EPIC+TECH+LLC+Orlando+FL+reviews" rel="noopener" target="_blank">Find us on Google</a>
+        </div>
         <div data-google-reviews></div>
       </div>
     </section>
 
     <section class="section alt">
       <div class="container">
-        <h2>On-site reviews</h2>
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Straight from clients</span>
+            <h2>On-site reviews</h2>
+          </div>
+        </div>
+        <p class="lead">Submitted directly through this page by businesses we've worked with, and manually checked before they're posted.</p>
         <div data-onsite-reviews></div>
       </div>
     </section>
 
     <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Worked with us?</span>
+            <h2>Leave a review</h2>
+          </div>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <span class="step-number">1</span>
+            <div>
+              <strong>Write your review</strong>
+              <p class="muted">Fill out the form below with your name, a star rating, and a few honest sentences about your experience.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <div>
+              <strong>We check it</strong>
+              <p class="muted">Every submission is manually reviewed before it goes live, nothing posts automatically.</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <div>
+              <strong>It goes live</strong>
+              <p class="muted">Once approved, your review appears in the On-site reviews section above.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
       <div class="container grid-2">
         <form class="card" data-review-form data-endpoint="https://intake.epictech.club/review-intake" novalidate>
-          <h2>Leave a review</h2>
+          <h2>Submit your review</h2>
           <div class="hp-field" aria-hidden="true">
             <label for="review-hp-field">Website</label>
             <input type="text" id="review-hp-field" name="_hp" tabindex="-1" autocomplete="off" maxlength="100">
@@ -98,17 +154,17 @@
           </label>
           <div class="cf-turnstile" data-sitekey="0x4AAAAAADoX85vY2NYijBo-" data-theme="light"></div>
           <button class="btn btn-primary" type="submit">Submit review</button>
-          <p class="fine">Reviews are checked before they appear on this page. Your email is never shown publicly &mdash; it's only used if we need to verify or follow up.</p>
+          <p class="fine">Reviews are checked before they appear on this page. Your email is never shown publicly, it's only used if we need to verify or follow up.</p>
         </form>
 
         <div class="card">
           <h2>Why we ask</h2>
           <p class="muted">Real feedback helps other small business owners decide whether EPIC TECH is a fit, and it helps us know what's actually working.</p>
-          <ul>
-            <li>Every review is checked before it goes live &mdash; no auto-publishing.</li>
-            <li>We never share, sell, or publicly post your email address.</li>
-            <li>Prefer Google? Use the "Leave us a review on Google" button above instead.</li>
-          </ul>
+          <div class="status-list">
+            <div class="status-item"><span class="check">✓</span><div><strong>Manually checked</strong><br><span class="muted">Every review is checked before it goes live, no auto-publishing.</span></div></div>
+            <div class="status-item"><span class="check">✓</span><div><strong>Private by default</strong><br><span class="muted">We never share, sell, or publicly post your email address.</span></div></div>
+            <div class="status-item"><span class="check">✓</span><div><strong>Prefer Google?</strong><br><span class="muted">Use the "Find us on Google" button above instead.</span></div></div>
+          </div>
         </div>
       </div>
     </section>
