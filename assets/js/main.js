@@ -5,11 +5,53 @@
   // ── Navigation toggle ──────────────────────────────────────────────────
   var menuButton = document.querySelector('[data-menu-button]');
   var navLinks   = document.querySelector('[data-nav-links]');
+
+  function closeMenu(returnFocus) {
+    if (!navLinks || !navLinks.classList.contains('open')) return;
+    navLinks.classList.remove('open');
+    if (menuButton) {
+      menuButton.setAttribute('aria-expanded', 'false');
+      if (returnFocus) menuButton.focus();
+    }
+  }
+
   if (menuButton && navLinks) {
     menuButton.addEventListener('click', function () {
       var isOpen = navLinks.classList.toggle('open');
       menuButton.setAttribute('aria-expanded', String(isOpen));
     });
+
+    // Escape closes the menu and returns focus to the toggle button.
+    navLinks.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' || event.key === 'Esc') {
+        closeMenu(true);
+      }
+    });
+
+    // Selecting a link closes the menu (mobile only has room for one open
+    // panel at a time; leaving it open after navigation is disorienting).
+    navLinks.addEventListener('click', function (event) {
+      if (event.target && event.target.tagName === 'A') {
+        closeMenu(false);
+      }
+    });
+  }
+
+  // ── Active nav link ────────────────────────────────────────────────────
+  // Marks the current page's nav link with aria-current="page" without
+  // needing to hand-edit every page's markup.
+  function normalizePath(path) {
+    return path.replace(/index\.html$/, '') || '/';
+  }
+
+  if (navLinks) {
+    var here = normalizePath(location.pathname);
+    var links = navLinks.querySelectorAll('a[href]');
+    for (var li = 0; li < links.length; li++) {
+      if (normalizePath(links[li].pathname) === here) {
+        links[li].setAttribute('aria-current', 'page');
+      }
+    }
   }
 
   // ── Footer year ────────────────────────────────────────────────────────
