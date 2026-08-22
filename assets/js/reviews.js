@@ -48,7 +48,7 @@
     var status = google && google.status;
 
     if (!google || status === 'not_configured') {
-      if (summaryEl) summaryEl.appendChild(el('p', 'muted', 'Live star rating loads here once this business’s Google Business Profile is connected to the site.'));
+      if (summaryEl) summaryEl.appendChild(el('p', 'muted', 'Google reviews will appear here once this business’s Google Business Profile is connected. You can leave an on-site review below in the meantime.'));
       return;
     }
 
