@@ -38,20 +38,17 @@
     var summaryEl = document.querySelector('[data-google-summary]');
     var listEl = document.querySelector('[data-google-reviews]');
     var linkEl = document.querySelector('[data-google-link]');
-    var linkIntroEl = document.querySelector('[data-google-link-intro]');
     if (summaryEl) summaryEl.textContent = '';
     if (listEl) listEl.textContent = '';
-    // The link defaults to hidden with no href — it must never point to a
-    // guessed search query, since that can surface an unrelated business.
-    // It only becomes visible once the worker returns a real googleReviewUrl
-    // built from this business's actual configured Google Place ID.
-    if (linkEl) { linkEl.hidden = true; linkEl.removeAttribute('href'); }
-    if (linkIntroEl) linkIntroEl.hidden = true;
+    // linkEl already has a known-correct href baked into the static HTML
+    // (the business's actual Google review link). It's left alone here —
+    // never hidden, never cleared — and only upgraded below if the worker
+    // returns a different one from a connected Places API integration.
 
     var status = google && google.status;
 
     if (!google || status === 'not_configured') {
-      if (summaryEl) summaryEl.appendChild(el('p', 'muted', 'Google reviews will appear here once this business’s Google Business Profile is connected. You can leave an on-site review below in the meantime.'));
+      if (summaryEl) summaryEl.appendChild(el('p', 'muted', 'Live star rating loads here once this business’s Google Business Profile is connected to the site.'));
       return;
     }
 
@@ -69,13 +66,10 @@
       summaryEl.appendChild(summary);
     }
 
-    // The review URL only needs a connected Business Profile, not a
-    // successful rating fetch, so it upgrades in both "ok" and "degraded".
+    // If the worker has a live Places API integration configured, prefer
+    // its googleReviewUrl over the static fallback already in the HTML.
     if (linkEl && google.googleReviewUrl) {
       linkEl.href = google.googleReviewUrl;
-      linkEl.textContent = 'Leave us a review on Google';
-      linkEl.hidden = false;
-      if (linkIntroEl) linkIntroEl.hidden = false;
     }
 
     var list = google.reviews || [];
