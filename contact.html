@@ -58,7 +58,7 @@
         "name": "How much does a technology assessment cost?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Assessments and planning sessions start at $150 and include a written scope. See the pricing page for current packages."
+          "text": "A Technology Assessment is $249 and covers a network, website, or firewall review with a written plan. If you just need a written plan for a custom business app, the App Development Plan is a separate $150 service. See the pricing page for current packages."
         }
       }
     ]
@@ -75,7 +75,7 @@
       </a>
       <button class="menu-btn" data-menu-button aria-expanded="false">Menu</button>
       <nav class="nav-links" data-nav-links>
-        <a href="services/index.html">Services</a>
+        <a href="services/">Services</a>
         <a href="pricing.html">Pricing</a>
         <a href="about.html">About</a>
         <a href="reviews.html">Reviews</a>
@@ -88,14 +88,14 @@
     <section class="page-hero">
       <div class="container">
         <span class="eyebrow">Start here</span>
-        <h1>Schedule a technology assessment.</h1>
+        <h1>Schedule a technology assessment</h1>
         <p class="lead">Tell us what is going on and we will reply with the right next step. The more detail you include, the more useful our reply will be.</p>
       </div>
     </section>
 
     <section class="section">
       <div class="container grid-2">
-        <form class="card" data-intake-form data-endpoint="https://intake.epictech.club/lead-intake" novalidate>
+        <form class="card" data-intake-form method="post" action="contact.html" data-endpoint="https://intake.epictech.club/lead-intake" novalidate>
           <div class="hp-field" aria-hidden="true">
             <label for="hp-field">Website</label>
             <input type="text" id="hp-field" name="_hp" tabindex="-1" autocomplete="off" maxlength="100">
@@ -194,13 +194,28 @@
         <p>No. Most small businesses start with a single assessment or project. Monthly care plans are optional and only added if ongoing support makes sense for you.</p>
 
         <h3>How much does a technology assessment cost?</h3>
-        <p>Assessments and planning sessions start at $150 and include a written scope. See the <a href="pricing.html">pricing page</a> for current packages.</p>
+        <p>A Technology Assessment is $249 and covers a network, website, or firewall review with a written plan. If you only need a written plan for a custom business app, that's a separate $150 App Development Plan. See the <a href="pricing.html">pricing page</a> for current packages.</p>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="container">© <span data-year></span> EPIC TECH LLC<br><span class="fine">Serving Orlando, Winter Park, and Central Florida</span></div>
+    <div class="container footer-grid">
+    <div>
+      <strong>EPIC TECH LLC</strong><br>
+      <span class="fine">Serving Orlando, Winter Park, and Central Florida.</span><br>
+      <span class="fine">© <span data-year></span> EPIC TECH LLC</span>
+    </div>
+    <div class="mini-links">
+      <a href="services/">Services</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="about.html">About</a>
+      <a href="reviews.html">Reviews</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="mailto:info@epictech.club">info@epictech.club</a>
+    </div>
+  </div>
   </footer>
 
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
