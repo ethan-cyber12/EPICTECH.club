@@ -28,19 +28,36 @@
     return '★'.repeat(r) + '☆'.repeat(5 - r);
   }
 
+  // google is always an object (never null) with a status field:
+  //   "ok"             -> rating/snippets loaded, googleReviewUrl set
+  //   "degraded"       -> Google Business Profile is connected (a review URL
+  //                       exists) but the rating/snippet fetch failed or
+  //                       isn't fully set up yet
+  //   "not_configured" -> no Google Business Profile connected at all
   function renderGoogle(google) {
     var summaryEl = document.querySelector('[data-google-summary]');
     var listEl = document.querySelector('[data-google-reviews]');
     var linkEl = document.querySelector('[data-google-link]');
+    var linkIntroEl = document.querySelector('[data-google-link-intro]');
     if (summaryEl) summaryEl.textContent = '';
     if (listEl) listEl.textContent = '';
+    // The link defaults to hidden with no href — it must never point to a
+    // guessed search query, since that can surface an unrelated business.
+    // It only becomes visible once the worker returns a real googleReviewUrl
+    // built from this business's actual configured Google Place ID.
+    if (linkEl) { linkEl.hidden = true; linkEl.removeAttribute('href'); }
+    if (linkIntroEl) linkIntroEl.hidden = true;
 
-    if (!google) {
-      if (summaryEl) summaryEl.appendChild(el('p', 'muted', 'Live rating loads here once connected to our Google Business Profile.'));
+    var status = google && google.status;
+
+    if (!google || status === 'not_configured') {
+      if (summaryEl) summaryEl.appendChild(el('p', 'muted', 'Google reviews will appear here once this business’s Google Business Profile is connected. You can leave an on-site review below in the meantime.'));
       return;
     }
 
-    if (summaryEl) {
+    if (status === 'degraded') {
+      if (summaryEl) summaryEl.appendChild(el('p', 'muted', 'Star rating and recent reviews are temporarily unavailable.'));
+    } else if (summaryEl) {
       var summary = el('div', 'reviews-summary');
       if (typeof google.rating === 'number') {
         summary.appendChild(el('span', 'rating-number', google.rating.toFixed(1)));
@@ -52,9 +69,13 @@
       summaryEl.appendChild(summary);
     }
 
+    // The review URL only needs a connected Business Profile, not a
+    // successful rating fetch, so it upgrades in both "ok" and "degraded".
     if (linkEl && google.googleReviewUrl) {
       linkEl.href = google.googleReviewUrl;
       linkEl.textContent = 'Leave us a review on Google';
+      linkEl.hidden = false;
+      if (linkIntroEl) linkIntroEl.hidden = false;
     }
 
     var list = google.reviews || [];
@@ -121,8 +142,19 @@
         renderOnsite(data && data.onsite);
       })
       .catch(function () {
-        renderGoogle(null);
-        renderOnsite([]);
+        // The whole request failed (network/CORS/5xx) — distinct from
+        // "not configured yet," which is a normal, expected response state.
+        if (summaryEl) {
+          summaryEl.textContent = '';
+          summaryEl.appendChild(el('p', 'muted', 'Reviews could not be loaded right now. Please refresh the page.'));
+        }
+        if (onsiteContainer) {
+          onsiteContainer.textContent = '';
+          var failCard = el('div', 'card reviews-empty');
+          failCard.appendChild(el('p', null, 'Reviews could not be loaded right now.'));
+          failCard.appendChild(el('p', 'muted', 'Please refresh the page.'));
+          onsiteContainer.appendChild(failCard);
+        }
       });
   }
 
@@ -159,10 +191,15 @@
     var email = clean(data.get('email'), 254);
     var rating = parseInt(data.get('rating'), 10);
     var text = clean(data.get('text'), 2000);
+    var starInput = form.querySelector('.star-input');
 
     if (name.length < 2) { return fail(form, 'Please enter your name (at least 2 characters).'); }
     if (!isValidEmail(email)) { return fail(form, 'Please enter a valid email address.'); }
-    if (!(rating >= 1 && rating <= 5)) { return fail(form, 'Please choose a star rating.'); }
+    if (!(rating >= 1 && rating <= 5)) {
+      if (starInput) starInput.classList.add('invalid');
+      return fail(form, 'Please choose a star rating.');
+    }
+    if (starInput) starInput.classList.remove('invalid');
     if (text.length < 10) { return fail(form, 'Please write a bit more detail (at least 10 characters).'); }
 
     var tokenEl = form.querySelector('[name="cf-turnstile-response"]');
