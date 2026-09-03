@@ -1,10 +1,10 @@
-# Local release verification — 2026-09-02
+# Local release verification — 2026-09-03
 
 - Branch: `codex/epictech-founder-led-redesign-handoff`
-- Working-tree base: `06efec3` (`feat: package EPICTECH redesign for remote handoff`)
+- Verified release-candidate HEAD: `373d200` (`chore: harden EPICTECH publication candidate`)
 - Merge base with `origin/main`: `c10c8bd2677a22b2dac299cdb7caba72a4b6e7fc`
 - Scope: the current base plus the listed local release-hardening changes and `http://127.0.0.1:4173` preview
-- Working tree: intentionally modified at the time of this record; the new CI, public-artifact, security, and accessibility changes are ready for transfer to the existing feature branch but are not merged or published
+- Working tree: clean after the new CI, public-artifact, security, and accessibility changes were committed and pushed to the existing feature branch; they are not merged or published
 - Local decision: the site passes its local build and release contracts. Production publication remains blocked by the owner, edge-header, deployment-binding, and live-service gates below.
 
 No live form was submitted, and no Cloudflare setting, search engine, validator, bot log, deployment target, `main` branch, or production service was changed. The owner authorized transfer of this release candidate to the existing remote feature branch; merge and deployment remain separate gates. Current browser work used localhost; the historical review-feed observation below remains read-only evidence from the earlier task.
@@ -133,7 +133,7 @@ The scan cannot verify the out-of-repository intake Worker's server-side Turnsti
 ### Authenticated GitHub repository evidence
 
 - Repository: `ethan-cyber12/EPICTECH.club`; authenticated access has admin, maintain, push, pull, and triage permission.
-- The current feature branch is directly based on the current `main`: ahead by one committed handoff commit and behind by zero before the local release-hardening transfer.
+- The current feature branch is directly based on the current `main`: ahead by two commits and behind by zero after the release-hardening transfer.
 - `main` reports `protected: false`; the repository exposes no rulesets and no required status checks. Establish branch protection or a repository ruleset with the release and security checks required before merging this publication candidate.
 - No open pull request exists for the current feature branch at the time of inspection.
 - `claude/content-alignment-positioning` is stale and diverged (ahead 1, behind 28) and deletes two service pages; `claude/epic-tech-seo-audit-3150v7` has no unique commits and is behind 29. Neither branch is a safe architecture source for this transfer, so neither was merged.
@@ -141,7 +141,7 @@ The scan cannot verify the out-of-repository intake Worker's server-side Turnsti
 
 ### Branch evidence
 
-`git diff --shortstat origin/main...HEAD` reported **162 files changed, 14,384 insertions, and 508 deletions** for committed work through base `06efec3`. The current release-hardening changes are additional uncommitted work and are intentionally reported separately by `git status`.
+`git diff --shortstat origin/main...HEAD` reported **170 files changed, 15,106 insertions, and 510 deletions** for committed work through `373d200`. `git status --short --branch` reported a clean working tree synchronized with `origin/codex/epictech-founder-led-redesign-handoff`.
 
 Relevant task-sized commit sequence from case studies through the security runbook:
 
@@ -159,7 +159,7 @@ Relevant task-sized commit sequence from case studies through the security runbo
 - [ ] **Privacy retention/deletion wording:** the owner must confirm that the drafted operational statement in `privacy.html` is true before publication. No fixed retention period or unsupported deletion promise was invented.
 - [ ] **Effective anti-framing protection:** before launch, activate and verify the documented enforcing response CSP with `frame-ancestors 'none'` and `X-Frame-Options: DENY` on Contact and Reviews. Report-Only CSP does not satisfy this gate.
 - [ ] **Deploy only the allowlisted artifact:** production must consume generated `_site`, never the repository root. Bind the approval record to the intended Git account, target, revision, and artifact digest.
-- [ ] **Merge and publication:** the release candidate may be transferred to its existing feature branch under the current authorization. Pull-request creation, merge, deployment, and production publication remain separate actions and were not performed.
+- [ ] **Merge and publication:** the release candidate was transferred to its existing feature branch under the current authorization. Pull-request creation, merge, deployment, and production publication remain separate actions and were not performed.
 - [ ] **Protected merge path:** configure branch protection or a repository ruleset for `main` and require the release/security checks before merging; `main` is currently unprotected and has no required checks.
 - [x] **Security workflow supply chain:** the unhashed pip-resolved Semgrep dependency closure was replaced with the official versioned image pinned by immutable OCI digest.
 - [ ] **Canonical redirects:** activate the documented permanent redirects only after authorization, then verify their production status, destination, and order.
