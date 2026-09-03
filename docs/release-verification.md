@@ -156,7 +156,7 @@ Relevant task-sized commit sequence from case studies through the security runbo
 
 ## Pending owner, live, and external gates
 
-- [ ] **Privacy retention/deletion wording:** the owner must confirm that the drafted operational statement in `privacy.html` is true before publication. No fixed retention period or unsupported deletion promise was invented.
+- [x] **Privacy retention/deletion wording:** the owner confirmed on 2026-09-02 (America/Los_Angeles) that the existing `privacy.html` statement reflects current operations. No fixed retention period or unsupported deletion promise was added.
 - [ ] **Effective anti-framing protection:** before launch, activate and verify the documented enforcing response CSP with `frame-ancestors 'none'` and `X-Frame-Options: DENY` on Contact and Reviews. Report-Only CSP does not satisfy this gate.
 - [ ] **Deploy only the allowlisted artifact:** production must consume generated `_site`, never the repository root. Bind the approval record to the intended Git account, target, revision, and artifact digest.
 - [ ] **Merge and publication:** the release candidate was transferred to its existing feature branch under the current authorization. Pull-request creation, merge, deployment, and production publication remain separate actions and were not performed.
@@ -176,4 +176,4 @@ Relevant task-sized commit sequence from case studies through the security runbo
 
 ## Publication gate
 
-Do not merge or publish this branch until the owner confirms the Privacy retention/deletion statement, production is configured to deploy only `_site`, the Contact/Reviews anti-framing response headers are enforced and verified, the intake Worker controls are reviewed, and the intended merge/deployment action is separately authorized. Cloudflare activation, live form/review tests, redirects, validators, search submissions, performance measurement, and production verification remain separate staged actions; this local record grants no authority to perform them.
+Do not merge or publish this branch until production is configured to deploy only `_site`, the Contact/Reviews anti-framing response headers are enforced and verified, the intake Worker controls are reviewed, and the intended merge/deployment action is separately authorized. The owner has confirmed the Privacy retention/deletion statement. Cloudflare activation, live form/review tests, redirects, validators, search submissions, performance measurement, and production verification remain separate staged actions; this local record grants no authority to perform them.
