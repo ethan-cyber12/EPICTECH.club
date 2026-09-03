@@ -86,7 +86,7 @@ Before creating or enabling anything, export or record all existing configuratio
 - Existing redirects and redirect order.
 - WAF and custom rules.
 - Bot Fight Mode or Bot Management.
-- AI Crawl Control and verified-bot settings.
+- Crawler controls and verified-bot settings.
 - DNS and proxy status for every hostname.
 - Record every subdomain's HTTPS capability, including the intake service.
 - Cloudflare Trace and evaluation-order evidence for redirects, transforms, and relevant security rules.

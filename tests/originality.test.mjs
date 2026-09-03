@@ -56,7 +56,7 @@ test('recorder hashes masters and scopes external review to recorded evidence', 
   });
 
   assert.equal(manifest.schemaVersion, 1);
-  assert.equal(manifest.generationTool, 'OpenAI ImageGen');
+  assert.equal(manifest.generationMethod, 'documented-original-workflow');
   assert.deepEqual(manifest.assets[0], {
     id: 'sample',
     privateMasterName: 'sample-master.png',
@@ -104,7 +104,7 @@ function reviewedAsset(id, sourceSha256, differenceHashValue, reverseImageSearch
 test('verifier rejects duplicate source hashes', async () => {
   const manifest = {
     schemaVersion: 1,
-    generationTool: 'OpenAI ImageGen',
+    generationMethod: 'documented-original-workflow',
     assets: [
       reviewedAsset('first', 'a'.repeat(64), '0000000000000000'),
       reviewedAsset('second', 'a'.repeat(64), 'ffffffffffffffff')
@@ -120,7 +120,7 @@ test('verifier rejects duplicate source hashes', async () => {
 test('verifier rejects perceptual hashes less than 12 bits apart', async () => {
   const manifest = {
     schemaVersion: 1,
-    generationTool: 'OpenAI ImageGen',
+    generationMethod: 'documented-original-workflow',
     assets: [
       reviewedAsset('first', 'a'.repeat(64), '0000000000000000'),
       reviewedAsset('second', 'b'.repeat(64), '0000000000000001')
@@ -136,7 +136,7 @@ test('verifier rejects perceptual hashes less than 12 bits apart', async () => {
 test('verifier accepts complete review records at or above the distance gate', async () => {
   const manifest = {
     schemaVersion: 1,
-    generationTool: 'OpenAI ImageGen',
+    generationMethod: 'documented-original-workflow',
     assets: [
       reviewedAsset('first', 'a'.repeat(64), '0000000000000000'),
       reviewedAsset('second', 'b'.repeat(64), '0000000000000fff')
@@ -157,7 +157,7 @@ test('verifier accepts complete review records at or above the distance gate', a
 test('verifier rejects an unrecognized external-review claim', async () => {
   const manifest = {
     schemaVersion: 1,
-    generationTool: 'OpenAI ImageGen',
+    generationMethod: 'documented-original-workflow',
     assets: [reviewedAsset('first', 'a'.repeat(64), '0000000000000000', {
       googleLens: 'assumed-clear',
       bingVisualSearch: 'not-performed-user-opt-out'

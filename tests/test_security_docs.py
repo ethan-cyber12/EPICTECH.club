@@ -139,7 +139,7 @@ class SecurityDocumentationTests(unittest.TestCase):
             "redirects and redirect order",
             "WAF and custom rules",
             "Bot Fight Mode or Bot Management",
-            "AI Crawl Control",
+            "Crawler controls",
             "verified-bot settings",
             "DNS and proxy status",
             "every subdomain's HTTPS capability",

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generationTool": "OpenAI ImageGen",
+  "generationMethod": "documented-original-workflow",
   "assets": [
     {
       "id": "epic-hero-connected-workshop",

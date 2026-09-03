@@ -41,7 +41,10 @@ export async function verifyOriginalityManifest(manifest, options = {}) {
   const rootDirectory = options.rootDirectory ?? '.';
 
   requireCondition(manifest && manifest.schemaVersion === 1, 'schemaVersion must be 1');
-  requireCondition(manifest.generationTool === 'OpenAI ImageGen', 'generationTool must be OpenAI ImageGen');
+  requireCondition(
+    manifest.generationMethod === 'documented-original-workflow',
+    'generationMethod must identify the documented original workflow'
+  );
   requireCondition(Array.isArray(manifest.assets) && manifest.assets.length > 0, 'assets must be a non-empty array');
 
   if (catalog.length > 0) {

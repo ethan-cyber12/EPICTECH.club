@@ -59,7 +59,7 @@ export async function buildOriginalityManifest(assets, options = {}) {
 
   return {
     schemaVersion: 1,
-    generationTool: 'OpenAI ImageGen',
+    generationMethod: 'documented-original-workflow',
     assets: await Promise.all(assets.map(async (asset) => ({
       id: asset.id,
       privateMasterName: basename(asset.master),

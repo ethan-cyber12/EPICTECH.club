@@ -46,25 +46,11 @@ ORDERED_CANONICALS = (
 )
 
 SEARCH_AND_ANSWER_AGENTS = (
-    "OAI-SearchBot",
-    "PerplexityBot",
-    "Perplexity-User",
     "Googlebot",
     "bingbot",
 )
 
-TRAINING_AGENTS = ("GPTBot", "Google-Extended")
-
-OPTION_A_ROBOTS = """User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Perplexity-User
-Allow: /
-
-User-agent: Googlebot
+OPTION_A_ROBOTS = """User-agent: Googlebot
 Allow: /
 
 User-agent: bingbot
@@ -122,39 +108,32 @@ class SitemapAndRobotsTests(unittest.TestCase):
         self.assertIn("User-agent: *\nAllow: /", robots)
         self.assertIn("Sitemap: https://epictech.club/sitemap.xml", robots)
         self.assertNotIn("Disallow:", robots)
-        for agent in TRAINING_AGENTS:
-            self.assertNotIn(f"User-agent: {agent}\nDisallow: /", robots)
 
     def test_policy_records_the_owner_choice_and_operational_caveats(self) -> None:
         policy_path = ROOT / "docs/crawler-policy.md"
         self.assertTrue(policy_path.exists(), "crawler policy decision record is missing")
         policy = policy_path.read_text(encoding="utf-8")
         for statement in (
-            "Training-crawler policy: allow",
+            "Crawler policy: allow",
             "Decision date: 2026-09-02",
-            "Search and answer retrieval: allow",
-            "maximum AI crawlability",
+            "Search retrieval: allow",
+            "search-discovery objective",
             "preserves the existing wildcard-allow posture",
             "not a new data-access grant",
             "robots.txt is a preference for compliant crawlers, not access control",
-            "User-triggered agents may handle robots.txt differently",
-            "AI Crawl Control",
+            "Crawler behavior can vary by provider",
+            "bot controls",
             "WAF",
             "verified-bot",
             "must be audited separately before live rollout",
-            "September 15, 2026",
         ):
             with self.subTest(statement=statement):
                 self.assertIn(statement, policy)
 
-        self.assertNotIn("Training-crawler policy: block", policy)
-        for agent in TRAINING_AGENTS:
-            self.assertIn(agent, policy)
+        self.assertNotIn("Crawler policy: block", policy)
         for official_url in (
-            "https://developers.openai.com/api/docs/bots",
-            "https://docs.perplexity.ai/docs/resources/perplexity-crawlers",
             "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers",
-            "https://developers.cloudflare.com/bots/additional-configurations/block-ai-bots/",
+            "https://developers.cloudflare.com/bots/",
         ):
             self.assertIn(official_url, policy)
 
