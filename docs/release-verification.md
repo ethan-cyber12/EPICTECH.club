@@ -1,13 +1,13 @@
 # Local release verification — 2026-09-02
 
-- Branch: `codex/epictech-founder-led-redesign-implementation`
-- Verified implementation HEAD: `04e884c` (`docs: stage Cloudflare security headers safely`)
+- Branch: `codex/epictech-founder-led-redesign-handoff`
+- Working-tree base: `06efec3` (`feat: package EPICTECH redesign for remote handoff`)
 - Merge base with `origin/main`: `c10c8bd2677a22b2dac299cdb7caba72a4b6e7fc`
-- Scope: local files and the already-running `http://127.0.0.1:4173` preview only
-- Starting worktree: clean (`git status --short --branch` showed only the branch line)
-- Local decision: the checked implementation passes its local release contracts. Publication remains blocked by the owner and live-service gates listed below.
+- Scope: the current base plus the listed local release-hardening changes and `http://127.0.0.1:4173` preview
+- Working tree: intentionally modified at the time of this record; the new CI, public-artifact, security, and accessibility changes are ready for transfer to the existing feature branch but are not merged or published
+- Local decision: the site passes its local build and release contracts. Production publication remains blocked by the owner, edge-header, deployment-binding, and live-service gates below.
 
-No live site, external form, review service, Cloudflare setting, search engine, validator, bot log, deployment target, or remote Git branch was contacted or changed for this verification.
+No live form was submitted, and no Cloudflare setting, search engine, validator, bot log, deployment target, `main` branch, or production service was changed. The owner authorized transfer of this release candidate to the existing remote feature branch; merge and deployment remain separate gates. Current browser work used localhost; the historical review-feed observation below remains read-only evidence from the earlier task.
 
 ## Completed local evidence
 
@@ -15,11 +15,15 @@ No live site, external form, review service, Cloudflare setting, search engine, 
 
 | Check | Exact command | Observed result |
 | --- | --- | --- |
-| Full Python contract suite | `/Users/ethanplatt/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 -m unittest discover -s tests -p 'test_*.py' -q` | PASS: 97 tests, 0 failures/errors |
-| Node media suite | `npm run test:media` | PASS: 27 tests, 0 failures/skips |
+| Full Python contract suite | `python -m unittest discover -s tests -p 'test_*.py' -q` | PASS: 104 tests, 0 failures/errors |
+| Node media and public-artifact suite | `npm run test:media` | PASS: 28 tests, 0 failures/skips |
 | Published-media verification | `npm run media:verify` | PASS: 15 founder files, 54 service visuals, 2 social files, 54 service hashes, 0 privacy findings |
-| Originality gate | `npm run media:originality` | PASS: 9 reviewed originals, minimum pairwise distance 15, 9 private masters and 54 public derivatives verified; the record honestly retains 16 user-opt-out reviews rather than claiming they occurred |
-| Dependency audit | `npm audit --offline --audit-level=high` | PASS: 0 vulnerabilities found from the installed dependency state; no network or package installation used |
+| Originality gate | `npm run media:originality` | PASS: 9 reviewed originals, minimum pairwise distance 15, 0 private masters present in this clone, 54 public derivatives verified; the record honestly retains the opt-out evidence |
+| Allowlisted deployment build | `npm run site:build` | PASS: 117 public files copied to `_site`; source-only and development paths are rejected by contract tests |
+| Dependency audit | `npm audit --audit-level=high` | PASS: 0 vulnerabilities |
+| Secret scan | `gitleaks dir .` and `gitleaks git .` using the pinned workflow version | PASS: 0 findings in the current tree and Git history; synthetic test fixtures are narrowly allowlisted |
+| Repository vulnerability/misconfiguration scan | Trivy cached/offline high/critical vulnerability, secret, and misconfiguration scan | PASS: 0 findings; CycloneDX SBOM generated |
+| Standard Codex Security scan | Whole-repository, source-backed scan with independent validation | COMPLETE: 2 Low findings, 0 Critical/High/Medium findings |
 | JavaScript syntax | `node --check assets/js/main.js`, `node --check assets/js/qualification.js`, `node --check assets/js/reviews.js` | PASS: all three exit 0 |
 | Sitemap XML | `xmllint --noout sitemap.xml` | PASS: well-formed XML |
 | Repository JSON | `/Users/ethanplatt/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 -c 'import json,pathlib; skip={".git","node_modules",".superpowers",".private-media","__pycache__"}; files=[p for p in pathlib.Path(".").rglob("*.json") if not (set(p.parts)&skip)]; [json.load(p.open(encoding="utf-8")) for p in files]; print(f"PASS JSON: {len(files)} files parsed")'` | PASS: 5 JSON files parsed |
@@ -41,7 +45,7 @@ The sitemap contains exactly 25 canonical page URLs, all substantively updated b
 
 The crawler policy explicitly allows the approved search/answer groups (`OAI-SearchBot`, `ChatGPT-User`, `Claude-SearchBot`, `Claude-User`, `PerplexityBot`, `Perplexity-User`, `Googlebot`, and `bingbot`), then applies wildcard `Allow: /` and publishes the sitemap URL. Training-crawler policy is allow, with no training-agent `Disallow`. This is a preference for compliant crawlers; `robots.txt` is **not access control** and cannot guarantee crawling, indexing, citation, or model training.
 
-For each route below, the local smoke used `curl -sS -o /dev/null -w '%{http_code} %{content_type}' 'http://127.0.0.1:4173<route>'`, then required status `200` and the expected content type.
+For each route below, the final local smoke served the generated `_site` artifact at `http://127.0.0.1:4173`, requested the route with PowerShell `Invoke-WebRequest`, and required status `200`. Content types were checked against the platform's known Python-server mappings; production MIME values remain a live-host gate.
 
 HTML routes — PASS 25/25 as `200 text/html`:
 
@@ -52,7 +56,7 @@ HTML routes — PASS 25/25 as `200 text/html`:
 Discovery files — PASS 2/2:
 
 - `/robots.txt`: `200 text/plain`
-- `/sitemap.xml`: `200 application/xml`
+- `/sitemap.xml`: `200 text/xml` from the Windows Python preview server (production should serve an XML media type)
 
 Public PDFs — PASS 8/8 as `200 application/pdf`:
 
@@ -68,9 +72,9 @@ Public PDFs — PASS 8/8 as `200 application/pdf`:
 Representative responsive media — PASS 2/2:
 
 - `/assets/images/service-visuals/epic-hero-connected-workshop-1920.avif`: `200 image/avif`
-- `/assets/images/service-visuals/epic-hero-connected-workshop-1920.webp`: `200 image/webp`
+- `/assets/images/service-visuals/epic-hero-connected-workshop-1920.webp`: `200 application/octet-stream` from the Windows Python preview server (production must serve `image/webp`)
 
-Total local route/media smoke: **37/37** expected resources returned status 200 and the expected content type. This proves only the local preview behavior; it does not prove production routing or headers.
+Total allowlisted-artifact route/media smoke: **37/37** expected resources returned status 200. Thirty-five used their exact expected media type; the Windows Python preview server used the two documented MIME fallbacks above. This proves artifact completeness, not production routing, MIME configuration, or headers.
 
 ### Browser evidence already observed
 
@@ -79,6 +83,8 @@ Total local route/media smoke: **37/37** expected resources returned status 200 
 - Privacy: 1280 and 360 px passed. Desktop reading width was 820 px; all five sections and the ordinary email link were visible; neither width overflowed; console warnings/errors were empty. At 360 px the menu opened with `aria-expanded="true"`, Escape closed it with `aria-expanded="false"`, focus returned to the menu button, and the visible focus outline was solid.
 - Contact and Reviews were visually rerun from the active branch at desktop width after their approved redesign. The assessment hero, protected form, process guide, WhatsApp band, FAQ, review trust rail, live-proof areas, accessible rating fieldset, and review assurance panel rendered without horizontal overflow. No form or review submission was sent.
 - A read-only request to the existing public reviews endpoint confirmed that the approved First Option Insulation review remains the single on-site review. The page continues to retrieve that review dynamically; no customer quote, name, or rating was invented or copied into static markup.
+- Current-head browser rerun: homepage, pricing, Contact, Reviews, and Cloud Security & Automation passed at 1280 px and 390 px with no horizontal overflow or broken images. The mobile menu opens below the header with `aria-expanded="true"`. Pricing exposes the corrected heading hierarchy, and the case study exposes its canonical social metadata and high-priority hero. The local Reviews feed displayed its expected unavailable state because the production intake service is outside the local preview; no live request or submission was used as release evidence.
+- Final local Lighthouse 13.4.1 on the generated homepage scored Performance 100, Accessibility 100, Best Practices 96, and SEO 100, with FCP 0.9 s, LCP 1.4 s, TBT 0 ms, and CLS 0. The earlier missing-favicon request was removed by declaring the approved WebP logo on all 25 public pages. The remaining console item is the expected warning that `frame-ancestors` is ignored in a meta CSP; verified production response headers remain the required remedy.
 
 These viewport and local-browser observations are not field performance measurements and do not prove Core Web Vitals.
 
@@ -113,9 +119,29 @@ The local checks confirm that the Contact and Reviews endpoints, Turnstile origi
   - Websites → Secure Website & Application Practices
 - Each service detail retains exactly one mapped HTML proof link and two mapped related-service links. All eight case-study companions link their corresponding original PDF and service destination, and all local targets resolve.
 
+### Security review outcome
+
+The standard Codex Security scan completed against the stabilized source snapshot with complete repository coverage. It validated two Low-severity findings and no Critical, High, or Medium findings:
+
+- `contact.html` and `reviews.html` currently place `frame-ancestors 'none'` only in meta-delivered CSP. Browsers ignore `frame-ancestors` in a meta policy, so anti-framing is not effective until the documented HTTP response CSP and `X-Frame-Options: DENY` are activated at the edge. The attack requires a tailored lure, victim interaction, and Turnstile completion; this limits severity but does not remove the publication gate.
+- The scan snapshot found that `.github/workflows/security-baseline.yml` installed the exact Semgrep version `1.172.0` while pip still resolved its transitive dependency closure without hashes. The transfer candidate remediates this by running the official `semgrep/semgrep:1.172.0` image pinned to immutable OCI digest `sha256:65dcd4408adda7c183a6b4550cb1e9b19f7f627a6fbb7e0559bd466bedc44d7b`; the mutable pip-resolution step and Python setup were removed.
+
+The scan found no source-backed injection, traversal, unsafe parsing, upload, secret-exposure, or dependency vulnerability. The direct assignment of a backend-provided Google review URL remains an external trust-boundary hardening item because the intake implementation is not in this repository; it is not reported as a confirmed vulnerability.
+
+The scan cannot verify the out-of-repository intake Worker's server-side Turnstile validation, hostname/action binding, token freshness/replay handling, schemas and body limits, rate controls, CORS, storage, logging, moderation, or retention. No separate intake/Turnstile repository was visible in the authenticated GitHub account during this review. These are production-readiness checks, not assumed failures.
+
+### Authenticated GitHub repository evidence
+
+- Repository: `ethan-cyber12/EPICTECH.club`; authenticated access has admin, maintain, push, pull, and triage permission.
+- The current feature branch is directly based on the current `main`: ahead by one committed handoff commit and behind by zero before the local release-hardening transfer.
+- `main` reports `protected: false`; the repository exposes no rulesets and no required status checks. Establish branch protection or a repository ruleset with the release and security checks required before merging this publication candidate.
+- No open pull request exists for the current feature branch at the time of inspection.
+- `claude/content-alignment-positioning` is stale and diverged (ahead 1, behind 28) and deletes two service pages; `claude/epic-tech-seo-audit-3150v7` has no unique commits and is behind 29. Neither branch is a safe architecture source for this transfer, so neither was merged.
+- GitHub Pages settings could not be independently read through the authenticated repository connector. The browser session available to this task was not signed in and GitHub CLI is not installed, so the publication source remains an explicit owner/deployment gate rather than an inferred fact.
+
 ### Branch evidence
 
-Before adding this evidence-only document, `git diff --shortstat origin/main...04e884c` reported **161 files changed, 13,861 insertions, and 436 deletions**. The implementation range is based on merge base `c10c8bd2677a22b2dac299cdb7caba72a4b6e7fc`; this count intentionally excludes the present evidence record.
+`git diff --shortstat origin/main...HEAD` reported **162 files changed, 14,384 insertions, and 508 deletions** for committed work through base `06efec3`. The current release-hardening changes are additional uncommitted work and are intentionally reported separately by `git status`.
 
 Relevant task-sized commit sequence from case studies through the security runbook:
 
@@ -131,7 +157,11 @@ Relevant task-sized commit sequence from case studies through the security runbo
 ## Pending owner, live, and external gates
 
 - [ ] **Privacy retention/deletion wording:** the owner must confirm that the drafted operational statement in `privacy.html` is true before publication. No fixed retention period or unsupported deletion promise was invented.
-- [ ] **Deployment/Git publication:** push, pull request, merge, deployment, and production publication require separate authorization and were not performed.
+- [ ] **Effective anti-framing protection:** before launch, activate and verify the documented enforcing response CSP with `frame-ancestors 'none'` and `X-Frame-Options: DENY` on Contact and Reviews. Report-Only CSP does not satisfy this gate.
+- [ ] **Deploy only the allowlisted artifact:** production must consume generated `_site`, never the repository root. Bind the approval record to the intended Git account, target, revision, and artifact digest.
+- [ ] **Merge and publication:** the release candidate may be transferred to its existing feature branch under the current authorization. Pull-request creation, merge, deployment, and production publication remain separate actions and were not performed.
+- [ ] **Protected merge path:** configure branch protection or a repository ruleset for `main` and require the release/security checks before merging; `main` is currently unprotected and has no required checks.
+- [x] **Security workflow supply chain:** the unhashed pip-resolved Semgrep dependency closure was replaced with the official versioned image pinned by immutable OCI digest.
 - [ ] **Canonical redirects:** activate the documented permanent redirects only after authorization, then verify their production status, destination, and order.
 - [ ] **Cloudflare Stage 0 — inventory:** record existing transforms, headers, HSTS, redirects, WAF/bot/AI controls, DNS/proxy state, subdomain HTTPS support, overlaps, and Trace order before creating rules.
 - [ ] **Cloudflare Stage 1 — report only:** after separate owner approval, create disabled/reviewed rules and then test the exact report-only CSP, base headers, PDF header, consoles, and critical flows.
@@ -139,10 +169,11 @@ Relevant task-sized commit sequence from case studies through the security runbo
 - [ ] **Cloudflare Stage 3 — meta-CSP deduplication:** only after verified enforcement, make a separate code/deployment change for non-protected pages; Contact and Reviews remain protected.
 - [ ] **Live response evidence:** production HTML security headers, PDF `X-Robots-Tag: noindex, follow`, Cloudflare Trace, and verified-bot logs remain unchecked because live Cloudflare/network work was outside this task.
 - [ ] **Contact/Reviews integrations:** contact submission, review retrieval, review submission, Turnstile, intake endpoints, and WhatsApp external-side-effect checks require specific live-test authorization and were not exercised.
+- [ ] **Intake backend controls:** inspect or independently attest the deployed Worker for server-side Siteverify, hostname/action checks, schemas and request limits, rate controls, CORS, safe storage/logging, moderation, access control, and the stated retention/deletion practice.
 - [ ] **External schema/search validation:** Schema.org Validator, Google Rich Results, Search Console, Bing Webmaster Tools, sitemap submission, and index inspection were not contacted. Local schema parsing is not a substitute.
-- [ ] **Performance:** no Lighthouse executable is installed locally, and packages were not downloaded. Live Lighthouse/PageSpeed and field Core Web Vitals remain pending; viewport checks are not performance evidence.
-- [ ] **Final representative browser rerun:** the in-app browser was unavailable during this final task. Earlier completed-task browser evidence is recorded above, but this item remains unchecked rather than overstated.
+- [x] **Local performance:** Lighthouse 13.4.1 passed the generated homepage at 100 Performance, 100 Accessibility, 96 Best Practices, and 100 SEO. This is reproducible lab evidence only; live PageSpeed and field Core Web Vitals remain production follow-ups.
+- [x] **Final representative browser rerun:** current-head desktop and mobile checks completed locally for homepage, pricing, Contact, Reviews, and a representative case study without overflow, broken images, or form submissions.
 
 ## Publication gate
 
-Do not publish this branch until the owner confirms the Privacy retention/deletion statement and separately authorizes the intended Git/deployment action. Cloudflare activation, external form/review testing, redirects, validators, search submissions, production performance measurement, and live verification each remain separate staged actions; this local record grants no authority to perform them.
+Do not merge or publish this branch until the owner confirms the Privacy retention/deletion statement, production is configured to deploy only `_site`, the Contact/Reviews anti-framing response headers are enforced and verified, the intake Worker controls are reviewed, and the intended merge/deployment action is separately authorized. Cloudflare activation, live form/review tests, redirects, validators, search submissions, performance measurement, and production verification remain separate staged actions; this local record grants no authority to perform them.

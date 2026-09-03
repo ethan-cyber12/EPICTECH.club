@@ -13,6 +13,7 @@ EXCLUDED_PARTS = {
     ".private-media",
     ".superpowers",
     ".venv",
+    "_site",
     "docs",
     "node_modules",
     "tests",

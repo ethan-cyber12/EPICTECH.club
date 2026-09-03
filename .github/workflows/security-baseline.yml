@@ -1,0 +1,134 @@
+name: Security baseline
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GITLEAKS_VERSION: 8.30.0
+  TRIVY_VERSION: 0.74.0
+
+jobs:
+  secrets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Install checksum-pinned Gitleaks
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=/tmp/gitleaks.tar.gz
+          curl -fsSLo "$archive" "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "79a3ab579b53f71efd634f3aaf7e04a0fa0cf206b7ed434638d1547a2470a66e  $archive" | sha256sum -c -
+          mkdir -p /tmp/epictech-gitleaks
+          tar -xzf "$archive" -C /tmp/epictech-gitleaks gitleaks
+
+      - name: Scan repository history for secrets
+        id: gitleaks
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          /tmp/epictech-gitleaks/gitleaks git . --config .gitleaks.toml --redact --no-banner --report-format sarif --report-path artifacts/gitleaks.sarif
+
+      - name: Preserve Gitleaks evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: gitleaks-evidence
+          path: artifacts/gitleaks.sarif
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce secret gate
+        if: steps.gitleaks.outcome == 'failure'
+        run: exit 1
+
+  static-analysis:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    container:
+      image: semgrep/semgrep:1.172.0@sha256:65dcd4408adda7c183a6b4550cb1e9b19f7f627a6fbb7e0559bd466bedc44d7b
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Run EPICTECH static-analysis policy
+        id: semgrep
+        continue-on-error: true
+        run: |
+          mkdir -p artifacts
+          semgrep scan --config .semgrep/epictech.yml --metrics=off --error --sarif --output artifacts/semgrep.sarif .
+
+      - name: Preserve Semgrep evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: semgrep-evidence
+          path: artifacts/semgrep.sarif
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Enforce static-analysis gate
+        if: steps.semgrep.outcome == 'failure'
+        run: exit 1
+
+  supply-chain:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Install checksum-pinned Trivy
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive=/tmp/trivy.tar.gz
+          curl -fsSLo "$archive" "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          echo "2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a  $archive" | sha256sum -c -
+          mkdir -p /tmp/epictech-trivy
+          tar -xzf "$archive" -C /tmp/epictech-trivy trivy
+
+      - name: Scan dependencies, secrets, and configuration
+        id: trivy
+        continue-on-error: true
+        env:
+          TRIVY_NO_PROGRESS: "true"
+        run: |
+          mkdir -p artifacts
+          /tmp/epictech-trivy/trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 --format sarif --output artifacts/trivy.sarif .
+
+      - name: Generate CycloneDX SBOM
+        env:
+          TRIVY_NO_PROGRESS: "true"
+        run: /tmp/epictech-trivy/trivy fs --scanners vuln --format cyclonedx --output artifacts/sbom.cdx.json .
+
+      - name: Preserve supply-chain evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: supply-chain-evidence
+          path: |
+            artifacts/trivy.sarif
+            artifacts/sbom.cdx.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce supply-chain gate
+        if: steps.trivy.outcome == 'failure'
+        run: exit 1

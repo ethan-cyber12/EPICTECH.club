@@ -6,6 +6,7 @@
     "node": ">=20"
   },
   "scripts": {
+    "site:build": "node scripts/build-public-site.mjs",
     "test:media": "node --test tests/*.test.mjs",
     "media:founder": "node scripts/build-media.mjs --group founder",
     "media:workshop": "node scripts/build-media.mjs --group workshop",
