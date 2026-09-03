@@ -1,7 +1,7 @@
 # Local release verification — 2026-09-03
 
 - Branch: `codex/epictech-founder-led-redesign-handoff`
-- Verified release-candidate HEAD: `373d200` (`chore: harden EPICTECH publication candidate`)
+- Verified implementation commit: `373d200` (`chore: harden EPICTECH publication candidate`); the feature branch also contains the documentation-only transfer record
 - Merge base with `origin/main`: `c10c8bd2677a22b2dac299cdb7caba72a4b6e7fc`
 - Scope: the current base plus the listed local release-hardening changes and `http://127.0.0.1:4173` preview
 - Working tree: clean after the new CI, public-artifact, security, and accessibility changes were committed and pushed to the existing feature branch; they are not merged or published
@@ -133,7 +133,7 @@ The scan cannot verify the out-of-repository intake Worker's server-side Turnsti
 ### Authenticated GitHub repository evidence
 
 - Repository: `ethan-cyber12/EPICTECH.club`; authenticated access has admin, maintain, push, pull, and triage permission.
-- The current feature branch is directly based on the current `main`: ahead by two commits and behind by zero after the release-hardening transfer.
+- The current feature branch remains directly based on the inspected `main` and was behind by zero at transfer time; its additional commits are the handoff, release-hardening, and verification records.
 - `main` reports `protected: false`; the repository exposes no rulesets and no required status checks. Establish branch protection or a repository ruleset with the release and security checks required before merging this publication candidate.
 - No open pull request exists for the current feature branch at the time of inspection.
 - `claude/content-alignment-positioning` is stale and diverged (ahead 1, behind 28) and deletes two service pages; `claude/epic-tech-seo-audit-3150v7` has no unique commits and is behind 29. Neither branch is a safe architecture source for this transfer, so neither was merged.
@@ -141,7 +141,7 @@ The scan cannot verify the out-of-repository intake Worker's server-side Turnsti
 
 ### Branch evidence
 
-`git diff --shortstat origin/main...HEAD` reported **170 files changed, 15,106 insertions, and 510 deletions** for committed work through `373d200`. `git status --short --branch` reported a clean working tree synchronized with `origin/codex/epictech-founder-led-redesign-handoff`.
+`git diff --shortstat origin/main...373d200` reported **170 files changed, 15,106 insertions, and 510 deletions** for committed implementation work. The documentation-only transfer record follows that implementation commit; the final working tree is synchronized with `origin/codex/epictech-founder-led-redesign-handoff`.
 
 Relevant task-sized commit sequence from case studies through the security runbook:
 
