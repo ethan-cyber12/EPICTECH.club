@@ -1,6 +1,6 @@
 # Intake Worker security contract
 
-Status: client-side action binding is implemented in this branch. The deployed Worker source was imported into `worker/src/index.js`, and the local candidate now enforces the exact hostname/action contract. Rate controls, live submissions, production configuration changes, and deployment are not authorized or completed by this document.
+Status: client-side action binding is implemented in this branch. The deployed Worker source was imported into `worker/src/index.js`, and the local candidate now enforces the exact hostname/action contract, strict request-origin and JSON boundaries, bounded streaming reads, route-specific rate-limit bindings, and hardened moderation responses. Live submissions, production configuration changes, and deployment are not authorized or completed by this document.
 
 ## Read-only production evidence
 
@@ -12,9 +12,11 @@ The Cloudflare dashboard was reviewed on 2026-09-02 without changing configurati
 - Production and preview `workers.dev` routes are disabled; the Worker is exposed through its custom domain.
 - No intake-specific rate limit was identified during the review.
 - `ALLOWED_ORIGINS` is configured for the apex and `www` origins, and the required secret values are stored as encrypted variables.
-- Production defines `CRN_INGEST_URL`, while the deployed source reads `CRM_INGEST_URL`. The mismatch prevents the optional CRM branch from being enabled as intended and has not been changed in production.
+- Production defines `CRN_INGEST_URL`, while deployed version `f022c249` reads only `CRM_INGEST_URL`. The local candidate gives the canonical name precedence and supports `CRN_INGEST_URL` as a compatibility fallback, so deploying the candidate would activate the currently configured CRM URL. Renaming the variable remains recommended cleanup, not a local-code blocker.
+- The account showed one Worker application and one active KV binding on 2026-09-03. The local Wrangler configuration uses distinct rate-limit namespace IDs `1001` and `1002`; because Cloudflare does not expose a namespace registry, active bindings must be rechecked immediately before deployment.
+- The dashboard confirms compatibility date `2025-05-23`, no compatibility flags, no cron triggers, and no queue consumers. The committed configuration preserves that compatibility date and declares no triggers.
 
-These observations are point-in-time dashboard evidence. Deployment `f022c249` was copied without secret values into `worker/src/index.js` on 2026-09-03, fingerprinted as SHA-256 `688fc976e0c63598148e56da4e62bd8ee09d87dbb601c6ac0cb3ff278e945bf7` after LF normalization, then patched locally. The local source is not yet a production attestation because it has not been staged or deployed.
+These observations are point-in-time dashboard evidence. Deployment `f022c249` was copied without secret values into `worker/src/index.js` on 2026-09-03, fingerprinted as SHA-256 `688fc976e0c63598148e56da4e62bd8ee09d87dbb601c6ac0cb3ff278e945bf7` after LF normalization, then patched locally. The local source is not yet a production attestation because it has not been pushed or deployed.
 
 ## Required Turnstile boundary
 
@@ -27,11 +29,12 @@ The public widget and Worker must use this exact route-to-action contract:
 
 For both POST routes, the Worker must fail closed unless all of these checks pass before any email, storage, moderation, or other side effect:
 
-1. The request method is `POST`, the media type is `application/json`, and the body is within a documented small limit.
-2. The Turnstile token is present and no longer than 2,048 characters.
-3. Siteverify is called server-side with the encrypted secret, token, and Cloudflare-provided client address. A generated idempotency key may be used for a safe verification retry.
-4. The Siteverify HTTP response and JSON are valid, `success` is true, `hostname` is in the exact allowlist above, and `action` exactly matches the route.
-5. The request body passes a server-side allowlist schema and length checks. Client-side cleanup is only a usability control.
+1. The request method is `POST`, `Origin` is one of the exact approved origins, and the media type is exactly `application/json` with optional parameters.
+2. A streaming reader rejects request bodies above 10,000 bytes for leads or 16,000 bytes for reviews before buffering more data; the decoded JSON must be a non-array object and pass the route schema.
+3. The Turnstile token is present, no longer than 2,048 characters, and unambiguous when both supported field names are supplied.
+4. The route-specific rate-limit binding is available and allows the pseudonymous client key. A missing, malformed, or failing binding returns a generic 503; exhaustion returns 429 with `Retry-After`.
+5. Siteverify is called server-side with the encrypted secret, token, and Cloudflare-provided client address.
+6. The Siteverify HTTP response and JSON are valid, `success` is true, `hostname` is in the exact allowlist above, and `action` exactly matches the route.
 
 Cloudflare documents that Siteverify is mandatory and that tokens are single-use and expire after five minutes: [Turnstile server-side validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/). Cloudflare also documents `data-action` as the value returned during validation: [Turnstile widget configuration](https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/widget-configurations/).
 
@@ -46,18 +49,20 @@ Cloudflare documents that Siteverify is mandatory and that tokens are single-use
 
 ## Abuse and availability controls
 
-Add a route-scoped Worker rate-limit binding before the submission handlers perform Siteverify or storage work. Use separate namespaces for lead and review submission traffic and monitor HTTP 429 responses. Cloudflare notes that Worker rate-limit counters are permissive and local to a Cloudflare location, so they are an abuse layer rather than an exact accounting mechanism: [Workers Rate Limiting API](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/).
+The local candidate calls a route-scoped Worker rate-limit binding before Siteverify or storage work. `LEAD_RATE_LIMITER` allows 6 calls per 60 seconds and `REVIEW_RATE_LIMITER` allows 3 calls per 60 seconds, using separate locally assigned namespaces. Production must recheck account-wide namespace use, monitor HTTP 429 responses, and revisit these starting thresholds with real traffic. Cloudflare notes that Worker rate-limit counters are permissive and local to a Cloudflare location, so they are an abuse layer rather than an exact accounting mechanism: [Workers Rate Limiting API](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/).
 
 Any IP-based edge rule must allow for shared networks and accessibility tools. Turnstile validation, the honeypot, strict schemas, body limits, bounded upstream work, and monitoring remain required even when an edge rate rule is present.
 
 ## Deployment gates
 
-- [x] Export deployed Worker version `f022c249` into source control without secret values.
-- [ ] Add a reviewed deployment configuration that maps the existing KV namespace and encrypted variables without committing secret values.
-- [ ] Add unit tests for accepted action/hostname pairs and rejections for a wrong action, look-alike hostname, expired or duplicate token, oversized body, malformed JSON, disallowed origin, and unavailable Siteverify.
-- [ ] Add route-specific rate-limit bindings and verify their namespace IDs do not collide with unrelated Workers.
+- [x] Derive the source-controlled candidate from deployed Worker version `f022c249` without secret values and record the retrieved source fingerprint.
+- [x] Add a reviewed deployment configuration that maps the existing review KV namespace, preserves dashboard-managed variables, and commits no secret values.
+- [x] Add unit tests for accepted action/hostname pairs and fail-closed handling of wrong actions, look-alike hostnames, failed Siteverify responses, conflicting or oversized tokens, oversized or malformed bodies, disallowed origins, and unavailable dependencies.
+- [x] Add route-specific rate-limit bindings with distinct local namespace IDs.
+- [ ] Immediately before deployment, recheck every active Worker binding and confirm namespace IDs `1001` and `1002` do not share counters with another binding.
 - [ ] Review storage, moderation access, deletion/retention operations, observability redaction, and secret rotation.
-- [ ] Deploy to a non-production environment with a separate Turnstile widget and secret.
+- [ ] Provision a non-production Worker, KV namespace, rate-limit namespaces, hostname, and separate Turnstile widget/secret; then create its environment-specific Wrangler configuration.
+- [ ] Deploy to that non-production environment and complete the staged checks.
 - [ ] After owner authorization, run one synthetic Contact submission and one synthetic Review submission, confirm storage/moderation behavior, and remove the synthetic records.
 - [ ] Deploy production only after the staged tests pass, then verify the exact custom-domain routes and Turnstile Analytics.
 

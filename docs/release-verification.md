@@ -4,7 +4,7 @@
 - Verified implementation history includes `373d200` (`chore: harden EPICTECH publication candidate`) and `ed55b06` (`fix: bind Turnstile actions and lock review link`); the source-controlled Worker candidate is recorded below
 - Merge base with `origin/main`: `c10c8bd2677a22b2dac299cdb7caba72a4b6e7fc`
 - Scope: the current base plus the listed local release-hardening changes and `http://127.0.0.1:4173` preview
-- Working tree: clean after the new CI, public-artifact, security, and accessibility changes were committed and pushed to the existing feature branch; they are not merged or published
+- Working tree: the current intake hardening and Wrangler configuration pass their local checks; the branch's Worker commits remain local and unpushed pending explicit owner approval
 - Local decision: the site passes its local build and release contracts. Production publication remains blocked by the owner, edge-header, deployment-binding, and live-service gates below.
 
 No live form was submitted, and no Cloudflare setting, search engine, validator, bot log, deployment target, `main` branch, or production service was changed. The owner authorized transfer of this release candidate to the existing remote feature branch; merge and deployment remain separate gates. Current browser work used localhost; the historical review-feed observation below remains read-only evidence from the earlier task.
@@ -16,8 +16,9 @@ No live form was submitted, and no Cloudflare setting, search engine, validator,
 | Check | Exact command | Observed result |
 | --- | --- | --- |
 | Full Python contract suite | `python -m unittest discover -s tests -p 'test_*.py' -q` | PASS: 104 tests, 0 failures/errors |
-| Node media, Worker-security, and public-artifact suite | `npm run test:media` | PASS: 34 tests, 0 failures/skips |
-| Focused intake Worker security suite | `npm run test:worker` | PASS: 5 tests, 0 failures/skips |
+| Node media, Worker-security, and public-artifact suite | `npm run test:media` | PASS: 48 tests, 0 failures/skips |
+| Focused intake Worker security suite | `npm run test:worker` | PASS: 19 tests, 0 failures/skips |
+| Worker bundle and binding validation | `npm run worker:check` | PASS: Wrangler 4.128.0 dry run; 30.61 KiB upload / 8.14 KiB gzip; existing review KV plus distinct 6/min lead and 3/min review rate-limit bindings resolved; no upload or deploy |
 | Published-media verification | `npm run media:verify` | PASS: 15 founder files, 54 service visuals, 2 social files, 54 service hashes, 0 privacy findings |
 | Originality gate | `npm run media:originality` | PASS: 9 reviewed originals, minimum pairwise distance 15, 0 private masters present in this clone, 54 public derivatives verified; the record honestly retains the opt-out evidence |
 | Allowlisted deployment build | `npm run site:build` | PASS: 117 public files copied to `_site`; source-only and development paths are rejected by contract tests |
@@ -129,15 +130,15 @@ The standard Codex Security scan completed against the stabilized source snapsho
 
 The earlier scan found no source-backed injection, traversal, unsafe parsing, upload, secret-exposure, or dependency vulnerability. It deferred the backend-provided Google review URL because the intake implementation was not yet in the repository. The subsequent hardening makes the reviewed static destination immutable and adds a regression test for external, look-alike, proxy, redirect, and different-business values.
 
-The earlier repository scan could not verify the out-of-repository intake Worker's server-side controls. The exact dashboard-managed source for deployment `f022c249` has since been imported into `worker/src/index.js`, making its validation, schemas, CORS, storage, moderation, and outbound flows reviewable locally. Runtime behavior, rate controls, bindings, logging/retention operations, and production deployment still require staged verification.
+The earlier repository scan could not verify the out-of-repository intake Worker's server-side controls. The exact dashboard-managed source for deployment `f022c249` has since been imported into `worker/src/index.js`, making its validation, schemas, CORS, storage, moderation, and outbound flows reviewable locally. The local candidate and source-controlled bindings pass a Wrangler dry run, but runtime behavior, logging/retention operations, production binding activation, and deployment still require staged verification.
 
 ### Cloudflare intake review and local hardening
 
 A read-only Cloudflare dashboard review on 2026-09-02 established a narrower production finding without changing configuration or sending a live submission. The Turnstile widget is in Managed mode, is restricted to `epictech.club` and `www.epictech.club`, and uses an encrypted Worker secret. The custom-domain Worker calls Siteverify, but the reviewed implementation accepted a result by checking `success` only; it did not also require the expected `hostname` and endpoint-specific `action`. Production and preview `workers.dev` routes were disabled, and no intake-specific rate limit was identified.
 
-This branch now supplies `lead_intake` and `review_intake` actions from the two widgets and contains a source-controlled Worker candidate that rejects a Siteverify result unless `success` is true, `hostname` is exactly `epictech.club` or `www.epictech.club`, and `action` exactly matches the selected route. It also makes the reviewed static EPIC TECH Google review destination immutable: backend response data cannot replace it with an arbitrary external, look-alike, proxy, redirect, or different-business URL. The local Worker fix is not deployed; rate controls, deployment configuration, operational logging/retention review, and staged verification still require the rollout in [the intake Worker security contract](intake-worker-security.md).
+This branch now supplies `lead_intake` and `review_intake` actions from the two widgets and contains a source-controlled Worker candidate that rejects a Siteverify result unless `success` is true, `hostname` is exactly `epictech.club` or `www.epictech.club`, and `action` exactly matches the selected route. It also enforces exact submission origins, byte-bounded JSON objects, consistent token aliases, fail-closed route rate limits, and hardened moderation responses. The reviewed static EPIC TECH Google review destination remains immutable: backend response data cannot replace it with an arbitrary external, look-alike, proxy, redirect, or different-business URL. The local Worker fix and bindings are not deployed; operational logging/retention review and staged verification still require the rollout in [the intake Worker security contract](intake-worker-security.md).
 
-The 2026-09-03 settings review also found `CRN_INGEST_URL` configured in Cloudflare while the source reads `CRM_INGEST_URL`. That production variable-name mismatch has not been changed and must be reconciled before the CRM path can be treated as enabled.
+The 2026-09-03 settings review found `CRN_INGEST_URL` configured in Cloudflare while deployed version `f022c249` reads only `CRM_INGEST_URL`. The local candidate now prefers the canonical name and supports the deployed legacy name as a fallback, with signed-request and queue-failure regression tests. Deploying the candidate would therefore activate the current CRM endpoint; renaming the dashboard variable remains recommended cleanup rather than a local-code blocker.
 
 ### Authenticated GitHub repository evidence
 
@@ -150,7 +151,7 @@ The 2026-09-03 settings review also found `CRN_INGEST_URL` configured in Cloudfl
 
 ### Branch evidence
 
-`git diff --shortstat origin/main...373d200` reported **170 files changed, 15,106 insertions, and 510 deletions** for committed implementation work. The documentation-only transfer record follows that implementation commit; the final working tree is synchronized with `origin/codex/epictech-founder-led-redesign-handoff`.
+`git diff --shortstat origin/main...373d200` reported **170 files changed, 15,106 insertions, and 510 deletions** for committed implementation work. The later release and Worker commits extend that baseline. The current feature branch intentionally remains ahead of its remote until the owner explicitly authorizes publishing the internal Worker source.
 
 Relevant task-sized commit sequence from case studies through the security runbook:
 
@@ -178,7 +179,7 @@ Relevant task-sized commit sequence from case studies through the security runbo
 - [ ] **Cloudflare Stage 3 — meta-CSP deduplication:** only after verified enforcement, make a separate code/deployment change for non-protected pages; Contact and Reviews remain protected.
 - [ ] **Live response evidence:** production HTML security headers, PDF `X-Robots-Tag: noindex, follow`, Cloudflare Trace, and verified-bot logs remain unchecked because live Cloudflare/network work was outside this task.
 - [ ] **Contact/Reviews integrations:** contact submission, review retrieval, review submission, Turnstile, intake endpoints, and WhatsApp external-side-effect checks require specific live-test authorization and were not exercised.
-- [ ] **Intake backend controls:** source import and local hostname/action enforcement are complete. Add the reviewed deployment configuration, rate-limit bindings, remaining contract tests and operational review; correct the `CRN_INGEST_URL`/`CRM_INGEST_URL` mismatch; then stage, deploy, and verify before publication.
+- [ ] **Intake backend controls:** source derivation, local hostname/action enforcement, strict intake parsing, stable IP-keyed route limits, legacy/canonical CRM compatibility, contract tests, and a production-targeted Wrangler dry-run configuration are complete. Recheck rate namespace IDs, provision an isolated staging stack, review operations and retention, then stage, deploy, and verify before publication.
 - [ ] **External schema/search validation:** Schema.org Validator, Google Rich Results, Search Console, Bing Webmaster Tools, sitemap submission, and index inspection were not contacted. Local schema parsing is not a substitute.
 - [x] **Local performance:** Lighthouse 13.4.1 passed the generated homepage at 100 Performance, 100 Accessibility, 96 Best Practices, and 100 SEO. This is reproducible lab evidence only; live PageSpeed and field Core Web Vitals remain production follow-ups.
 - [x] **Final representative browser rerun:** current-head desktop and mobile checks completed locally for homepage, pricing, Contact, Reviews, and a representative case study without overflow, broken images, or form submissions.

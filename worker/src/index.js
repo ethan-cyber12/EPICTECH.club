@@ -60,6 +60,9 @@ async function handleLeadIntake(request, env) {
     .filter(Boolean);
 
   if (request.method === "OPTIONS") {
+    if (!allowed.includes(origin)) {
+      return json({ error: "Forbidden" }, 403, origin, allowed);
+    }
     return new Response(null, { status: 204, headers: cors(origin, allowed) });
   }
 
@@ -67,24 +70,18 @@ async function handleLeadIntake(request, env) {
     return json({ error: "Method not allowed" }, 405, origin, allowed);
   }
 
-  if (allowed.length && origin && !allowed.includes(origin)) {
+  if (!allowed.includes(origin)) {
     return json({ error: "Forbidden" }, 403, origin, allowed);
   }
 
-  if (!(request.headers.get("Content-Type") || "").includes("application/json")) {
+  if (!isJsonRequest(request)) {
     return json({ error: "Unsupported media type" }, 415, origin, allowed);
   }
-  const raw = await request.text();
-  if (raw.length > MAX_BODY_BYTES) {
-    return json({ error: "Payload too large" }, 413, origin, allowed);
+  const parsed = await readJsonObject(request, MAX_BODY_BYTES);
+  if (!parsed.ok) {
+    return json({ error: parsed.error }, parsed.status, origin, allowed);
   }
-
-  let body;
-  try {
-    body = JSON.parse(raw);
-  } catch {
-    return json({ error: "Invalid JSON" }, 400, origin, allowed);
-  }
+  const body = parsed.body;
 
   if (String(body._hp || "").trim().length > 0) {
     return json({ ok: true }, 200, origin, allowed);
@@ -107,8 +104,29 @@ async function handleLeadIntake(request, env) {
     return json({ error: "Message too short" }, 422, origin, allowed);
   }
 
-  const token = String(body.token || body["cf-turnstile-response"] || "");
+  const token = getTurnstileToken(body);
+  if (!token || token.length > MAX_TURNSTILE_TOKEN_LENGTH) {
+    return json({ error: "Verification failed" }, 403, origin, allowed);
+  }
   const ip = request.headers.get("CF-Connecting-IP") || "";
+  if (!ip) {
+    return json({ error: "Service unavailable" }, 503, origin, allowed);
+  }
+  const ua = request.headers.get("User-Agent") || "";
+  let clientHash;
+  let rateLimitKey;
+  try {
+    clientHash = await hmac(env.INTAKE_HMAC_SECRET, ip + "|" + ua);
+    rateLimitKey = await hmac(env.INTAKE_HMAC_SECRET, "rate-limit|" + ip);
+  } catch {
+    return json({ error: "Service unavailable" }, 503, origin, allowed);
+  }
+
+  const rateLimit = await checkRateLimit(env.LEAD_RATE_LIMITER, rateLimitKey);
+  if (rateLimit !== "allowed") {
+    return rateLimitError(rateLimit, origin, allowed);
+  }
+
   if (!(await verifyTurnstile(
     env.TURNSTILE_SECRET_KEY,
     token,
@@ -117,9 +135,6 @@ async function handleLeadIntake(request, env) {
   ))) {
     return json({ error: "Verification failed" }, 403, origin, allowed);
   }
-
-  const ua = request.headers.get("User-Agent") || "";
-  const clientHash = await hmac(env.INTAKE_HMAC_SECRET, ip + "|" + ua);
 
   const submittedAt = new Date().toISOString();
   const lead = {
@@ -188,29 +203,26 @@ async function handleReviewIntake(request, env) {
   const methods = "POST, OPTIONS";
 
   if (request.method === "OPTIONS") {
+    if (!allowed.includes(origin)) {
+      return json({ error: "Forbidden" }, 403, origin, allowed, methods);
+    }
     return new Response(null, { status: 204, headers: cors(origin, allowed, methods) });
   }
   if (request.method !== "POST") {
     return json({ error: "Method not allowed" }, 405, origin, allowed, methods);
   }
-  if (allowed.length && origin && !allowed.includes(origin)) {
+  if (!allowed.includes(origin)) {
     return json({ error: "Forbidden" }, 403, origin, allowed, methods);
   }
-  if (!(request.headers.get("Content-Type") || "").includes("application/json")) {
+  if (!isJsonRequest(request)) {
     return json({ error: "Unsupported media type" }, 415, origin, allowed, methods);
   }
 
-  const raw = await request.text();
-  if (raw.length > MAX_REVIEW_BODY_BYTES) {
-    return json({ error: "Payload too large" }, 413, origin, allowed, methods);
+  const parsed = await readJsonObject(request, MAX_REVIEW_BODY_BYTES);
+  if (!parsed.ok) {
+    return json({ error: parsed.error }, parsed.status, origin, allowed, methods);
   }
-
-  let body;
-  try {
-    body = JSON.parse(raw);
-  } catch {
-    return json({ error: "Invalid JSON" }, 400, origin, allowed, methods);
-  }
+  const body = parsed.body;
 
   if (String(body._hp || "").trim().length > 0) {
     return json({ ok: true }, 200, origin, allowed, methods);
@@ -234,8 +246,29 @@ async function handleReviewIntake(request, env) {
     return json({ error: "Review must be at least 10 characters" }, 422, origin, allowed, methods);
   }
 
-  const token = String(body.token || body["cf-turnstile-response"] || "");
+  const token = getTurnstileToken(body);
+  if (!token || token.length > MAX_TURNSTILE_TOKEN_LENGTH) {
+    return json({ error: "Verification failed" }, 403, origin, allowed, methods);
+  }
   const ip = request.headers.get("CF-Connecting-IP") || "";
+  if (!ip) {
+    return json({ error: "Service unavailable" }, 503, origin, allowed, methods);
+  }
+  const ua = request.headers.get("User-Agent") || "";
+  let clientHash;
+  let rateLimitKey;
+  try {
+    clientHash = await hmac(env.INTAKE_HMAC_SECRET, ip + "|" + ua);
+    rateLimitKey = await hmac(env.INTAKE_HMAC_SECRET, "rate-limit|" + ip);
+  } catch {
+    return json({ error: "Service unavailable" }, 503, origin, allowed, methods);
+  }
+
+  const rateLimit = await checkRateLimit(env.REVIEW_RATE_LIMITER, rateLimitKey);
+  if (rateLimit !== "allowed") {
+    return rateLimitError(rateLimit, origin, allowed, methods);
+  }
+
   if (!(await verifyTurnstile(
     env.TURNSTILE_SECRET_KEY,
     token,
@@ -250,13 +283,18 @@ async function handleReviewIntake(request, env) {
     return json({ error: "Reviews are temporarily unavailable" }, 503, origin, allowed, methods);
   }
 
-  const ua = request.headers.get("User-Agent") || "";
-  const clientHash = await hmac(env.INTAKE_HMAC_SECRET, ip + "|" + ua);
-
   const id = crypto.randomUUID();
   const submittedAt = new Date().toISOString();
   const expiresAt = Math.floor(Date.now() / 1000) + REVIEW_TTL_SECONDS;
   const pendingKey = "review:pending:" + id;
+  let approveSig;
+  let rejectSig;
+  try {
+    approveSig = await signReviewAction(env.REVIEW_APPROVAL_SECRET, id, "approve", expiresAt);
+    rejectSig = await signReviewAction(env.REVIEW_APPROVAL_SECRET, id, "reject", expiresAt);
+  } catch {
+    return json({ error: "Reviews are temporarily unavailable" }, 503, origin, allowed, methods);
+  }
 
   const record = {
     id: id,
@@ -278,8 +316,6 @@ async function handleReviewIntake(request, env) {
     return json({ error: "Could not save review" }, 500, origin, allowed, methods);
   }
 
-  const approveSig = await signReviewAction(env.REVIEW_APPROVAL_SECRET, id, "approve", expiresAt);
-  const rejectSig = await signReviewAction(env.REVIEW_APPROVAL_SECRET, id, "reject", expiresAt);
   const base = "https://intake.epictech.club";
   const approveUrl = base + REVIEW_APPROVE_PATH + "?id=" + id + "&sig=" + approveSig;
   const rejectUrl = base + REVIEW_REJECT_PATH + "?id=" + id + "&sig=" + rejectSig;
@@ -419,7 +455,7 @@ async function handleReviewAction(request, env, action) {
   if (request.method !== "GET" && request.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
   }
-  if (!id || !sig || !env.REVIEWS_KV) {
+  if (!isReviewActionInput(id, sig) || !env.REVIEWS_KV) {
     return htmlPage("Invalid link", "<p>This link is missing required information.</p>", 400);
   }
 
@@ -499,16 +535,26 @@ function confirmPage(action, record, id, sig) {
 }
 
 function htmlPage(title, bodyHtml, status) {
+  const contentSecurityPolicy =
+    "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; " +
+    "frame-ancestors 'none'; form-action 'self'";
   const page =
     "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">" +
     "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
-    "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'\">" +
+    "<meta http-equiv=\"Content-Security-Policy\" content=\"" + contentSecurityPolicy + "\">" +
     "<title>" + escapeHtml(title) + "</title></head><body>" +
     "<h1>" + escapeHtml(title) + "</h1>" + bodyHtml +
     "</body></html>";
   return new Response(page, {
     status: status || 200,
-    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" },
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-store",
+      "Content-Security-Policy": contentSecurityPolicy,
+      "Permissions-Policy": "camera=(), geolocation=(), microphone=()",
+      "Referrer-Policy": "no-referrer",
+      "X-Content-Type-Options": "nosniff",
+    },
   });
 }
 
@@ -536,6 +582,99 @@ function json(obj, status, origin, allowed, methods) {
       cors(origin, allowed, methods)
     ),
   });
+}
+
+function isJsonRequest(request) {
+  const mediaType = (request.headers.get("Content-Type") || "")
+    .split(";", 1)[0]
+    .trim()
+    .toLowerCase();
+  return mediaType === "application/json";
+}
+
+async function readJsonObject(request, maxBytes) {
+  const declaredLength = request.headers.get("Content-Length");
+  if (
+    declaredLength &&
+    /^\d+$/.test(declaredLength) &&
+    Number(declaredLength) > maxBytes
+  ) {
+    return { ok: false, status: 413, error: "Payload too large" };
+  }
+
+  if (!request.body) {
+    return { ok: false, status: 400, error: "Invalid JSON" };
+  }
+
+  const reader = request.body.getReader();
+  const chunks = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBytes) {
+        await reader.cancel().catch(() => {});
+        return { ok: false, status: 413, error: "Payload too large" };
+      }
+      chunks.push(value);
+    }
+
+    const bytes = new Uint8Array(totalBytes);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+
+    const raw = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    const body = JSON.parse(raw);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return { ok: false, status: 400, error: "Invalid JSON" };
+    }
+    return { ok: true, body: body };
+  } catch {
+    return { ok: false, status: 400, error: "Invalid JSON" };
+  }
+}
+
+function getTurnstileToken(body) {
+  const token = typeof body.token === "string" ? body.token : "";
+  const alias =
+    typeof body["cf-turnstile-response"] === "string"
+      ? body["cf-turnstile-response"]
+      : "";
+  if (token && alias && token !== alias) return "";
+  return token || alias;
+}
+
+function isReviewActionInput(id, sig) {
+  return (
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id) &&
+    /^[0-9a-f]{64}$/i.test(sig)
+  );
+}
+
+async function checkRateLimit(limiter, key) {
+  if (!limiter || typeof limiter.limit !== "function") return "unavailable";
+  try {
+    const result = await limiter.limit({ key: key });
+    if (!result || typeof result.success !== "boolean") return "unavailable";
+    return result.success ? "allowed" : "limited";
+  } catch {
+    return "unavailable";
+  }
+}
+
+function rateLimitError(decision, origin, allowed, methods) {
+  if (decision === "limited") {
+    const response = json({ error: "Too many requests" }, 429, origin, allowed, methods);
+    response.headers.set("Retry-After", "60");
+    return response;
+  }
+  return json({ error: "Service unavailable" }, 503, origin, allowed, methods);
 }
 
 function stripControl(s) {
@@ -614,6 +753,9 @@ async function verifyTurnstile(secret, token, ip, expectedAction) {
 }
 
 async function hmac(secret, data) {
+  if (typeof secret !== "string" || !secret) {
+    throw new Error("HMAC secret is not configured");
+  }
   const key = await crypto.subtle.importKey(
     "raw",
     new TextEncoder().encode(secret),
@@ -698,15 +840,23 @@ function buildReviewEmailHtml(r) {
 }
 
 async function postToCRM(env, payload) {
-  if (!env.CRM_INGEST_URL || !env.CRM_INGEST_SECRET) return true;
+  const crmIngestUrl = env.CRM_INGEST_URL || env.CRN_INGEST_URL;
+  const hasUrl = typeof crmIngestUrl === "string" && crmIngestUrl.length > 0;
+  const hasSecret =
+    typeof env.CRM_INGEST_SECRET === "string" && env.CRM_INGEST_SECRET.length > 0;
+  if (!hasUrl && !hasSecret) return true;
+  if (!hasUrl || !hasSecret) {
+    console.log("CRM sync unavailable because its configuration is incomplete.");
+    return false;
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 3000);
   try {
     const body = JSON.stringify(payload);
     const ts = Math.floor(Date.now() / 1000).toString();
     const signature = await hmac(env.CRM_INGEST_SECRET, ts + "." + body);
 
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(env.CRM_INGEST_URL, {
+    const res = await fetch(crmIngestUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -716,12 +866,13 @@ async function postToCRM(env, payload) {
       body: body,
       signal: controller.signal,
     });
-    clearTimeout(timer);
     console.log(res.ok ? "CRM sync ok" : "CRM sync non-OK: " + res.status);
     return res.ok;
   } catch (err) {
     console.log("CRM sync failed (email already sent):", err && err.message);
     return false;
+  } finally {
+    clearTimeout(timer);
   }
 }
 

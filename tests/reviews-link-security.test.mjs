@@ -27,16 +27,27 @@ function loadReviewRenderer() {
 test('Worker data cannot replace the reviewed static Google destination', () => {
   const { link, renderGoogle } = loadReviewRenderer();
   const fallback = link.href;
+  assert.equal(fallback, 'https://g.page/r/static-fallback/review');
   const backendValues = [
     'javascript:alert(1)',
     'https://google.com.evil.example/review',
+    'https://google.com@evil.example/review',
     'https://translate.google.com/translate?u=https%3A%2F%2Fexample.com%2F',
+    'https://www.google.com/amp/s/example.com',
+    'https://www.google.com/url?url=https%3A%2F%2Fexample.com%2F',
     'https://g.page/r/a-different-business/review',
+    'https://search.google.com/local/writereview?placeid=ATTACKER_PLACE_ID',
+    'https://search.google.com/local/writereview?placeid=REAL_PLACE_ID',
     'https://www.google.com/maps?cid=123',
   ];
 
   for (const googleReviewUrl of backendValues) {
-    renderGoogle({ status: 'degraded', googleReviewUrl });
-    assert.equal(link.href, fallback);
+    for (const status of ['ok', 'degraded', 'not_configured']) {
+      renderGoogle({ status, googleReviewUrl, reviews: [] });
+      assert.equal(link.href, fallback);
+    }
   }
+
+  renderGoogle(null);
+  assert.equal(link.href, fallback);
 });

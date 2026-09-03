@@ -28,6 +28,7 @@ These rules apply to Codex, Claude, and any other coding agent working in this r
 
 ~~~powershell
 npm run test:worker
+npm run worker:check
 node --test tests/*.test.mjs
 python -m unittest discover -s tests -v
 npm run site:build

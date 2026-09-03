@@ -1,7 +1,9 @@
 .worktrees/
+.wrangler/
 .private-media/
 .media-review/
 node_modules/
+.npm-cache/
 __pycache__/
 *.py[cod]
 _site/

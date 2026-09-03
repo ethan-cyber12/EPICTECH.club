@@ -3,12 +3,13 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "site:build": "node scripts/build-public-site.mjs",
     "test:media": "node --test tests/*.test.mjs",
     "test:worker": "node --test tests/intake-worker-security.test.mjs",
+    "worker:check": "wrangler deploy --config worker/wrangler.jsonc --dry-run",
     "media:founder": "node scripts/build-media.mjs --group founder",
     "media:workshop": "node scripts/build-media.mjs --group workshop",
     "media:social": "node scripts/build-media.mjs --group social",
@@ -17,6 +18,7 @@
     "media:originality": "node scripts/verify-originality.mjs"
   },
   "devDependencies": {
-    "sharp": "0.35.4"
+    "sharp": "0.35.4",
+    "wrangler": "4.128.0"
   }
 }

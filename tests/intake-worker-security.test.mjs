@@ -9,6 +9,8 @@ if (!globalThis.crypto) globalThis.crypto = webcrypto;
 const originalFetch = globalThis.fetch;
 const siteverifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const resendUrl = 'https://api.resend.com/emails';
+const legacyCrmUrl = 'https://intake-crm.epictech.club/api/leads/ingest';
+const canonicalCrmUrl = 'https://crm.epictech.club/api/leads/ingest';
 
 test.afterEach(() => {
   globalThis.fetch = originalFetch;
@@ -21,7 +23,8 @@ function makeKv() {
     async delete(key) {
       operations.push({ type: 'delete', key });
     },
-    async get() {
+    async get(key) {
+      operations.push({ type: 'get', key });
       return null;
     },
     async list() {
@@ -33,17 +36,34 @@ function makeKv() {
   };
 }
 
+function makeRateLimiter(success = true) {
+  const calls = [];
+  return {
+    calls,
+    async limit(input) {
+      calls.push(input);
+      return { success };
+    },
+  };
+}
+
 function makeEnv() {
   const kv = makeKv();
+  const leadLimiter = makeRateLimiter();
+  const reviewLimiter = makeRateLimiter();
   return {
     kv,
+    leadLimiter,
+    reviewLimiter,
     env: {
       ALLOWED_ORIGINS: 'https://epictech.club,https://www.epictech.club',
       INTAKE_HMAC_SECRET: 'test-intake-hmac-secret',
+      LEAD_RATE_LIMITER: leadLimiter,
       NOTIFY_FROM: 'noreply@epictech.club',
       NOTIFY_TO: 'info@epictech.club',
       RESEND_API_KEY: 'test-resend-key',
       REVIEW_APPROVAL_SECRET: 'test-review-approval-secret',
+      REVIEW_RATE_LIMITER: reviewLimiter,
       REVIEWS_KV: kv,
       TURNSTILE_SECRET_KEY: 'test-turnstile-secret',
     },
@@ -70,16 +90,23 @@ function bodyFor(path, token = 'test-token') {
   };
 }
 
-function requestFor(path, body = bodyFor(path), origin = 'https://epictech.club') {
+function requestFor(path, body = bodyFor(path), origin = 'https://epictech.club', options = {}) {
+  const headers = {
+    'Content-Type': options.contentType || 'application/json',
+  };
+  if (options.cfConnectingIp !== null) {
+    headers['CF-Connecting-IP'] = options.cfConnectingIp || '203.0.113.9';
+  }
+  if (options.userAgent !== null) {
+    headers['User-Agent'] = options.userAgent || 'EPIC-TECH-test';
+  }
+  if (origin !== null) headers.Origin = origin;
+  if (options.contentLength) headers['Content-Length'] = options.contentLength;
+
   return new Request('https://intake.epictech.club' + path, {
     method: 'POST',
-    headers: {
-      'CF-Connecting-IP': '203.0.113.9',
-      'Content-Type': 'application/json',
-      Origin: origin,
-      'User-Agent': 'EPIC-TECH-test',
-    },
-    body: JSON.stringify(body),
+    headers,
+    body: options.rawBody === undefined ? JSON.stringify(body) : options.rawBody,
   });
 }
 
@@ -101,6 +128,11 @@ function installFetch(siteverifyResult, options = {}) {
       return Response.json({ id: 'test-message-id' });
     }
 
+    if (url === legacyCrmUrl || url === canonicalCrmUrl) {
+      if (options.crmError) throw options.crmError;
+      return Response.json({ ok: true }, { status: options.crmStatus || 200 });
+    }
+
     throw new Error('Unexpected outbound request: ' + url);
   };
   return calls;
@@ -114,7 +146,7 @@ test('accepts only the exact hostname and action pair for each intake route', as
 
   for (const [path, action] of routes) {
     for (const hostname of ['epictech.club', 'www.epictech.club']) {
-      const { env, kv } = makeEnv();
+      const { env, kv, leadLimiter, reviewLimiter } = makeEnv();
       const calls = installFetch({ success: true, hostname, action });
       const response = await worker.fetch(requestFor(path), env);
 
@@ -124,6 +156,11 @@ test('accepts only the exact hostname and action pair for each intake route', as
       assert.equal(calls[0].init.body.get('secret'), 'test-turnstile-secret');
       assert.equal(calls[0].init.body.get('response'), 'test-token');
       assert.equal(calls[0].init.body.get('remoteip'), '203.0.113.9');
+      const expectedLimiter = path === '/lead-intake' ? leadLimiter : reviewLimiter;
+      const unusedLimiter = path === '/lead-intake' ? reviewLimiter : leadLimiter;
+      assert.equal(expectedLimiter.calls.length, 1);
+      assert.match(expectedLimiter.calls[0].key, /^[0-9a-f]{64}$/);
+      assert.equal(unusedLimiter.calls.length, 0);
       if (path === '/review-intake') {
         assert.equal(kv.operations.filter((entry) => entry.type === 'put').length, 1);
       }
@@ -135,11 +172,14 @@ test('rejects swapped actions and hostname lookalikes before any side effect', a
   const cases = [
     ['/lead-intake', { success: true, hostname: 'epictech.club', action: 'review_intake' }],
     ['/review-intake', { success: true, hostname: 'www.epictech.club', action: 'lead_intake' }],
+    ['/lead-intake', { success: true, hostname: 'epictech.club', action: 'LEAD_INTAKE' }],
     ['/lead-intake', { success: true, hostname: 'intake.epictech.club', action: 'lead_intake' }],
     ['/review-intake', { success: true, hostname: 'epictech.club.evil.example', action: 'review_intake' }],
     ['/lead-intake', { success: true, hostname: 'epictech.club.', action: 'lead_intake' }],
+    ['/lead-intake', { success: true, hostname: 'EPICtech.club', action: 'lead_intake' }],
     ['/review-intake', { success: true, action: 'review_intake' }],
     ['/lead-intake', { success: true, hostname: 'epictech.club' }],
+    ['/lead-intake', { success: 'true', hostname: 'epictech.club', action: 'lead_intake' }],
   ];
 
   for (const [path, result] of cases) {
@@ -156,6 +196,15 @@ test('rejects swapped actions and hostname lookalikes before any side effect', a
 test('rejects invalid Siteverify responses and oversized tokens fail closed', async () => {
   const failures = [
     [{ success: false, hostname: 'epictech.club', action: 'lead_intake' }, {}],
+    [
+      {
+        success: false,
+        hostname: 'epictech.club',
+        action: 'lead_intake',
+        'error-codes': ['timeout-or-duplicate'],
+      },
+      {},
+    ],
     [{ success: true, hostname: 'epictech.club', action: 'lead_intake' }, { siteverifyStatus: 503 }],
     [null, { invalidJson: true }],
     [null, { siteverifyError: new Error('network unavailable') }],
@@ -206,6 +255,322 @@ test('preserves the legacy token alias and rejects a missing secret without a re
   assert.equal(noRequestCalls.length, 0);
 });
 
+test('accepts identical token aliases and rejects conflicting aliases before rate limiting', async () => {
+  const identical = bodyFor('/lead-intake');
+  identical['cf-turnstile-response'] = identical.token;
+  const acceptedEnv = makeEnv();
+  const acceptedCalls = installFetch({
+    success: true,
+    hostname: 'epictech.club',
+    action: 'lead_intake',
+  });
+
+  const accepted = await worker.fetch(requestFor('/lead-intake', identical), acceptedEnv.env);
+  assert.equal(accepted.status, 200);
+  assert.deepEqual(acceptedCalls.map((call) => call.url), [siteverifyUrl, resendUrl]);
+
+  const conflicting = bodyFor('/lead-intake');
+  conflicting['cf-turnstile-response'] = 'different-token';
+  const rejectedEnv = makeEnv();
+  const rejectedCalls = installFetch({
+    success: true,
+    hostname: 'epictech.club',
+    action: 'lead_intake',
+  });
+  const rejected = await worker.fetch(requestFor('/lead-intake', conflicting), rejectedEnv.env);
+
+  assert.equal(rejected.status, 403);
+  assert.equal(rejectedCalls.length, 0);
+  assert.equal(rejectedEnv.leadLimiter.calls.length, 0);
+});
+
+test('requires an exact allowed Origin and JSON media type before reading intake data', async () => {
+  const cases = [
+    [requestFor('/lead-intake', undefined, null), 403, null],
+    [requestFor('/lead-intake', undefined, 'https://epictech.club.evil.example'), 403, null],
+    [requestFor('/review-intake', undefined, 'https://www.epictech.club.evil.example'), 403, null],
+    [
+      requestFor('/lead-intake', undefined, 'https://epictech.club', {
+        contentType: 'text/plain; application/json',
+      }),
+      415,
+      'https://epictech.club',
+    ],
+  ];
+
+  for (const [request, expectedStatus, expectedCorsOrigin] of cases) {
+    const current = makeEnv();
+    const calls = installFetch({ success: true, hostname: 'epictech.club', action: 'lead_intake' });
+    const response = await worker.fetch(request, current.env);
+
+    assert.equal(response.status, expectedStatus);
+    assert.equal(response.headers.get('Access-Control-Allow-Origin'), expectedCorsOrigin);
+    assert.equal(calls.length, 0);
+    assert.equal(current.leadLimiter.calls.length, 0);
+    assert.equal(current.reviewLimiter.calls.length, 0);
+  }
+
+  const current = makeEnv();
+  const validTypeCalls = installFetch({
+    success: true,
+    hostname: 'epictech.club',
+    action: 'lead_intake',
+  });
+  const validType = await worker.fetch(
+    requestFor('/lead-intake', undefined, 'https://epictech.club', {
+      contentType: 'Application/JSON; Charset=UTF-8',
+    }),
+    current.env,
+  );
+  assert.equal(validType.status, 200);
+  assert.deepEqual(validTypeCalls.map((call) => call.url), [siteverifyUrl, resendUrl]);
+});
+
+test('CORS preflights succeed only for exact approved origins', async () => {
+  for (const [origin, expectedStatus] of [
+    ['https://epictech.club', 204],
+    ['https://www.epictech.club', 204],
+    ['https://epictech.club.evil.example', 403],
+    [null, 403],
+  ]) {
+    const headers = origin ? { Origin: origin } : {};
+    const response = await worker.fetch(
+      new Request('https://intake.epictech.club/lead-intake', {
+        method: 'OPTIONS',
+        headers,
+      }),
+      makeEnv().env,
+    );
+    assert.equal(response.status, expectedStatus);
+    assert.equal(
+      response.headers.get('Access-Control-Allow-Origin'),
+      expectedStatus === 204 ? origin : null,
+    );
+  }
+});
+
+test('rejects malformed, non-object, and byte-oversized JSON before rate limiting', async () => {
+  const cases = [
+    [requestFor('/lead-intake', undefined, undefined, { rawBody: '{' }), 400],
+    [requestFor('/lead-intake', null), 400],
+    [requestFor('/lead-intake', []), 400],
+    [
+      requestFor('/lead-intake', {
+        ...bodyFor('/lead-intake'),
+        message: '\ud83d\ude00'.repeat(3000),
+      }),
+      413,
+    ],
+    [requestFor('/lead-intake', {}, undefined, { contentLength: '10001' }), 413],
+  ];
+
+  for (const [request, expectedStatus] of cases) {
+    const current = makeEnv();
+    const calls = installFetch({ success: true, hostname: 'epictech.club', action: 'lead_intake' });
+    const response = await worker.fetch(request, current.env);
+
+    assert.equal(response.status, expectedStatus);
+    assert.equal(calls.length, 0);
+    assert.equal(current.leadLimiter.calls.length, 0);
+  }
+});
+
+test('enforces the Turnstile token boundary exactly', async () => {
+  const acceptedEnv = makeEnv();
+  const acceptedCalls = installFetch({
+    success: true,
+    hostname: 'epictech.club',
+    action: 'lead_intake',
+  });
+  const accepted = await worker.fetch(
+    requestFor('/lead-intake', bodyFor('/lead-intake', 'x'.repeat(2048))),
+    acceptedEnv.env,
+  );
+
+  assert.equal(accepted.status, 200);
+  assert.equal(acceptedCalls[0].init.body.get('response').length, 2048);
+});
+
+test('rate-limit bindings are mandatory, route-specific, and fail closed', async () => {
+  const limited = makeEnv();
+  limited.env.LEAD_RATE_LIMITER = makeRateLimiter(false);
+  const limitedCalls = installFetch({ success: true, hostname: 'epictech.club', action: 'lead_intake' });
+  const limitedResponse = await worker.fetch(requestFor('/lead-intake'), limited.env);
+  assert.equal(limitedResponse.status, 429);
+  assert.equal(limitedResponse.headers.get('Retry-After'), '60');
+  assert.equal(limitedCalls.length, 0);
+  assert.equal(limited.kv.operations.length, 0);
+
+  const missing = makeEnv();
+  delete missing.env.REVIEW_RATE_LIMITER;
+  const missingCalls = installFetch({ success: true, hostname: 'epictech.club', action: 'review_intake' });
+  const missingResponse = await worker.fetch(requestFor('/review-intake'), missing.env);
+  assert.equal(missingResponse.status, 503);
+  assert.equal(missingCalls.length, 0);
+  assert.equal(missing.kv.operations.length, 0);
+
+  const failed = makeEnv();
+  failed.env.LEAD_RATE_LIMITER = {
+    async limit() {
+      throw new Error('rate-limit service unavailable');
+    },
+  };
+  const failedCalls = installFetch({ success: true, hostname: 'epictech.club', action: 'lead_intake' });
+  const failedResponse = await worker.fetch(requestFor('/lead-intake'), failed.env);
+  assert.equal(failedResponse.status, 503);
+  assert.equal(failedCalls.length, 0);
+});
+
+test('rate limiting is stable across User-Agent rotation and requires Cloudflare client IP', async () => {
+  for (const [path, action, limiterName] of [
+    ['/lead-intake', 'lead_intake', 'leadLimiter'],
+    ['/review-intake', 'review_intake', 'reviewLimiter'],
+  ]) {
+    const current = makeEnv();
+    const calls = installFetch({
+      success: false,
+      hostname: 'epictech.club',
+      action,
+    });
+    const first = await worker.fetch(
+      requestFor(path, undefined, undefined, { userAgent: 'UA-one' }),
+      current.env,
+    );
+    const second = await worker.fetch(
+      requestFor(path, undefined, undefined, { userAgent: 'UA-two' }),
+      current.env,
+    );
+
+    assert.equal(first.status, 403);
+    assert.equal(second.status, 403);
+    assert.equal(current[limiterName].calls.length, 2);
+    assert.equal(current[limiterName].calls[0].key, current[limiterName].calls[1].key);
+    assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl, siteverifyUrl]);
+
+    const missingIp = makeEnv();
+    const missingIpCalls = installFetch({
+      success: true,
+      hostname: 'epictech.club',
+      action,
+    });
+    const missingIpResponse = await worker.fetch(
+      requestFor(path, undefined, undefined, { cfConnectingIp: null }),
+      missingIp.env,
+    );
+    assert.equal(missingIpResponse.status, 503);
+    assert.equal(missingIp[limiterName].calls.length, 0);
+    assert.equal(missingIpCalls.length, 0);
+  }
+});
+
+test('missing HMAC configuration fails before rate limiting or outbound requests', async () => {
+  const current = makeEnv();
+  delete current.env.INTAKE_HMAC_SECRET;
+  const calls = installFetch({ success: true, hostname: 'epictech.club', action: 'lead_intake' });
+  const response = await worker.fetch(requestFor('/lead-intake'), current.env);
+
+  assert.equal(response.status, 503);
+  assert.equal(calls.length, 0);
+  assert.equal(current.leadLimiter.calls.length, 0);
+});
+
+test('missing review-approval secret cannot create an unmoderatable pending record', async () => {
+  const current = makeEnv();
+  delete current.env.REVIEW_APPROVAL_SECRET;
+  const calls = installFetch({
+    success: true,
+    hostname: 'epictech.club',
+    action: 'review_intake',
+  });
+  const response = await worker.fetch(requestFor('/review-intake'), current.env);
+
+  assert.equal(response.status, 503);
+  assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl]);
+  assert.equal(current.kv.operations.length, 0);
+});
+
+test('lead sync supports the deployed legacy CRM variable name without weakening signing', async () => {
+  const current = makeEnv();
+  current.env.CRN_INGEST_URL = legacyCrmUrl;
+  current.env.CRM_INGEST_SECRET = 'test-crm-ingest-secret';
+  const calls = installFetch({
+    success: true,
+    hostname: 'epictech.club',
+    action: 'lead_intake',
+  });
+  const response = await worker.fetch(requestFor('/lead-intake'), current.env);
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl, resendUrl, legacyCrmUrl]);
+  const crmCall = calls[2];
+  assert.equal(crmCall.init.method, 'POST');
+  assert.match(crmCall.init.headers['X-Signature'], /^sha256=[0-9a-f]{64}$/);
+  assert.match(crmCall.init.headers['X-Timestamp'], /^\d+$/);
+  assert.equal(crmCall.init.headers['Content-Type'], 'application/json');
+
+  const canonical = makeEnv();
+  canonical.env.CRM_INGEST_URL = canonicalCrmUrl;
+  canonical.env.CRN_INGEST_URL = legacyCrmUrl;
+  canonical.env.CRM_INGEST_SECRET = 'test-crm-ingest-secret';
+  const canonicalCalls = installFetch({
+    success: true,
+    hostname: 'epictech.club',
+    action: 'lead_intake',
+  });
+  const canonicalResponse = await worker.fetch(requestFor('/lead-intake'), canonical.env);
+  assert.equal(canonicalResponse.status, 200);
+  assert.deepEqual(
+    canonicalCalls.map((call) => call.url),
+    [siteverifyUrl, resendUrl, canonicalCrmUrl],
+  );
+});
+
+test('partial CRM configuration queues the emailed lead instead of reporting a false sync', async () => {
+  for (const partial of [
+    { CRM_INGEST_SECRET: 'test-crm-ingest-secret' },
+    { CRN_INGEST_URL: legacyCrmUrl },
+  ]) {
+    const current = makeEnv();
+    const queue = makeKv();
+    Object.assign(current.env, partial, { LEAD_QUEUE: queue });
+    const calls = installFetch({
+      success: true,
+      hostname: 'epictech.club',
+      action: 'lead_intake',
+    });
+    const response = await worker.fetch(requestFor('/lead-intake'), current.env);
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl, resendUrl]);
+    assert.equal(queue.operations.filter((entry) => entry.type === 'put').length, 1);
+    assert.match(queue.operations[0].key, /^pending:/);
+  }
+});
+
+test('CRM non-OK and network failures queue the emailed lead', async () => {
+  for (const fetchOptions of [
+    { crmStatus: 503 },
+    { crmError: new Error('CRM network unavailable') },
+  ]) {
+    const current = makeEnv();
+    const queue = makeKv();
+    Object.assign(current.env, {
+      CRN_INGEST_URL: legacyCrmUrl,
+      CRM_INGEST_SECRET: 'test-crm-ingest-secret',
+      LEAD_QUEUE: queue,
+    });
+    const calls = installFetch(
+      { success: true, hostname: 'epictech.club', action: 'lead_intake' },
+      fetchOptions,
+    );
+    const response = await worker.fetch(requestFor('/lead-intake'), current.env);
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl, resendUrl, legacyCrmUrl]);
+    assert.equal(queue.operations.filter((entry) => entry.type === 'put').length, 1);
+  }
+});
+
 test('expected action comes from the route and the honeypot remains side-effect free', async () => {
   const { env } = makeEnv();
   const calls = installFetch({
@@ -230,4 +595,32 @@ test('expected action comes from the route and the honeypot remains side-effect 
   );
   assert.equal(honeypot.status, 200);
   assert.equal(honeypotCalls.length, 0);
+});
+
+test('moderation HTML sends anti-framing and browser hardening headers', async () => {
+  const { env, kv } = makeEnv();
+  const response = await worker.fetch(
+    new Request('https://intake.epictech.club/review-approve?id=missing&sig=missing'),
+    env,
+  );
+
+  assert.equal(response.status, 400);
+  assert.equal(kv.operations.length, 0);
+  assert.match(response.headers.get('Content-Security-Policy'), /frame-ancestors 'none'/);
+  assert.match(response.headers.get('Content-Security-Policy'), /form-action 'self'/);
+  assert.equal(response.headers.get('Referrer-Policy'), 'no-referrer');
+  assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff');
+});
+
+test('moderation lookup accepts only generated UUID and HMAC shapes', async () => {
+  const { env, kv } = makeEnv();
+  const id = '123e4567-e89b-42d3-a456-426614174000';
+  const sig = 'a'.repeat(64);
+  const response = await worker.fetch(
+    new Request('https://intake.epictech.club/review-approve?id=' + id + '&sig=' + sig),
+    env,
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(kv.operations, [{ type: 'get', key: 'review:pending:' + id }]);
 });

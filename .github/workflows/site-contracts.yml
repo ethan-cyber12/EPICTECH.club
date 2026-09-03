@@ -37,8 +37,11 @@ jobs:
       - name: Audit Node dependencies
         run: npm audit --audit-level=high
 
-      - name: Run media contracts
+      - name: Run JavaScript contracts, including Worker security
         run: npm run test:media
+
+      - name: Validate Cloudflare Worker bundle and bindings
+        run: npm run worker:check
 
       - name: Verify published media
         run: npm run media:verify
