@@ -47,27 +47,15 @@ ORDERED_CANONICALS = (
 
 SEARCH_AND_ANSWER_AGENTS = (
     "OAI-SearchBot",
-    "ChatGPT-User",
-    "Claude-SearchBot",
-    "Claude-User",
     "PerplexityBot",
     "Perplexity-User",
     "Googlebot",
     "bingbot",
 )
 
-TRAINING_AGENTS = ("GPTBot", "ClaudeBot", "Google-Extended")
+TRAINING_AGENTS = ("GPTBot", "Google-Extended")
 
 OPTION_A_ROBOTS = """User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: Claude-SearchBot
-Allow: /
-
-User-agent: Claude-User
 Allow: /
 
 User-agent: PerplexityBot
@@ -164,7 +152,6 @@ class SitemapAndRobotsTests(unittest.TestCase):
             self.assertIn(agent, policy)
         for official_url in (
             "https://developers.openai.com/api/docs/bots",
-            "https://support.claude.com/en/articles/8896518-does-anthropic-crawl-data-from-the-web-and-how-can-site-owners-block-the-crawler",
             "https://docs.perplexity.ai/docs/resources/perplexity-crawlers",
             "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers",
             "https://developers.cloudflare.com/bots/additional-configurations/block-ai-bots/",
