@@ -662,8 +662,10 @@ class CaseStudyTests(unittest.TestCase):
                 )
                 self.assertIn(f'href="/assets/projects/{case["pdf"]}"', main)
                 self.assertIn(f'href="{case["service"]}"', main)
-                self.assertIn(f"{case['visual']}-640.avif 640w", source)
-                self.assertIn(f"{case['visual']}-1200.webp 1200w", source)
+                self.assertIn(f"{case['visual']}-640.avif?v=20260903 640w", source)
+                self.assertIn(f"{case['visual']}-1920.avif?v=20260903 1920w", source)
+                self.assertIn(f"{case['visual']}-1200.webp?v=20260903 1200w", source)
+                self.assertIn(f"{case['visual']}-1920.webp?v=20260903 1920w", source)
                 image = re.search(
                     rf'<img[^>]+{case["visual"]}-1200\.webp[^>]*>',
                     source,

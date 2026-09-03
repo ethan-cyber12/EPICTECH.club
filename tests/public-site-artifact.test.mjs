@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import { readFile, readdir, rm, stat } from "node:fs/promises";
+import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 
-import { buildPublicSite, OUTPUT_DIR } from "../scripts/build-public-site.mjs";
+import { buildPublicSite, clearOutputDirectory, OUTPUT_DIR } from "../scripts/build-public-site.mjs";
 
 async function artifactFiles() {
   const entries = await readdir(OUTPUT_DIR, { withFileTypes: true, recursive: true });
@@ -14,7 +14,7 @@ async function artifactFiles() {
 }
 
 test("public build contains only the explicit deployable surface", async (context) => {
-  context.after(() => rm(OUTPUT_DIR, { recursive: true, force: true }));
+  context.after(() => clearOutputDirectory());
   const { copied } = await buildPublicSite();
   const files = await artifactFiles();
 

@@ -31,11 +31,10 @@ class FounderPageTests(unittest.TestCase):
 
     def test_founder_portrait_is_responsive_and_informative(self) -> None:
         self.assertEqual(self.html.count('data-media-source="founder-photo"'), 1)
-        self.assertNotIn('data-media-source="generated"', self.html)
         self.assertIn("ethan-platt-graduation-close-640.avif", self.html)
         self.assertIn("ethan-platt-graduation-close-1200.webp", self.html)
         self.assertIn('width="1200" height="1500"', self.html)
-        self.assertIn('alt="Ethan Platt at his graduation ceremony"', self.html)
+        self.assertIn('alt="Ethan Platt, founder of EPIC TECH LLC"', self.html)
 
     def test_sensitive_details_are_absent(self) -> None:
         for forbidden in (

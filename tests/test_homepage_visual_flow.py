@@ -18,13 +18,13 @@ HOME_SERVICE_LINKS = {
 GENERATED_HOME_BASENAMES = {
     "epic-hero-connected-workshop",
     "epic-service-firewalls-security",
+    "epic-service-websites",
     "epic-service-automation",
     "epic-service-virtualization",
 }
 
 UNUSED_HOME_BASENAMES = {
     "epic-service-network-wifi",
-    "epic-service-websites",
     "epic-service-business-apps",
     "epic-service-ecommerce",
     "epic-service-internal-tools",
@@ -66,20 +66,25 @@ class HomepageVisualFlowTests(unittest.TestCase):
                 self.assertRegex(self.html, f"(?:{pattern}|{reverse})")
                 self.assertIn(label, self.html)
 
-    def test_homepage_uses_only_four_generated_raster_placements(self) -> None:
-        self.assertEqual(self.html.count('data-media-source="generated"'), 4)
+    def test_homepage_uses_only_five_service_visual_placements(self) -> None:
+        self.assertEqual(self.html.count('class="visual-hero__visual"'), 1)
+        self.assertEqual(self.html.count('class="service-chapter__visual"'), 4)
+        self.assertNotIn("epic-detail-", self.html)
         for basename in GENERATED_HOME_BASENAMES:
             self.assertIn(basename, self.html)
         for basename in UNUSED_HOME_BASENAMES:
             self.assertNotIn(basename, self.html)
 
-    def test_websites_and_ecommerce_use_a_code_native_diagram(self) -> None:
+    def test_websites_and_ecommerce_use_a_responsive_browser_visual(self) -> None:
         chapter = re.search(r'<article class="service-chapter" id="websites-commerce">(.*?)</article>', self.html, re.DOTALL)
         self.assertIsNotNone(chapter)
         markup = chapter.group(1)
-        self.assertRegex(markup, r'class="[^"]*\bcode-diagram\b[^"]*"')
-        self.assertIn('data-media-source="code-native"', markup)
-        self.assertNotIn("<img", markup)
+        self.assertIn('class="service-chapter__visual"', markup)
+        self.assertNotIn('data-media-source=', markup)
+        self.assertIn("epic-service-websites-640.avif", markup)
+        self.assertIn("epic-service-websites-1200.webp", markup)
+        self.assertIn("epic-service-websites-1920.webp", markup)
+        self.assertIn("<img", markup)
 
     def test_founder_proof_process_and_close_use_real_evidence(self) -> None:
         self.assertIn('class="founder-bridge"', self.html)

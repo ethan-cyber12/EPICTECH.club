@@ -57,10 +57,15 @@ async function copyPublicTree(tree) {
   return copied;
 }
 
-export async function buildPublicSite() {
+export async function clearOutputDirectory() {
   assertSafeOutputDirectory();
-  await rm(OUTPUT_DIR, { recursive: true, force: true });
   await mkdir(OUTPUT_DIR, { recursive: true });
+  const entries = await readdir(OUTPUT_DIR);
+  await Promise.all(entries.map((entry) => rm(path.join(OUTPUT_DIR, entry), { recursive: true, force: true })));
+}
+
+export async function buildPublicSite() {
+  await clearOutputDirectory();
 
   let copied = 0;
   for (const relative of PUBLIC_ROOT_FILES) {

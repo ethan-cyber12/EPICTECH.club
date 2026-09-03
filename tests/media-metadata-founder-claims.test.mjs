@@ -50,5 +50,5 @@ test('founder portrait contract remains informative and responsive', () => {
   assert.match(founder, /ethan-platt-graduation-close-1200\.webp/);
   assert.match(founder, /ethan-platt-graduation-close-1200\.jpg/);
   assert.match(founder, /width="1200" height="1500"/);
-  assert.match(founder, /alt="Ethan Platt at his graduation ceremony"/);
+  assert.match(founder, /alt="Ethan Platt, founder of EPIC TECH LLC"/);
 });

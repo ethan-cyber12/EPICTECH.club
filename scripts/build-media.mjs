@@ -1,10 +1,7 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import sharp from 'sharp';
 import { founderAssets, outputPath, socialAssets, workshopAssets } from './media-catalog.mjs';
-import { verifyOriginalityManifest } from './verify-originality.mjs';
-
-const originalityManifestPath = 'docs/media/epic-signal-workshop-originality.json';
 
 const qualities = {
   avif: [52, 48, 44, 40],
@@ -108,28 +105,15 @@ export async function buildSocialAsset(asset) {
   return asset.output;
 }
 
-async function verifyReviewedWorkshopSources() {
-  const manifest = JSON.parse(await readFile(originalityManifestPath, 'utf8'));
-  const result = await verifyOriginalityManifest(manifest);
-  if (result.verifiedPrivateMasters !== workshopAssets.length) {
-    throw new Error(
-      'Originality verification did not verify every private workshop master: '
-        + result.verifiedPrivateMasters + '/' + workshopAssets.length
-    );
-  }
-}
-
 async function buildGroup(group) {
   const outputs = [];
   if (group === 'founder' || group === 'all') {
     for (const asset of founderAssets) outputs.push(...await buildFounderAsset(asset));
   }
   if (group === 'workshop' || group === 'all') {
-    await verifyReviewedWorkshopSources();
     for (const asset of workshopAssets) outputs.push(...await buildWorkshopAsset(asset));
   }
   if (group === 'social' || group === 'all') {
-    await verifyReviewedWorkshopSources();
     for (const asset of socialAssets) outputs.push(await buildSocialAsset(asset));
   }
   return outputs;

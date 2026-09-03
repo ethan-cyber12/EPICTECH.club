@@ -17,6 +17,14 @@ SERVICE_BASES = (
     "epic-service-ecommerce",
     "epic-service-virtualization",
     "epic-service-internal-tools",
+    "epic-detail-network-wifi",
+    "epic-detail-firewalls-security",
+    "epic-detail-websites",
+    "epic-detail-business-apps",
+    "epic-detail-automation",
+    "epic-detail-ecommerce",
+    "epic-detail-virtualization",
+    "epic-detail-internal-tools",
 )
 
 CASE_PREVIEWS = (
@@ -76,10 +84,10 @@ class VisualQualityGateTests(unittest.TestCase):
 
     def test_homepage_media_hierarchy_and_loading_contract(self) -> None:
         home = read_text("index.html")
-        self.assertEqual(home.count('data-media-source="generated"'), 4)
+        self.assertEqual(home.count('<picture'), 6)
         self.assertEqual(home.count('data-media-source="founder-photo"'), 1)
         self.assertEqual(home.count('data-media-source="pdf-preview"'), 3)
-        self.assertEqual(home.count('data-media-source="code-native"'), 1)
+        self.assertEqual(home.count('data-media-source="code-native"'), 0)
         self.assertEqual(home.count('fetchpriority="high"'), 1)
         self.assertEqual(len(re.findall(r'<article class="service-chapter"', home)), 4)
         self.assertEqual(len(re.findall(r'class="service-destination"', home)), 8)

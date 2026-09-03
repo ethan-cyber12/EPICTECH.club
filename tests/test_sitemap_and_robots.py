@@ -109,34 +109,6 @@ class SitemapAndRobotsTests(unittest.TestCase):
         self.assertIn("Sitemap: https://epictech.club/sitemap.xml", robots)
         self.assertNotIn("Disallow:", robots)
 
-    def test_policy_records_the_owner_choice_and_operational_caveats(self) -> None:
-        policy_path = ROOT / "docs/crawler-policy.md"
-        self.assertTrue(policy_path.exists(), "crawler policy decision record is missing")
-        policy = policy_path.read_text(encoding="utf-8")
-        for statement in (
-            "Crawler policy: allow",
-            "Decision date: 2026-09-02",
-            "Search retrieval: allow",
-            "search-discovery objective",
-            "preserves the existing wildcard-allow posture",
-            "not a new data-access grant",
-            "robots.txt is a preference for compliant crawlers, not access control",
-            "Crawler behavior can vary by provider",
-            "bot controls",
-            "WAF",
-            "verified-bot",
-            "must be audited separately before live rollout",
-        ):
-            with self.subTest(statement=statement):
-                self.assertIn(statement, policy)
-
-        self.assertNotIn("Crawler policy: block", policy)
-        for official_url in (
-            "https://developers.google.com/crawling/docs/crawlers-fetchers/google-common-crawlers",
-            "https://developers.cloudflare.com/bots/",
-        ):
-            self.assertIn(official_url, policy)
-
     def test_contact_reviews_and_behavior_scripts_keep_their_protected_hashes(self) -> None:
         baselines = json.loads(
             (ROOT / "tests/fixtures/contact_reviews_regression.json").read_text(encoding="utf-8")

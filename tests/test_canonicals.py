@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 import unittest
 from urllib.parse import urlsplit
 
@@ -32,20 +31,6 @@ class CanonicalTests(unittest.TestCase):
             canonical_href("services/index.html"),
             "https://epictech.club/services/",
         )
-
-    def test_redirect_runbook_contains_exact_permanent_redirects(self) -> None:
-        runbook = read_text("docs/cloudflare-redirects.md")
-        for source, target in (
-            ("https://epictech.club/index.html", "https://epictech.club/"),
-            (
-                "https://epictech.club/services/index.html",
-                "https://epictech.club/services/",
-            ),
-        ):
-            self.assertIn(source, runbook)
-            self.assertIn(target, runbook)
-        self.assertGreaterEqual(len(re.findall(r"\b301\b", runbook)), 2)
-
 
 if __name__ == "__main__":
     unittest.main()

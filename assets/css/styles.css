@@ -45,10 +45,11 @@
 .editorial-thesis {
   margin: 0;
   padding-block: clamp(80px, 12vw, 170px);
-  font-size: clamp(2.6rem, 7vw, 6.8rem);
+  font-size: clamp(2rem, 3.6vw, 3.25rem);
   line-height: .94;
   letter-spacing: -.055em;
-  max-width: 15ch;
+  max-width: none;
+  white-space: nowrap;
 }
 .editorial-thesis::after {
   content: "";
@@ -94,20 +95,6 @@
 .service-chapter__visual img {
   aspect-ratio: 8 / 5;
 }
-.code-diagram {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(20px, .25fr) minmax(0, 1fr) minmax(20px, .25fr) minmax(0, 1fr);
-  gap: clamp(12px, 3vw, 28px);
-  align-items: center;
-  aspect-ratio: 8 / 5;
-  padding: clamp(22px, 5vw, 58px);
-  border-radius: 30px;
-  background: var(--soft);
-  border: 1px solid var(--line);
-}
-.code-diagram__node { padding: clamp(14px, 2vw, 24px); border: 2px solid var(--brand); border-radius: 18px; background: var(--bg); text-align: center; font-weight: 900; }
-.code-diagram__node:last-child { border-color: var(--accent); }
-.code-diagram__connector { height: 3px; background: linear-gradient(90deg, var(--brand), var(--accent)); }
 .pdf-preview { display: block; margin: 0 0 22px; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: var(--bg); }
 .pdf-preview img { display: block; width: 100%; height: auto; aspect-ratio: 612 / 792; object-fit: cover; object-position: top; }
 
@@ -423,6 +410,11 @@
   .side-nav{position:static}
   .hero{padding-top:54px}
   .hero-image{min-height:260px}
+  .editorial-thesis {
+    max-width: 15ch;
+    font-size: clamp(2.6rem, 7vw, 6.8rem);
+    white-space: normal;
+  }
   .visual-hero,
   .founder-bridge,
   .founder-layout,
@@ -485,8 +477,6 @@
   .process-timeline { grid-template-columns: 1fr; }
   .trust-rail > div + div { border-left: 0; border-top: 1px solid var(--line); }
   .service-chapter__layout { padding-block: 34px; }
-  .code-diagram { grid-template-columns: 1fr; aspect-ratio: auto; }
-  .code-diagram__connector { width: 3px; height: 28px; justify-self: center; }
   .assessment-path { grid-template-columns: 1fr; gap: 0; }
   .assessment-path__step { padding-block: 18px; }
   .assessment-path__connector { width: 2px; height: 24px; margin-left: 8px; }

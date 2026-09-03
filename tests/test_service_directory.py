@@ -141,8 +141,9 @@ class ServiceDirectoryTests(unittest.TestCase):
                     re.DOTALL,
                 )
                 self.assertIsNotNone(entry)
-                self.assertIn(f"{basename}-1200.avif", entry.group(1))
-                self.assertIn(f"{basename}-1200.webp", entry.group(1))
+                for width in (640, 1200, 1920):
+                    self.assertIn(f"{basename}-{width}.avif?v=20260903 {width}w", entry.group(1))
+                    self.assertIn(f"{basename}-{width}.webp?v=20260903 {width}w", entry.group(1))
                 self.assertIn('loading="lazy"', entry.group(1))
                 self.assertIn('alt=""', entry.group(1))
 
@@ -156,15 +157,15 @@ class ServiceDirectoryTests(unittest.TestCase):
         markup = hero.group(1)
         self.assertEqual(markup.count("<picture"), 1)
         self.assertIn('class="service-index-hero__visual"', markup)
-        self.assertIn('data-media-source="generated"', markup)
+        self.assertNotIn('data-media-source=', markup)
         for width in (640, 1200, 1920):
-            self.assertIn(f"epic-hero-connected-workshop-{width}.avif {width}w", markup)
-            self.assertIn(f"epic-hero-connected-workshop-{width}.webp {width}w", markup)
+            self.assertIn(f"epic-hero-connected-workshop-{width}.avif?v=20260903 {width}w", markup)
+            self.assertIn(f"epic-hero-connected-workshop-{width}.webp?v=20260903 {width}w", markup)
         self.assertIn('type="image/avif"', markup)
         self.assertIn('type="image/webp"', markup)
         self.assertRegex(
             markup,
-            r'<img[^>]+src="\.\./assets/images/service-visuals/epic-hero-connected-workshop-1920\.webp"[^>]+width="1920"[^>]+height="1200"[^>]+alt=""[^>]+fetchpriority="high"[^>]+decoding="async"[^>]*>',
+            r'<img[^>]+src="\.\./assets/images/service-visuals/epic-hero-connected-workshop-1920\.webp\?v=20260903"[^>]+width="1920"[^>]+height="1200"[^>]+alt=""[^>]+fetchpriority="high"[^>]+decoding="async"[^>]*>',
         )
         self.assertNotIn('loading="lazy"', markup)
         self.assertEqual(self.html.count('fetchpriority="high"'), 1)

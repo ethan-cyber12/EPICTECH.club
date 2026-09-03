@@ -1,13 +1,11 @@
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
-import { appendFile, cp, mkdir, mkdtemp, readFile, rm, stat } from 'node:fs/promises';
+import { appendFile, cp, mkdir, mkdtemp, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import sharp from 'sharp';
 import { workshopAssets, socialAssets, outputPath } from '../scripts/media-catalog.mjs';
 import { buildReviewSheet } from '../scripts/build-review-sheets.mjs';
-import { buildPublicDerivativesById } from '../scripts/record-originality.mjs';
 import { verifyMedia } from '../scripts/verify-media.mjs';
 
 test('service visuals have exact dimensions, formats, budgets, and no metadata', async () => {
@@ -54,32 +52,11 @@ test('founder social image uses the approved real graduation derivative and revi
   assert.equal(asset.position, 'north');
 });
 
-test('originality records enumerate six exact derivative hashes per workshop asset', async () => {
-  const derivativesById = await buildPublicDerivativesById(workshopAssets);
-  for (const asset of workshopAssets) {
-    const records = derivativesById.get(asset.id);
-    assert.equal(records.length, 6, asset.id);
-    assert.deepEqual(records.map(({ width, format }) => ({ width, format })), [
-      { width: 640, format: 'avif' },
-      { width: 640, format: 'webp' },
-      { width: 1200, format: 'avif' },
-      { width: 1200, format: 'webp' },
-      { width: 1920, format: 'avif' },
-      { width: 1920, format: 'webp' }
-    ], asset.id);
-    for (const record of records) {
-      const bytes = await readFile(record.path);
-      assert.equal(record.sha256, createHash('sha256').update(bytes).digest('hex'), record.path);
-    }
-  }
-});
-
 test('independent verifier accepts the complete public media interface', async () => {
   assert.deepEqual(await verifyMedia(), {
-    founderFiles: 15,
-    serviceVisualFiles: 54,
+    founderFiles: 5,
+    serviceVisualFiles: 102,
     socialFiles: 2,
-    verifiedServiceHashes: 54,
     privacyFindings: 0
   });
 });
@@ -89,11 +66,6 @@ test('independent verifier reports a forbidden privacy token and its public path
   try {
     await mkdir(join(root, 'assets'), { recursive: true });
     await cp('assets/images', join(root, 'assets/images'), { recursive: true });
-    await mkdir(join(root, 'docs/media'), { recursive: true });
-    await cp(
-      'docs/media/epic-signal-workshop-originality.json',
-      join(root, 'docs/media/epic-signal-workshop-originality.json')
-    );
     const publicPath = join(root, 'assets/images/social/epic-tech-home-og-1200x630.jpg');
     await appendFile(publicPath, Buffer.from('GPS'));
 

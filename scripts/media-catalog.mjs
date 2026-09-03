@@ -8,32 +8,8 @@ export const founderAssets = [
     formats: ['avif', 'webp'],
     jpgWidths: [1200],
     aspect: { width: 4, height: 5 },
-    crop: { strategy: 'extract', left: 700, top: 600, width: 2600, height: 3250 },
-    alt: 'Ethan Platt at his graduation ceremony'
-  },
-  {
-    id: 'ethan-platt-graduation-full-body',
-    input: '.private-media/founder/ethan-full-body-graduation-original',
-    workingInput: '.private-media/founder/ethan-full-body-graduation-working.png',
-    outputBase: 'assets/images/founder/ethan-platt-graduation-full-body',
-    widths: [640, 1200],
-    formats: ['avif', 'webp'],
-    jpgWidths: [1200],
-    aspect: { width: 2, height: 3 },
-    crop: { strategy: 'extract', left: 642, top: 1100, width: 3000, height: 4500 },
-    alt: 'Ethan Platt in graduation attire'
-  },
-  {
-    id: 'ethan-platt-graduation-open-arms',
-    input: '.private-media/founder/ethan-open-arms-graduation-original',
-    workingInput: '.private-media/founder/ethan-open-arms-graduation-working.png',
-    outputBase: 'assets/images/founder/ethan-platt-graduation-open-arms',
-    widths: [640, 1200],
-    formats: ['avif', 'webp'],
-    jpgWidths: [1200],
-    aspect: { width: 2, height: 3 },
-    crop: { strategy: 'extract', left: 642, top: 1100, width: 3000, height: 4500 },
-    alt: ''
+    crop: { strategy: 'attention' },
+    alt: 'Ethan Platt, founder of EPIC TECH LLC'
   }
 ];
 
@@ -46,7 +22,15 @@ const workshopIds = [
   'epic-service-automation',
   'epic-service-ecommerce',
   'epic-service-virtualization',
-  'epic-service-internal-tools'
+  'epic-service-internal-tools',
+  'epic-detail-network-wifi',
+  'epic-detail-firewalls-security',
+  'epic-detail-websites',
+  'epic-detail-business-apps',
+  'epic-detail-automation',
+  'epic-detail-ecommerce',
+  'epic-detail-virtualization',
+  'epic-detail-internal-tools'
 ];
 
 export const workshopAssets = workshopIds.map((id) => ({

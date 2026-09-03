@@ -28,7 +28,6 @@ class VisualFoundationTests(unittest.TestCase):
             ".service-chapter__visual",
             ".service-destinations",
             ".service-destination",
-            ".code-diagram",
             ".pdf-preview",
             ".founder-bridge",
             ".founder-layout",

@@ -7,16 +7,12 @@ import {
   outputPath
 } from '../scripts/media-catalog.mjs';
 
-test('catalog exposes the three supplied founder sources', () => {
+test('catalog exposes only the founder portrait used by the site', () => {
   assert.deepEqual(founderAssets.map((asset) => asset.id), [
-    'ethan-platt-graduation-close',
-    'ethan-platt-graduation-full-body',
-    'ethan-platt-graduation-open-arms'
+    'ethan-platt-graduation-close'
   ]);
   assert.deepEqual(founderAssets.map((asset) => asset.input), [
-    '.private-media/founder/ethan-close-graduation-original',
-    '.private-media/founder/ethan-full-body-graduation-original',
-    '.private-media/founder/ethan-open-arms-graduation-original'
+    '.private-media/founder/ethan-close-graduation-original'
   ]);
   for (const asset of founderAssets) {
     assert.deepEqual(asset.widths, [640, 1200]);
@@ -36,7 +32,15 @@ test('catalog matches the visual-pages workshop interface exactly', () => {
     'epic-service-automation',
     'epic-service-ecommerce',
     'epic-service-virtualization',
-    'epic-service-internal-tools'
+    'epic-service-internal-tools',
+    'epic-detail-network-wifi',
+    'epic-detail-firewalls-security',
+    'epic-detail-websites',
+    'epic-detail-business-apps',
+    'epic-detail-automation',
+    'epic-detail-ecommerce',
+    'epic-detail-virtualization',
+    'epic-detail-internal-tools'
   ]);
   for (const asset of workshopAssets) {
     assert.deepEqual(asset.widths, [640, 1200, 1920]);

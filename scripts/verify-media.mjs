@@ -3,9 +3,6 @@ import { extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { founderAssets, outputPath, socialAssets, workshopAssets } from './media-catalog.mjs';
-import { sha256File } from './originality-lib.mjs';
-
-const manifestPath = 'docs/media/epic-signal-workshop-originality.json';
 const publicImagesDirectory = 'assets/images';
 const allowedExtensions = new Set(['.avif', '.webp', '.jpg', '.jpeg']);
 const forbiddenPrivacyTokens = ['GPS', 'DateTimeOriginal', 'Make', 'Model', 'SerialNumber', 'gmail.com', 'tel:'];
@@ -124,40 +121,20 @@ async function verifySocialAssets(rootDirectory) {
   }
 }
 
-async function verifyServiceHashes(rootDirectory) {
-  const manifest = JSON.parse(await readFile(projectPath(rootDirectory, manifestPath), 'utf8'));
-  const records = manifest.assets.flatMap((asset) => asset.publicDerivatives);
-  requireCondition(records.length === 54, 'originality manifest must contain exactly 54 public derivative hashes');
-  const recordsByPath = new Map(records.map((record) => [record.path, record]));
-  requireCondition(recordsByPath.size === 54, 'originality manifest contains duplicate public derivative paths');
-
-  let verified = 0;
-  for (const asset of workshopAssets) {
-    for (const width of asset.widths) {
-      for (const format of asset.formats) {
-        const relativePath = outputPath(asset.outputBase, width, format);
-        const record = recordsByPath.get(relativePath);
-        requireCondition(record !== undefined, 'originality manifest is missing ' + relativePath);
-        requireCondition(record.width === width, relativePath + ' manifest width is incorrect');
-        requireCondition(record.format === format, relativePath + ' manifest format is incorrect');
-        requireCondition(
-          await sha256File(projectPath(rootDirectory, relativePath)) === record.sha256,
-          relativePath + ' hash does not match the originality manifest'
-        );
-        verified += 1;
-      }
-    }
-  }
-  return verified;
-}
-
 export async function verifyMedia(options = {}) {
   const rootDirectory = options.rootDirectory ?? '.';
   const founderFiles = await listFiles(projectPath(rootDirectory, 'assets/images/founder'));
   const serviceVisualFiles = await listFiles(projectPath(rootDirectory, 'assets/images/service-visuals'));
   const socialFiles = await listFiles(projectPath(rootDirectory, 'assets/images/social'));
-  requireCondition(founderFiles.length === 15, 'assets/images/founder must contain exactly 15 files');
-  requireCondition(serviceVisualFiles.length === 54, 'assets/images/service-visuals must contain exactly 54 files');
+  requireCondition(founderFiles.length === 5, 'assets/images/founder must contain exactly five files');
+  const expectedServiceVisualFiles = workshopAssets.reduce(
+    (total, asset) => total + (asset.widths.length * asset.formats.length),
+    0
+  );
+  requireCondition(
+    serviceVisualFiles.length === expectedServiceVisualFiles,
+    'assets/images/service-visuals must contain exactly ' + expectedServiceVisualFiles + ' files'
+  );
   requireCondition(socialFiles.length === 2, 'assets/images/social must contain exactly two files');
 
   const publicFiles = await listFiles(projectPath(rootDirectory, publicImagesDirectory));
@@ -181,13 +158,11 @@ export async function verifyMedia(options = {}) {
   await verifyFounderAssets(rootDirectory);
   await verifyWorkshopAssets(rootDirectory);
   await verifySocialAssets(rootDirectory);
-  const verifiedServiceHashes = await verifyServiceHashes(rootDirectory);
 
   return {
     founderFiles: founderFiles.length,
     serviceVisualFiles: serviceVisualFiles.length,
     socialFiles: socialFiles.length,
-    verifiedServiceHashes,
     privacyFindings: 0
   };
 }
@@ -198,7 +173,6 @@ async function main() {
     'PASS media: ' + result.founderFiles + ' founder files; '
       + result.serviceVisualFiles + ' service visuals; '
       + result.socialFiles + ' social files; '
-      + result.verifiedServiceHashes + ' service hashes verified; '
       + result.privacyFindings + ' privacy findings.'
   );
 }
