@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/webp" href="assets/images/logo/epic-tech-logo-final.webp">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; form-action 'self' mailto:; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
 
@@ -17,57 +18,79 @@
   <meta property="og:title" content="Small Business IT, Networks &amp; Websites | EPIC TECH, Orlando">
   <meta property="og:description" content="Small business IT for Orlando and Central Florida: secure networks, business websites, and custom apps that replace unreliable Wi-Fi and scattered spreadsheets.">
   <meta property="og:url" content="https://epictech.club/">
-  <meta property="og:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
-  <meta property="og:image:alt" content="EPIC TECH LLC logo">
+  <meta property="og:image" content="https://epictech.club/assets/images/social/epic-tech-home-og-1200x630.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:alt" content="Abstract EPIC TECH signal workshop connecting business technology systems">
 
   <!-- Twitter -->
-  <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Small Business IT, Networks &amp; Websites | EPIC TECH, Orlando">
   <meta name="twitter:description" content="Small business IT for Orlando and Central Florida: secure networks, business websites, and custom apps that replace unreliable Wi-Fi and scattered spreadsheets.">
-  <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
+  <meta name="twitter:image" content="https://epictech.club/assets/images/social/epic-tech-home-og-1200x630.jpg">
+  <meta name="twitter:image:alt" content="Abstract EPIC TECH signal workshop connecting business technology systems">
 
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260903">
 
   <!-- LocalBusiness / Organization structured data.
        JSON-LD is non-executable data and is NOT restricted by script-src 'self'. -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    "@id": "https://epictech.club/#business",
-    "name": "EPIC TECH LLC",
-    "url": "https://epictech.club/",
-    "image": "https://epictech.club/assets/images/logo/epic-tech-logo-final.webp",
-    "logo": "https://epictech.club/assets/images/logo/epic-tech-logo-final.webp",
-    "description": "Veteran-owned, family-operated technology optimization for small businesses in Central Florida. Secure networks, clean websites, business apps, CRM tools, and documented support.",
-    "priceRange": "$$",
-    "areaServed": [
-      { "@type": "City", "name": "Orlando" },
-      { "@type": "City", "name": "Winter Park" },
-      { "@type": "City", "name": "Maitland" },
-      { "@type": "City", "name": "Oviedo" },
-      { "@type": "City", "name": "Lake Mary" },
-      { "@type": "AdministrativeArea", "name": "Central Florida" }
-    ],
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Orlando",
-      "addressRegion": "FL",
-      "addressCountry": "US"
-    },
-    "knowsAbout": [
-      "Network security",
-      "Firewall configuration",
-      "Ubiquiti",
-      "Cloudflare",
-      "DNS",
-      "Small business IT support",
-      "Website maintenance",
-      "Business CRM tools",
-      "Business dashboards",
-      "Automation"
-    ],
-    "sameAs": []
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://epictech.club/#website",
+        "url": "https://epictech.club/",
+        "name": "EPIC TECH LLC",
+        "publisher": {"@id": "https://epictech.club/#business"}
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://epictech.club/#business",
+        "name": "EPIC TECH LLC",
+        "url": "https://epictech.club/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://epictech.club/assets/images/logo/epic-tech-logo-final.webp",
+          "width": 787,
+          "height": 904
+        },
+        "founder": {"@id": "https://epictech.club/#ethan-platt"},
+        "areaServed": {
+          "@type": "AdministrativeArea",
+          "name": "Central Florida"
+        },
+        "knowsAbout": [
+          "Small business networks",
+          "Business Wi-Fi",
+          "Firewalls and cybersecurity",
+          "Business websites",
+          "Business applications",
+          "Automation",
+          "Ecommerce",
+          "Infrastructure",
+          "Virtualization"
+        ]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://epictech.club/#ethan-platt",
+        "name": "Ethan Platt",
+        "jobTitle": "Founder",
+        "worksFor": {"@id": "https://epictech.club/#business"},
+        "url": "https://epictech.club/founder.html"
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://epictech.club/#webpage",
+        "url": "https://epictech.club/",
+        "name": "Small Business IT, Networks & Websites | EPIC TECH, Orlando",
+        "isPartOf": {"@id": "https://epictech.club/#website"},
+        "about": {"@id": "https://epictech.club/#business"}
+      }
+    ]
   }
   </script>
 </head>
@@ -76,9 +99,10 @@
 
   <header class="site-header">
     <div class="container nav">
-      <a class="brand" href="index.html" aria-label="EPIC TECH home">
+      <a class="brand" href="/" aria-label="EPIC TECH home">
         <img src="assets/images/logo/epic-tech-logo-final.webp"
              alt="EPIC TECH LLC"
+             width="787" height="904"
              class="site-logo">
       </a>
       <button class="menu-btn" data-menu-button aria-expanded="false" aria-controls="nav-links">Menu</button>
@@ -94,127 +118,154 @@
 
   <main id="main">
     <section class="hero">
-      <div class="container hero-grid">
-        <div>
-          <span class="eyebrow">Veteran owned. Family operated.</span>
-          <h1>Small business IT: secure networks, websites, and custom tools</h1>
-          <p class="lead">EPIC TECH helps Central Florida businesses fix unreliable Wi-Fi, replace slow or outdated websites, close security gaps before they become incidents, and build simple tools to replace scattered spreadsheets. Every project starts with a written plan and a clear price.</p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="contact.html">Start with an assessment</a>
-            <a class="btn btn-secondary" href="services/">See our services</a>
+      <div class="container">
+        <div class="visual-hero">
+          <div class="visual-hero__copy">
+            <span class="eyebrow">Veteran owned. Family operated. Central Florida based.</span>
+            <h1>Small business IT: secure networks, websites, and custom tools</h1>
+            <p class="lead">EPIC TECH helps Central Florida businesses fix unreliable Wi-Fi, replace slow or outdated websites, close security gaps before they become incidents, and build simple tools to replace scattered spreadsheets. Every project starts with a written plan and a clear price.</p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="contact.html">Start with an assessment</a>
+              <a class="btn btn-secondary" href="services/">See our services</a>
+            </div>
           </div>
-          <div class="trust-strip">
-            <div class="pill"><strong>Security first</strong><span class="muted">Protect what matters.</span></div>
-            <div class="pill"><strong>Built clean</strong><span class="muted">Simple systems that last.</span></div>
-            <div class="pill"><strong>Clear pricing</strong><span class="muted">Written pricing before work begins.</span></div>
-            <div class="pill"><strong>Local support</strong><span class="muted">Central Florida focused.</span></div>
-          </div>
-        </div>
-
-        <div class="device-card card hero-image">
-          <span class="eyebrow">What gets improved</span>
-          <h2>Less chaos. Better systems. Work that is documented</h2>
-          <p class="muted">Most small businesses do not need a massive IT contract first. They need a clean assessment, a written plan, and practical fixes that make the business easier to run.</p>
-          <div class="status-list">
-            <div class="status-item"><span class="check">✓</span><div><strong>Networks &amp; firewalls</strong><br><span class="muted">Secure Wi-Fi, guest networks, VPN, and rule review.</span></div></div>
-            <div class="status-item"><span class="check">✓</span><div><strong>Websites &amp; Cloudflare</strong><br><span class="muted">Fast static sites, DNS, HTTPS, contact flow, and hardening.</span></div></div>
-            <div class="status-item"><span class="check">✓</span><div><strong>Business apps &amp; CRM</strong><br><span class="muted">Lead tracking, dashboards, quote tools, and workflows.</span></div></div>
-          </div>
+          <picture class="visual-hero__visual">
+              <source type="image/avif" srcset="assets/images/service-visuals/epic-hero-connected-workshop-640.avif?v=20260903 640w, assets/images/service-visuals/epic-hero-connected-workshop-1200.avif?v=20260903 1200w, assets/images/service-visuals/epic-hero-connected-workshop-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 54vw">
+              <source type="image/webp" srcset="assets/images/service-visuals/epic-hero-connected-workshop-640.webp?v=20260903 640w, assets/images/service-visuals/epic-hero-connected-workshop-1200.webp?v=20260903 1200w, assets/images/service-visuals/epic-hero-connected-workshop-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 54vw">
+              <img src="assets/images/service-visuals/epic-hero-connected-workshop-1200.webp?v=20260903" width="1200" height="750" alt="" fetchpriority="high" decoding="async">
+            </picture>
         </div>
       </div>
+    </section>
 
+    <section class="container trust-rail" aria-label="Operating commitments">
+      <div>
+        <strong>Security built in from the start</strong>
+        <span class="muted">Practical safeguards are part of the plan.</span>
+      </div>
+      <div>
+        <strong>Written scope and pricing before work begins</strong>
+        <span class="muted">Know what is included before committing.</span>
+      </div>
+      <div>
+        <strong>Documentation included with every project</strong>
+        <span class="muted">Keep the plan, decisions, and next steps.</span>
+      </div>
+      <div>
+        <strong>Direct, accountable support</strong>
+        <span class="muted">Work with the person responsible for the result.</span>
+      </div>
+    </section>
+
+    <blockquote class="container editorial-thesis">Service before scale. Clarity before complexity.</blockquote>
+
+    <section class="service-chapters" aria-label="Services">
+      <article class="service-chapter" id="networks-security">
+        <div class="container service-chapter__layout">
+          <div class="service-chapter__copy">
+            <span class="eyebrow">Reliable foundations</span>
+            <h2>Networks &amp; Security</h2>
+            <p class="lead">Secure Wi-Fi, guest networks, firewall baselines, VPN basics, and practical protection for daily business operations.</p>
+            <div class="service-destinations">
+              <a class="service-destination" href="services/infrastructure.html">Network & Wi-Fi</a>
+              <a class="service-destination" href="services/firewalls.html">Firewalls & Cybersecurity</a>
+            </div>
+          </div>
+          <picture class="service-chapter__visual">
+              <source type="image/avif" srcset="assets/images/service-visuals/epic-service-firewalls-security-640.avif?v=20260903 640w, assets/images/service-visuals/epic-service-firewalls-security-1200.avif?v=20260903 1200w, assets/images/service-visuals/epic-service-firewalls-security-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 61vw">
+              <source type="image/webp" srcset="assets/images/service-visuals/epic-service-firewalls-security-640.webp?v=20260903 640w, assets/images/service-visuals/epic-service-firewalls-security-1200.webp?v=20260903 1200w, assets/images/service-visuals/epic-service-firewalls-security-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 61vw">
+              <img src="assets/images/service-visuals/epic-service-firewalls-security-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+            </picture>
+        </div>
+      </article>
+
+      <article class="service-chapter" id="websites-commerce">
+        <div class="container service-chapter__layout">
+          <div class="service-chapter__copy">
+            <span class="eyebrow">Clear digital paths</span>
+            <h2>Websites &amp; E-Commerce</h2>
+            <p class="lead">Fast, clean websites that explain your services, capture qualified inquiries, and move each lead into the right follow-up workflow&mdash;with secure online sales available when needed.</p>
+            <div class="service-destinations">
+              <a class="service-destination" href="services/webhosting.html">Websites</a>
+              <a class="service-destination" href="services/ecommerce.html">E-Commerce</a>
+            </div>
+          </div>
+          <picture class="service-chapter__visual">
+              <source type="image/avif" srcset="assets/images/service-visuals/epic-service-websites-640.avif?v=20260903 640w, assets/images/service-visuals/epic-service-websites-1200.avif?v=20260903 1200w, assets/images/service-visuals/epic-service-websites-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 61vw">
+              <source type="image/webp" srcset="assets/images/service-visuals/epic-service-websites-640.webp?v=20260903 640w, assets/images/service-visuals/epic-service-websites-1200.webp?v=20260903 1200w, assets/images/service-visuals/epic-service-websites-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 61vw">
+              <img src="assets/images/service-visuals/epic-service-websites-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+            </picture>
+        </div>
+      </article>
+
+      <article class="service-chapter" id="apps-automation-tools">
+        <div class="container service-chapter__layout">
+          <div class="service-chapter__copy">
+            <span class="eyebrow">Work that moves</span>
+            <h2>Apps, Automation &amp; Internal Tools</h2>
+            <p class="lead">Lead dashboards, client tracking, quote tools, invoice workflows, forms, and repeatable automation built around how your business actually works.</p>
+            <div class="service-destinations">
+              <a class="service-destination" href="services/app-building.html">Business Apps & Dashboards</a>
+              <a class="service-destination" href="services/automation.html">Automation</a>
+              <a class="service-destination" href="services/software.html">Forms & Internal Tools</a>
+            </div>
+          </div>
+          <picture class="service-chapter__visual">
+              <source type="image/avif" srcset="assets/images/service-visuals/epic-service-automation-640.avif?v=20260903 640w, assets/images/service-visuals/epic-service-automation-1200.avif?v=20260903 1200w, assets/images/service-visuals/epic-service-automation-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 61vw">
+              <source type="image/webp" srcset="assets/images/service-visuals/epic-service-automation-640.webp?v=20260903 640w, assets/images/service-visuals/epic-service-automation-1200.webp?v=20260903 1200w, assets/images/service-visuals/epic-service-automation-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 61vw">
+              <img src="assets/images/service-visuals/epic-service-automation-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+            </picture>
+        </div>
+      </article>
+
+      <article class="service-chapter" id="virtualization-labs">
+        <div class="container service-chapter__layout">
+          <div class="service-chapter__copy">
+            <span class="eyebrow">Test without disruption</span>
+            <h2>Virtualization Labs</h2>
+            <p class="lead">We help build small VM labs and isolated environments so technology can be tested without risking the main business network.</p>
+            <div class="service-destinations">
+              <a class="service-destination" href="services/virtualization.html">Virtualization Labs</a>
+            </div>
+          </div>
+          <picture class="service-chapter__visual">
+              <source type="image/avif" srcset="assets/images/service-visuals/epic-service-virtualization-640.avif?v=20260903 640w, assets/images/service-visuals/epic-service-virtualization-1200.avif?v=20260903 1200w, assets/images/service-visuals/epic-service-virtualization-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 61vw">
+              <source type="image/webp" srcset="assets/images/service-visuals/epic-service-virtualization-640.webp?v=20260903 640w, assets/images/service-visuals/epic-service-virtualization-1200.webp?v=20260903 1200w, assets/images/service-visuals/epic-service-virtualization-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 61vw">
+              <img src="assets/images/service-visuals/epic-service-virtualization-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+            </picture>
+        </div>
+      </article>
+    </section>
+
+    <section class="section" aria-label="IT systems and monthly support">
+      <div class="container feature-bar">
+        <div><strong>IT Systems &amp; Monthly Support</strong><span class="muted">Practical support for the tools your business depends on.</span></div>
+        <div><strong>Setup &amp; Updates</strong><span class="muted">Clean configuration and routine maintenance.</span></div>
+        <div><strong>Backups &amp; DNS Review</strong><span class="muted">Clear checks for essential business systems.</span></div>
+        <div><a href="pricing.html#care-plans"><strong>View care plans →</strong></a><span class="muted">Choose the support level that fits.</span></div>
+      </div>
+    </section>
+
+    <section class="section alt">
       <div class="container">
-        <figure class="hero-quote">
-          <blockquote>Service before scale. Clarity before complexity.</blockquote>
-          <figcaption>That is the standard behind every EPIC TECH project.</figcaption>
-        </figure>
+        <div class="founder-bridge">
+          <div>
+            <span class="eyebrow">Founder-led work</span>
+            <h2>Technology should leave people better equipped.</h2>
+            <p class="lead">A veteran founder focused on building clear, practical solutions.</p>
+            <p class="muted">EPIC TECH brings service, technical training, and practical problem solving together so businesses can work with more clarity, efficiency, and confidence.</p>
+            <a class="btn btn-secondary" href="founder.html">Meet the founder →</a>
+          </div>
+          <picture class="founder-portrait" data-media-source="founder-photo">
+            <source type="image/avif" srcset="assets/images/founder/ethan-platt-graduation-close-640.avif?v=20260903-headshot 640w, assets/images/founder/ethan-platt-graduation-close-1200.avif?v=20260903-headshot 1200w" sizes="(max-width: 920px) calc(100vw - 32px), 48vw">
+            <source type="image/webp" srcset="assets/images/founder/ethan-platt-graduation-close-640.webp?v=20260903-headshot 640w, assets/images/founder/ethan-platt-graduation-close-1200.webp?v=20260903-headshot 1200w" sizes="(max-width: 920px) calc(100vw - 32px), 48vw">
+            <img src="assets/images/founder/ethan-platt-graduation-close-1200.jpg?v=20260903-headshot" width="1200" height="1500" alt="Ethan Platt, founder of EPIC TECH LLC" loading="lazy" decoding="async">
+          </picture>
+        </div>
       </div>
     </section>
 
     <section class="section">
-      <div class="container">
-        <div class="section-head">
-          <div><span class="eyebrow">What we do</span><h2>Small business tech, done right</h2></div>
-          <p class="muted">Focused services that fit small businesses without adding unnecessary complexity.</p>
-        </div>
-
-        <div class="grid-3 service-cards">
-          <article class="card">
-            <span class="tag">Network</span>
-            <h3>Network Security</h3>
-            <p class="muted">Secure Wi-Fi, guest networks, firewall baselines, and practical protection for daily business operations.</p>
-            <a href="services/infrastructure.html">View network services →</a>
-          </article>
-
-          <article class="card">
-            <span class="tag">Firewall</span>
-            <h3>Firewalls</h3>
-            <p class="muted">Gateway setup, firewall rules, VPN basics, and safer access without enterprise overhead.</p>
-            <a href="services/firewalls.html">View firewall package →</a>
-          </article>
-
-          <article class="card">
-            <span class="tag">Website</span>
-            <h3>Websites</h3>
-            <p class="muted">Fast, clean websites built to load well, explain your services, and convert visitors into leads.</p>
-            <a href="services/webhosting.html">View website package →</a>
-          </article>
-
-          <article class="card">
-            <span class="tag">Systems</span>
-            <h3>IT Systems</h3>
-            <p class="muted">Practical setup, updates, backups, DNS review, and support for the tools your business depends on.</p>
-            <a href="pricing.html">View support plans →</a>
-          </article>
-
-          <article class="card featured-service">
-            <span class="tag">Highlighted service</span>
-            <h3>Business Apps &amp; CRM</h3>
-            <p class="muted">Lead dashboards, client tracking, quote tools, invoice workflows, and internal apps built around how your business actually works.</p>
-            <a href="services/app-building.html">View business apps →</a>
-          </article>
-
-          <article class="card">
-            <span class="tag">Automation</span>
-            <h3>Automation</h3>
-            <p class="muted">Repeatable scripts and workflows that save time on backups, updates, reporting, and routine technical tasks.</p>
-            <a href="services/automation.html">View automation →</a>
-          </article>
-        </div>
-
-        <div class="feature-bar">
-          <div><strong>Security First</strong><span class="muted">Built with least privilege and clean access.</span></div>
-          <div><strong>Privacy Focused</strong><span class="muted">No sensitive details through public forms.</span></div>
-          <div><strong>Documented</strong><span class="muted">You get the plan, not just the result.</span></div>
-          <div><strong>Business Ready</strong><span class="muted">Built for real workflows and support.</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section alt">
-      <div class="container grid-2">
-        <div>
-          <span class="eyebrow">Highlighted service</span>
-          <h2>Business Apps &amp; Dashboards</h2>
-          <p class="lead">EPIC TECH builds internal tools that help small businesses track leads, clients, quotes, invoices, and follow-ups in one place.</p>
-          <p class="muted">This is for businesses that are tired of scattered notes, missed follow-ups, messy spreadsheets, and manual work that could be organized into a simple dashboard or CRM workflow.</p>
-          <a class="btn btn-secondary" href="services/app-building.html">Learn about business apps →</a>
-        </div>
-        <div class="card">
-          <span class="eyebrow">Common builds</span>
-          <ul>
-            <li>Initial App Development Plan: $150</li>
-            <li>Basic Starter App: starting at $1,000</li>
-            <li>Lead tracking dashboard</li>
-            <li>Client and follow-up CRM</li>
-            <li>Quote, invoice, and service workflow tools</li>
-          </ul>
-          <p class="muted">Each build starts with a written scope, a clear first version, and no unnecessary backend exposure on the public website.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section alt">
       <div class="container">
         <div class="section-head">
           <div>
@@ -223,20 +274,29 @@
           </div>
           <p class="muted">Public-safe examples showing security, infrastructure, and automation capability.</p>
         </div>
-        <div class="grid-3">
-          <article class="card">
+        <div class="proof-triptych">
+          <article>
+            <figure class="pdf-preview" data-media-source="pdf-preview">
+              <img src="assets/images/case-studies/epic-cloud-security-automation-first-page-800.webp" width="800" height="1035" alt="First page of the Cloud Security &amp; Automation public case study" loading="lazy" decoding="async">
+            </figure>
             <span class="tag">Cloud Security</span>
             <h3>Cloud Infrastructure Hardening</h3>
             <p class="muted">Ansible automation, Linux hardening, and repeatable cloud deployment.</p>
             <a href="assets/projects/epic-cloud-security-automation-public-sample.pdf" target="_blank" rel="noopener noreferrer">View case study →</a>
           </article>
-          <article class="card">
+          <article>
+            <figure class="pdf-preview" data-media-source="pdf-preview">
+              <img src="assets/images/case-studies/epic-disa-stig-hardening-first-page-800.webp" width="800" height="1035" alt="First page of the DISA STIG-Aligned System Hardening public case study" loading="lazy" decoding="async">
+            </figure>
             <span class="tag">Security</span>
             <h3>DISA STIG Hardening</h3>
             <p class="muted">Security baseline planning aligned with hardened Linux system concepts.</p>
             <a href="assets/projects/epic-disa-stig-hardening-public-sample.pdf" target="_blank" rel="noopener noreferrer">View case study →</a>
           </article>
-          <article class="card">
+          <article>
+            <figure class="pdf-preview" data-media-source="pdf-preview">
+              <img src="assets/images/case-studies/epic-network-infrastructure-first-page-800.webp" width="800" height="1035" alt="First page of the Business Network Infrastructure Design public case study" loading="lazy" decoding="async">
+            </figure>
             <span class="tag">Networking</span>
             <h3>Business Network Design</h3>
             <p class="muted">Small-business network planning with endpoints, Wi-Fi, server access, and documentation.</p>
@@ -247,17 +307,19 @@
     </section>
 
     <section class="section alt">
-      <div class="container grid-2">
-        <div>
+      <div class="container">
+        <div class="section-head">
+          <div>
           <span class="eyebrow">Simple process</span>
           <h2>You know what is happening before work starts</h2>
+          </div>
           <p class="lead">Every project starts with scope. You get a plain-English plan, exact pricing, and a written handoff so the work does not disappear into someone else's head.</p>
         </div>
-        <div class="steps">
-          <div class="step"><span class="step-number">1</span><div><strong>Assess</strong><p class="muted">We review the network, website, workflow, risk, budget, and goal.</p></div></div>
-          <div class="step"><span class="step-number">2</span><div><strong>Plan</strong><p class="muted">You get options and a clear recommendation before buying hardware or hosting.</p></div></div>
-          <div class="step"><span class="step-number">3</span><div><strong>Build</strong><p class="muted">The setup is completed, tested, and secured with minimal disruption.</p></div></div>
-          <div class="step"><span class="step-number">4</span><div><strong>Document</strong><p class="muted">You get notes, handoff details, and next steps for support.</p></div></div>
+        <div class="process-timeline">
+          <div><span class="process-timeline__number">1</span><div><strong>Assess</strong><p class="muted">We review the network, website, workflow, risk, budget, and goal.</p></div></div>
+          <div><span class="process-timeline__number">2</span><div><strong>Plan</strong><p class="muted">You get options and a clear recommendation before buying hardware or hosting.</p></div></div>
+          <div><span class="process-timeline__number">3</span><div><strong>Build</strong><p class="muted">The setup is completed, tested, and secured with minimal disruption.</p></div></div>
+          <div><span class="process-timeline__number">4</span><div><strong>Document</strong><p class="muted">You get notes, handoff details, and next steps for support.</p></div></div>
         </div>
       </div>
     </section>

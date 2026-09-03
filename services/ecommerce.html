@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/webp" href="../assets/images/logo/epic-tech-logo-final.webp">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self' mailto:; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
   <meta name="description" content="Shopify and WooCommerce store setup for Orlando small businesses: payments, product catalogs, and launch support, from $249.">
   <title>E-Commerce Solutions | EPIC TECH LLC</title>
@@ -18,25 +19,63 @@
   <meta name="twitter:title" content="E-Commerce Solutions | EPIC TECH LLC">
   <meta name="twitter:description" content="Shopify and WooCommerce store setup for Orlando small businesses: payments, product catalogs, and launch support, from $249.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
-  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css?v=20260903">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://epictech.club/services/ecommerce.html#webpage",
+        "url": "https://epictech.club/services/ecommerce.html",
+        "name": "Professional online stores built to generate sales",
+        "isPartOf": {"@id": "https://epictech.club/#website"},
+        "about": {"@id": "https://epictech.club/services/ecommerce.html#service"},
+        "mainEntity": {"@id": "https://epictech.club/services/ecommerce.html#service"},
+        "breadcrumb": {"@id": "https://epictech.club/services/ecommerce.html#breadcrumb"}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://epictech.club/services/ecommerce.html#breadcrumb",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://epictech.club/"},
+          {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://epictech.club/services/"},
+          {"@type": "ListItem", "position": 3, "name": "E-Commerce", "item": "https://epictech.club/services/ecommerce.html"}
+        ]
+      },
+      {
+        "@type": "Service",
+        "@id": "https://epictech.club/services/ecommerce.html#service",
+        "name": "E-Commerce",
+        "serviceType": "E-Commerce",
+        "url": "https://epictech.club/services/ecommerce.html",
+        "provider": {"@id": "https://epictech.club/#business"},
+        "areaServed": {"@type": "AdministrativeArea", "name": "Central Florida"},
+        "mainEntityOfPage": {"@id": "https://epictech.club/services/ecommerce.html#webpage"}
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <header class="site-header">
   <div class="container nav">
-    <a class="brand" href="../index.html">
+    <a class="brand" href="/" aria-label="EPIC TECH home">
   <img src="../assets/images/logo/epic-tech-logo-final.webp"
        alt="EPIC TECH LLC"
+       width="787" height="904"
        class="site-logo">
 </a>
 
-    <button class="menu-btn" data-menu-button aria-expanded="false">
+    <button class="menu-btn" data-menu-button aria-expanded="false" aria-controls="nav-links">
       Menu
     </button>
 
-    <nav class="nav-links" data-nav-links>
-      <a href="index.html">Services</a>
+    <nav class="nav-links" data-nav-links id="nav-links" aria-label="Primary navigation">
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
@@ -45,36 +84,53 @@
   </div>
 </header>
 
-<main>
+<main id="main">
 
   <section class="page-hero">
     <div class="container">
-      <span class="eyebrow">Sell online with confidence</span>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li><a href="/services/">Services</a></li>
+          <li aria-current="page">E-Commerce</li>
+        </ol>
+      </nav>
+      <div class="service-hero">
+        <div>
+          <span class="eyebrow">Sell online with confidence</span>
 
-      <h1>Professional online stores built to generate sales</h1>
+          <h1>Professional online stores built to generate sales</h1>
 
-      <p class="lead">
-        We help businesses launch secure online stores using Shopify and
-        WooCommerce. From payment processing and product setup to launch
-        support and ongoing maintenance, we build stores designed for
-        growth without unnecessary complexity.
-      </p>
+          <p class="lead">
+            We help businesses launch secure online stores using Shopify and
+            WooCommerce. From payment processing and product setup to launch
+            support and ongoing maintenance, we build stores designed for
+            growth without unnecessary complexity.
+          </p>
+        </div>
+        <picture class="service-hero__visual">
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-detail-ecommerce-640.avif?v=20260903-detail 640w, ../assets/images/service-visuals/epic-detail-ecommerce-1200.avif?v=20260903-detail 1200w, ../assets/images/service-visuals/epic-detail-ecommerce-1920.avif?v=20260903-detail 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-detail-ecommerce-640.webp?v=20260903-detail 640w, ../assets/images/service-visuals/epic-detail-ecommerce-1200.webp?v=20260903-detail 1200w, ../assets/images/service-visuals/epic-detail-ecommerce-1920.webp?v=20260903-detail 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
+            <img src="../assets/images/service-visuals/epic-detail-ecommerce-1200.webp?v=20260903-detail" width="1200" height="750" alt="" loading="eager" fetchpriority="high" decoding="async">
+          </picture>
+      </div>
     </div>
   </section>
 
   <section class="section">
-    <div class="container service-layout">
+    <div class="container service-flow">
 
-      <aside class="side-nav card">
-        <strong>Service Menu</strong>
+      <aside class="side-nav" aria-label="On this page">
+        <strong>On this page</strong>
 
         <a href="#packages">Packages</a>
         <a href="#included">What's Included</a>
         <a href="#benefits">Why E-Commerce</a>
+        <a href="#proof">Public proof</a>
         <a href="../contact.html">Request Quote</a>
       </aside>
 
-      <div>
+      <div class="service-flow__content">
 
         <section id="packages">
           <h2>Packages</h2>
@@ -212,6 +268,19 @@
           </div>
         </section>
 
+        <section class="section" id="proof">
+          <h2>Public proof</h2>
+          <a class="service-destination" href="/case-studies/secure-web-and-sdlc.html">Read the HTML case study: Secure Website &amp; Application Practices</a>
+        </section>
+
+        <section class="section" id="related-services">
+          <h2>Related services</h2>
+          <div class="service-destinations">
+            <a class="service-destination" href="webhosting.html">Websites</a>
+            <a class="service-destination" href="app-building.html">Business Apps &amp; Dashboards</a>
+          </div>
+        </section>
+
         <section class="section">
           <div class="notice">
             We keep project scope clear before work begins. Platform
@@ -237,7 +306,7 @@
       <span class="fine">© <span data-year></span> EPIC TECH LLC</span>
     </div>
     <div class="mini-links">
-      <a href="index.html">Services</a>
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>

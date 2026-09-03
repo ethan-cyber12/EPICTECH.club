@@ -1,0 +1,65 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "epictech-emailer-staging",
+  "account_id": "39b21ae616af6a94dfdaab87019260ce",
+  "main": "src/index.js",
+  "compatibility_date": "2025-05-23",
+  "workers_dev": true,
+  "preview_urls": false,
+  "send_metrics": false,
+
+  // Staging accepts only authenticated synthetic requests from a local QA page.
+  // It captures outbound messages and CRM payloads in STAGING_EVENTS for one hour.
+  "vars": {
+    "ENVIRONMENT": "staging",
+    "ALLOWED_ORIGINS": "http://localhost:4173,http://127.0.0.1:4173",
+    "NOTIFY_FROM": "noreply@epictech.club",
+    "NOTIFY_TO": "staging-capture@invalid.example",
+    "STAGING_BASE_URL": "https://epictech-emailer-staging.ethanplatt0120.workers.dev",
+    "STAGING_TURNSTILE_TEST_MODE": "true"
+  },
+
+  "secrets": {
+    "required": [
+      "INTAKE_HMAC_SECRET",
+      "REVIEW_APPROVAL_SECRET",
+      "STAGING_ACCESS_TOKEN",
+      "STAGING_TURNSTILE_SECRET_KEY"
+    ]
+  },
+
+  "kv_namespaces": [
+    {
+      "binding": "REVIEWS_KV",
+      "id": "f3539b9c01f84c6498e0800e8f25162f"
+    },
+    {
+      "binding": "LEAD_QUEUE",
+      "id": "6942ed5c35b644ef84f4601f61fe496d"
+    },
+    {
+      "binding": "STAGING_EVENTS",
+      "id": "886f75c19d714468b18a078fbf3d5f45"
+    }
+  ],
+
+  // Staging namespaces are distinct from production's 1001 and 1002.
+  "ratelimits": [
+    {
+      "name": "LEAD_RATE_LIMITER",
+      "namespace_id": "2001",
+      "simple": {
+        "limit": 6,
+        "period": 60
+      }
+    },
+    {
+      "name": "REVIEW_RATE_LIMITER",
+      "namespace_id": "2002",
+      "simple": {
+        "limit": 3,
+        "period": 60
+      }
+    }
+  ]
+}

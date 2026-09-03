@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/webp" href="../assets/images/logo/epic-tech-logo-final.webp">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self' mailto:; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
   <meta name="description" content="Business websites for Orlando small businesses. Fast static sites, DNS and HTTPS setup, and website care plans starting at $349.">
   <title>Websites &amp; Hosting | EPIC TECH LLC</title>
@@ -18,17 +19,54 @@
   <meta name="twitter:title" content="Websites &amp; Hosting | EPIC TECH LLC">
   <meta name="twitter:description" content="Business websites for Orlando small businesses. Fast static sites, DNS and HTTPS setup, and website care plans starting at $349.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
-  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css?v=20260903">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://epictech.club/services/webhosting.html#webpage",
+        "url": "https://epictech.club/services/webhosting.html",
+        "name": "Business websites and online stores that are fast, secure, and built to grow",
+        "isPartOf": {"@id": "https://epictech.club/#website"},
+        "about": {"@id": "https://epictech.club/services/webhosting.html#service"},
+        "mainEntity": {"@id": "https://epictech.club/services/webhosting.html#service"},
+        "breadcrumb": {"@id": "https://epictech.club/services/webhosting.html#breadcrumb"}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://epictech.club/services/webhosting.html#breadcrumb",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://epictech.club/"},
+          {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://epictech.club/services/"},
+          {"@type": "ListItem", "position": 3, "name": "Websites", "item": "https://epictech.club/services/webhosting.html"}
+        ]
+      },
+      {
+        "@type": "Service",
+        "@id": "https://epictech.club/services/webhosting.html#service",
+        "name": "Websites",
+        "serviceType": "Websites",
+        "url": "https://epictech.club/services/webhosting.html",
+        "provider": {"@id": "https://epictech.club/#business"},
+        "areaServed": {"@type": "AdministrativeArea", "name": "Central Florida"},
+        "mainEntityOfPage": {"@id": "https://epictech.club/services/webhosting.html#webpage"}
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="container nav">
-    <a class="brand" href="../index.html">
-      <img src="../assets/images/logo/epic-tech-logo-final.webp" alt="EPIC TECH LLC" class="site-logo">
+    <a class="brand" href="/" aria-label="EPIC TECH home">
+      <img src="../assets/images/logo/epic-tech-logo-final.webp" alt="EPIC TECH LLC" width="787" height="904" class="site-logo">
     </a>
-    <button class="menu-btn" data-menu-button aria-expanded="false">Menu</button>
-    <nav class="nav-links" data-nav-links>
-      <a href="index.html">Services</a>
+    <button class="menu-btn" data-menu-button aria-expanded="false" aria-controls="nav-links">Menu</button>
+    <nav class="nav-links" data-nav-links id="nav-links" aria-label="Primary navigation">
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
@@ -37,26 +75,42 @@
   </div>
 </header>
 
-<main>
+<main id="main">
   <section class="page-hero">
     <div class="container">
-      <span class="eyebrow">Fast sites, smaller risk</span>
-      <h1>Business websites and online stores that are fast, secure, and built to grow</h1>
-      <p class="lead">We build clean launch websites using GitHub Pages and Cloudflare so small businesses get a professional site without taking on a WordPress/database attack surface too early. When a business needs to sell online, we can also help set up Shopify or WooCommerce with payments, products, and launch support.</p>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li><a href="/services/">Services</a></li>
+          <li aria-current="page">Websites</li>
+        </ol>
+      </nav>
+      <div class="service-hero">
+        <div>
+          <span class="eyebrow">Fast sites, smaller risk</span>
+          <h1>Business websites and online stores that are fast, secure, and built to grow</h1>
+          <p class="lead">We build clean launch websites using GitHub Pages and Cloudflare so small businesses get a professional site without taking on a WordPress/database attack surface too early. When a business needs to sell online, we can also help set up Shopify or WooCommerce with payments, products, and launch support.</p>
+        </div>
+        <picture class="service-hero__visual">
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-detail-websites-640.avif?v=20260903-detail 640w, ../assets/images/service-visuals/epic-detail-websites-1200.avif?v=20260903-detail 1200w, ../assets/images/service-visuals/epic-detail-websites-1920.avif?v=20260903-detail 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-detail-websites-640.webp?v=20260903-detail 640w, ../assets/images/service-visuals/epic-detail-websites-1200.webp?v=20260903-detail 1200w, ../assets/images/service-visuals/epic-detail-websites-1920.webp?v=20260903-detail 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
+            <img src="../assets/images/service-visuals/epic-detail-websites-1200.webp?v=20260903-detail" width="1200" height="750" alt="" loading="eager" fetchpriority="high" decoding="async">
+          </picture>
+      </div>
     </div>
   </section>
 
   <section class="section">
-    <div class="container service-layout">
-      <aside class="side-nav card">
-        <strong>Service menu</strong>
+    <div class="container service-flow">
+      <aside class="side-nav" aria-label="On this page">
+        <strong>On this page</strong>
         <a href="#packages">Packages</a>
         <a href="#ecommerce">E-Commerce</a>
         <a href="#included">What is included</a>
         <a href="../contact.html">Request quote</a>
       </aside>
 
-      <div>
+      <div class="service-flow__content">
         <section id="packages">
           <h2>Packages</h2>
           <div class="grid-3">
@@ -115,6 +169,15 @@
             <h3>Secure Website &amp; SDLC Framework</h3>
             <p class="muted">Secure web planning, change control, documentation, testing, deployment review, and maintenance practices.</p>
             <a class="btn btn-primary" href="../assets/projects/epic-secure-web-and-sdlc-public-sample.pdf" target="_blank" rel="noopener noreferrer">View Case Study</a>
+            <a class="service-destination" href="/case-studies/secure-web-and-sdlc.html">Read the HTML case study: Secure Website &amp; Application Practices</a>
+          </div>
+        </section>
+
+        <section class="section" id="related-services">
+          <h2>Related services</h2>
+          <div class="service-destinations">
+            <a class="service-destination" href="ecommerce.html">E-Commerce</a>
+            <a class="service-destination" href="firewalls.html">Firewalls &amp; Security</a>
           </div>
         </section>
 
@@ -134,7 +197,7 @@
       <span class="fine">© <span data-year></span> EPIC TECH LLC</span>
     </div>
     <div class="mini-links">
-      <a href="index.html">Services</a>
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>

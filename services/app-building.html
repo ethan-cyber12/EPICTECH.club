@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/webp" href="../assets/images/logo/epic-tech-logo-final.webp">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self' mailto:; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="description" content="Custom apps and dashboards for small businesses in Orlando and Central Florida. Lead trackers, CRM tools, quote systems, and internal dashboards. From $150.">
@@ -19,19 +20,57 @@
   <meta name="twitter:title" content="Business Apps &amp; Dashboards in Orlando | EPIC TECH LLC">
   <meta name="twitter:description" content="Custom apps and dashboards for small businesses in Orlando and Central Florida. Lead trackers, CRM tools, quote systems, and internal dashboards. From $150.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
-  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css?v=20260903">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://epictech.club/services/app-building.html#webpage",
+        "url": "https://epictech.club/services/app-building.html",
+        "name": "Business Apps & Internal Dashboards",
+        "isPartOf": {"@id": "https://epictech.club/#website"},
+        "about": {"@id": "https://epictech.club/services/app-building.html#service"},
+        "mainEntity": {"@id": "https://epictech.club/services/app-building.html#service"},
+        "breadcrumb": {"@id": "https://epictech.club/services/app-building.html#breadcrumb"}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://epictech.club/services/app-building.html#breadcrumb",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://epictech.club/"},
+          {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://epictech.club/services/"},
+          {"@type": "ListItem", "position": 3, "name": "Business Apps & Dashboards", "item": "https://epictech.club/services/app-building.html"}
+        ]
+      },
+      {
+        "@type": "Service",
+        "@id": "https://epictech.club/services/app-building.html#service",
+        "name": "Business Apps & Dashboards",
+        "serviceType": "Business Apps & Dashboards",
+        "url": "https://epictech.club/services/app-building.html",
+        "provider": {"@id": "https://epictech.club/#business"},
+        "areaServed": {"@type": "AdministrativeArea", "name": "Central Florida"},
+        "mainEntityOfPage": {"@id": "https://epictech.club/services/app-building.html#webpage"}
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="container nav">
-    <a class="brand" href="../index.html">
+    <a class="brand" href="/" aria-label="EPIC TECH home">
       <img src="../assets/images/logo/epic-tech-logo-final.webp"
            alt="EPIC TECH LLC"
+           width="787" height="904"
            class="site-logo">
     </a>
-    <button class="menu-btn" data-menu-button aria-expanded="false">Menu</button>
-    <nav class="nav-links" data-nav-links>
-      <a href="index.html">Services</a>
+    <button class="menu-btn" data-menu-button aria-expanded="false" aria-controls="nav-links">Menu</button>
+    <nav class="nav-links" data-nav-links id="nav-links" aria-label="Primary navigation">
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
@@ -40,19 +79,35 @@
   </div>
 </header>
 
-<main>
+<main id="main">
 
   <section class="page-hero">
     <div class="container">
-      <span class="eyebrow">Business apps</span>
-      <h1>Business Apps &amp; Internal Dashboards</h1>
-      <p class="lead">Not every business needs a giant software platform. Sometimes you need a clean dashboard that tracks leads, clients, quotes, invoices, follow-ups, and reports in one place.</p>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li><a href="/services/">Services</a></li>
+          <li aria-current="page">Business Apps &amp; Dashboards</li>
+        </ol>
+      </nav>
+      <div class="service-hero">
+        <div>
+          <span class="eyebrow">Business apps</span>
+          <h1>Business Apps &amp; Internal Dashboards</h1>
+          <p class="lead">Not every business needs a giant software platform. Sometimes you need a clean dashboard that tracks leads, clients, quotes, invoices, follow-ups, and reports in one place.</p>
+        </div>
+        <picture class="service-hero__visual">
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-detail-business-apps-640.avif?v=20260903-detail 640w, ../assets/images/service-visuals/epic-detail-business-apps-1200.avif?v=20260903-detail 1200w, ../assets/images/service-visuals/epic-detail-business-apps-1920.avif?v=20260903-detail 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-detail-business-apps-640.webp?v=20260903-detail 640w, ../assets/images/service-visuals/epic-detail-business-apps-1200.webp?v=20260903-detail 1200w, ../assets/images/service-visuals/epic-detail-business-apps-1920.webp?v=20260903-detail 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
+            <img src="../assets/images/service-visuals/epic-detail-business-apps-1200.webp?v=20260903-detail" width="1200" height="750" alt="" loading="eager" fetchpriority="high" decoding="async">
+          </picture>
+      </div>
     </div>
   </section>
 
   <section class="section">
-    <div class="container service-layout">
-      <aside class="side-nav card">
+    <div class="container service-flow">
+      <aside class="side-nav" aria-label="On this page">
         <strong>On this page</strong>
         <a href="#solutions">Solutions we build</a>
         <a href="#packages">Pricing</a>
@@ -60,10 +115,11 @@
         <a href="#examples">What can be built</a>
         <a href="#process">How it works</a>
         <a href="#no-overbuild">What we do not overbuild</a>
+        <a href="#proof">Public proof</a>
         <a href="../contact.html">Request quote</a>
       </aside>
 
-      <div>
+      <div class="service-flow__content">
 
         <section id="solutions">
           <h2>Solutions we build</h2>
@@ -234,6 +290,19 @@
           </div>
         </section>
 
+        <section class="section" id="proof">
+          <h2>Public proof</h2>
+          <a class="service-destination" href="/case-studies/secure-web-and-sdlc.html">Read the HTML case study: Secure Website &amp; Application Practices</a>
+        </section>
+
+        <section class="section" id="related-services">
+          <h2>Related services</h2>
+          <div class="service-destinations">
+            <a class="service-destination" href="automation.html">Automation</a>
+            <a class="service-destination" href="software.html">Forms &amp; Internal Tools</a>
+          </div>
+        </section>
+
         <div class="notice">We keep the scope clear before any build starts. Hardware, licenses, cloud bills, hosting, travel, and after-hours work are separate unless the signed Statement of Work says otherwise.</div>
 
         <section class="section">
@@ -258,7 +327,7 @@
       <span class="fine">© <span data-year></span> EPIC TECH LLC</span>
     </div>
     <div class="mini-links">
-      <a href="index.html">Services</a>
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>

@@ -1,0 +1,42 @@
+rules:
+  - id: epictech.python.subprocess-shell-true
+    message: Avoid shell=True. Pass an argument array and validate each untrusted value.
+    severity: ERROR
+    languages: [python]
+    patterns:
+      - pattern: subprocess.$FUNC(..., shell=True, ...)
+    metadata:
+      cwe: CWE-78
+      control: NIST-SSDF-PW.5
+
+  - id: epictech.python.dynamic-sql
+    message: Dynamic SQL construction requires parameterization and authorization review.
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: $DB.execute(f"...")
+      - pattern: $DB.execute("..." % ...)
+      - pattern: $DB.execute("..." + ...)
+    metadata:
+      cwe: CWE-89
+      control: NIST-SSDF-PW.5
+
+  - id: epictech.javascript.child-process-exec
+    message: Avoid command-string execution. Use an argument-array API and validate untrusted values.
+    severity: ERROR
+    languages: [javascript, typescript]
+    pattern-either:
+      - pattern: child_process.exec(...)
+      - pattern: $CP.exec(...)
+    metadata:
+      cwe: CWE-78
+      control: NIST-SSDF-PW.5
+
+  - id: epictech.react.dangerous-html
+    message: Raw HTML rendering requires sanitization and a documented threat-model exception.
+    severity: WARNING
+    languages: [javascript, typescript]
+    pattern: <$TAG dangerouslySetInnerHTML={...} />
+    metadata:
+      cwe: CWE-79
+      control: OWASP-ASVS-V5

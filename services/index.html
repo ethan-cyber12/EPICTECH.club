@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/webp" href="../assets/images/logo/epic-tech-logo-final.webp">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self' mailto:; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
   <meta name="description" content="Small business IT services in Orlando and Central Florida: secure Wi-Fi, firewalls, websites, e-commerce, automation, and custom dashboards.">
   <title>Services | EPIC TECH LLC</title>
@@ -18,19 +19,55 @@
   <meta name="twitter:title" content="Services | EPIC TECH LLC">
   <meta name="twitter:description" content="Small business IT services in Orlando and Central Florida: secure Wi-Fi, firewalls, websites, e-commerce, automation, and custom dashboards.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
-  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css?v=20260903">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://epictech.club/services/#webpage",
+        "url": "https://epictech.club/services/",
+        "name": "Pick the problem you want fixed",
+        "isPartOf": {"@id": "https://epictech.club/#website"},
+        "about": {"@id": "https://epictech.club/#business"},
+        "breadcrumb": {"@id": "https://epictech.club/services/#breadcrumb"}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://epictech.club/services/#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://epictech.club/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Services",
+            "item": "https://epictech.club/services/"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="container nav">
-    <a class="brand" href="../index.html">
+    <a class="brand" href="/" aria-label="EPIC TECH home">
       <img src="../assets/images/logo/epic-tech-logo-final.webp"
            alt="EPIC TECH LLC"
+           width="787" height="904"
            class="site-logo">
     </a>
-    <button class="menu-btn" data-menu-button aria-expanded="false">Menu</button>
-    <nav class="nav-links" data-nav-links>
-      <a href="index.html">Services</a>
+    <button class="menu-btn" data-menu-button aria-expanded="false" aria-controls="nav-links">Menu</button>
+    <nav class="nav-links" data-nav-links id="nav-links" aria-label="Primary navigation">
+      <a href="/services/" aria-current="page">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
@@ -38,35 +75,149 @@
     </nav>
   </div>
 </header>
-<main>
+<main id="main">
   <section class="page-hero">
     <div class="container">
-      <span class="eyebrow">Service menu</span>
-      <h1>Pick the problem you want fixed</h1>
-      <p class="lead">EPIC TECH focuses on the services small businesses usually need first: secure Wi-Fi, firewalls, websites, Cloudflare, e-commerce, light automation, custom dashboards, and clean documentation.</p>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li aria-current="page">Services</li>
+        </ol>
+      </nav>
+    </div>
+    <div class="container service-index-hero">
+      <div class="service-index-hero__copy">
+        <span class="eyebrow">Service menu</span>
+        <h1>Pick the problem you want fixed</h1>
+        <p class="lead">EPIC TECH focuses on the services small businesses usually need first: secure Wi-Fi, firewalls, websites, Cloudflare, e-commerce, light automation, custom dashboards, and clean documentation.</p>
+      </div>
+      <picture class="service-index-hero__visual">
+          <source type="image/avif" srcset="../assets/images/service-visuals/epic-hero-connected-workshop-640.avif?v=20260903 640w, ../assets/images/service-visuals/epic-hero-connected-workshop-1200.avif?v=20260903 1200w, ../assets/images/service-visuals/epic-hero-connected-workshop-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 56vw">
+          <source type="image/webp" srcset="../assets/images/service-visuals/epic-hero-connected-workshop-640.webp?v=20260903 640w, ../assets/images/service-visuals/epic-hero-connected-workshop-1200.webp?v=20260903 1200w, ../assets/images/service-visuals/epic-hero-connected-workshop-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 56vw">
+          <img src="../assets/images/service-visuals/epic-hero-connected-workshop-1920.webp?v=20260903" width="1920" height="1200" alt="" fetchpriority="high" decoding="async">
+        </picture>
     </div>
   </section>
   <section class="section">
-    <div class="container grid-3">
-      <a class="card" href="webhosting.html"><span class="tag">Web</span><h3>Websites</h3><p class="muted">Fast launch sites, DNS, HTTPS, redirects, and website care plans.</p></a>
-      <a class="card" href="app-building.html"><span class="tag">Apps</span><h3>Business Apps &amp; Dashboards</h3><p class="muted">Lead trackers, client dashboards, quote systems, and simple CRM tools built around your workflow.</p></a>
-      <a class="card" href="infrastructure.html"><span class="tag">Wi-Fi</span><h3>Network &amp; Wi-Fi</h3><p class="muted">Office network cleanup, access point planning, device inventory, and handoff notes.</p></a>
-      <a class="card" href="firewalls.html"><span class="tag">Most requested</span><h3>Firewalls &amp; Security</h3><p class="muted">Ubiquiti setup, guest Wi-Fi, VLAN basics, VPN, DNS filtering, and firewall documentation.</p></a>
-      <a class="card" href="automation.html"><span class="tag">Automation</span><h3>Automation</h3><p class="muted">Small scripts, checklists, and repeatable setup processes that save time.</p></a>
-      <a class="card" href="ecommerce.html"><span class="tag">E-Commerce</span><h3>E-Commerce</h3><p class="muted">Shopify and WooCommerce stores with secure payments, product catalogs, shipping setup, and launch support.</p></a>
-      <a class="card" href="../pricing.html#care-plans"><span class="tag">Ongoing</span><h3>Monthly Support</h3><p class="muted">Website, firewall, and app care plans for after a project launches.</p></a>
-    </div>
-  </section>
-
-  <section class="section alt">
     <div class="container">
-      <div class="section-head">
-        <div><span class="eyebrow">Specialized</span><h2>Less common requests</h2></div>
-        <p class="muted">Smaller-scope services for specific situations.</p>
+      <div class="service-directory">
+        <a class="service-directory__link" href="webhosting.html" aria-label="View website services">
+          <picture>
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-service-websites-640.avif?v=20260903 640w, ../assets/images/service-visuals/epic-service-websites-1200.avif?v=20260903 1200w, ../assets/images/service-visuals/epic-service-websites-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-service-websites-640.webp?v=20260903 640w, ../assets/images/service-visuals/epic-service-websites-1200.webp?v=20260903 1200w, ../assets/images/service-visuals/epic-service-websites-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <img src="../assets/images/service-visuals/epic-service-websites-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <span class="eyebrow">Web</span>
+            <h2>Websites</h2>
+            <p>Fast launch sites, DNS, HTTPS, redirects, and website care plans.</p>
+            <span aria-hidden="true">View website services →</span>
+          </div>
+        </a>
+
+        <a class="service-directory__link" href="app-building.html" aria-label="View business app and dashboard services">
+          <picture>
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-service-business-apps-640.avif?v=20260903 640w, ../assets/images/service-visuals/epic-service-business-apps-1200.avif?v=20260903 1200w, ../assets/images/service-visuals/epic-service-business-apps-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-service-business-apps-640.webp?v=20260903 640w, ../assets/images/service-visuals/epic-service-business-apps-1200.webp?v=20260903 1200w, ../assets/images/service-visuals/epic-service-business-apps-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <img src="../assets/images/service-visuals/epic-service-business-apps-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <span class="eyebrow">Apps</span>
+            <h2>Business Apps & Dashboards</h2>
+            <p>Lead trackers, client dashboards, quote systems, and simple CRM tools built around your workflow.</p>
+            <span aria-hidden="true">View business app services →</span>
+          </div>
+        </a>
+
+        <a class="service-directory__link" href="infrastructure.html" aria-label="View network and Wi-Fi services">
+          <picture>
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-service-network-wifi-640.avif?v=20260903 640w, ../assets/images/service-visuals/epic-service-network-wifi-1200.avif?v=20260903 1200w, ../assets/images/service-visuals/epic-service-network-wifi-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-service-network-wifi-640.webp?v=20260903 640w, ../assets/images/service-visuals/epic-service-network-wifi-1200.webp?v=20260903 1200w, ../assets/images/service-visuals/epic-service-network-wifi-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <img src="../assets/images/service-visuals/epic-service-network-wifi-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <span class="eyebrow">Wi-Fi</span>
+            <h2>Network & Wi-Fi</h2>
+            <p>Office network cleanup, access point planning, device inventory, and handoff notes.</p>
+            <span aria-hidden="true">View network services →</span>
+          </div>
+        </a>
+
+        <a class="service-directory__link" href="firewalls.html" aria-label="View firewall and security services">
+          <picture>
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-service-firewalls-security-640.avif?v=20260903 640w, ../assets/images/service-visuals/epic-service-firewalls-security-1200.avif?v=20260903 1200w, ../assets/images/service-visuals/epic-service-firewalls-security-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-service-firewalls-security-640.webp?v=20260903 640w, ../assets/images/service-visuals/epic-service-firewalls-security-1200.webp?v=20260903 1200w, ../assets/images/service-visuals/epic-service-firewalls-security-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <img src="../assets/images/service-visuals/epic-service-firewalls-security-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <span class="eyebrow">Most requested</span>
+            <h2>Firewalls & Security</h2>
+            <p>Ubiquiti setup, guest Wi-Fi, VLAN basics, VPN, DNS filtering, and firewall documentation.</p>
+            <span aria-hidden="true">View firewall services →</span>
+          </div>
+        </a>
+
+        <a class="service-directory__link" href="automation.html" aria-label="View automation services">
+          <picture>
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-service-automation-640.avif?v=20260903 640w, ../assets/images/service-visuals/epic-service-automation-1200.avif?v=20260903 1200w, ../assets/images/service-visuals/epic-service-automation-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-service-automation-640.webp?v=20260903 640w, ../assets/images/service-visuals/epic-service-automation-1200.webp?v=20260903 1200w, ../assets/images/service-visuals/epic-service-automation-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <img src="../assets/images/service-visuals/epic-service-automation-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <span class="eyebrow">Automation</span>
+            <h2>Automation</h2>
+            <p>Small scripts, checklists, and repeatable setup processes that save time.</p>
+            <span aria-hidden="true">View automation services →</span>
+          </div>
+        </a>
+
+        <a class="service-directory__link" href="ecommerce.html" aria-label="View e-commerce services">
+          <picture>
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-service-ecommerce-640.avif?v=20260903 640w, ../assets/images/service-visuals/epic-service-ecommerce-1200.avif?v=20260903 1200w, ../assets/images/service-visuals/epic-service-ecommerce-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-service-ecommerce-640.webp?v=20260903 640w, ../assets/images/service-visuals/epic-service-ecommerce-1200.webp?v=20260903 1200w, ../assets/images/service-visuals/epic-service-ecommerce-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <img src="../assets/images/service-visuals/epic-service-ecommerce-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <span class="eyebrow">E-Commerce</span>
+            <h2>E-Commerce</h2>
+            <p>Shopify and WooCommerce stores with secure payments, product catalogs, shipping setup, and launch support.</p>
+            <span aria-hidden="true">View e-commerce services →</span>
+          </div>
+        </a>
+
+        <a class="service-directory__link" href="virtualization.html" aria-label="View virtualization lab services">
+          <picture>
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-service-virtualization-640.avif?v=20260903 640w, ../assets/images/service-visuals/epic-service-virtualization-1200.avif?v=20260903 1200w, ../assets/images/service-visuals/epic-service-virtualization-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-service-virtualization-640.webp?v=20260903 640w, ../assets/images/service-visuals/epic-service-virtualization-1200.webp?v=20260903 1200w, ../assets/images/service-visuals/epic-service-virtualization-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <img src="../assets/images/service-visuals/epic-service-virtualization-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <span class="eyebrow">Labs</span>
+            <h2>Virtualization Labs</h2>
+            <p>VM test labs and isolated environments for learning, demos, and safe testing.</p>
+            <span aria-hidden="true">View virtualization services →</span>
+          </div>
+        </a>
+
+        <a class="service-directory__link" href="software.html" aria-label="View form and internal tool services">
+          <picture>
+            <source type="image/avif" srcset="../assets/images/service-visuals/epic-service-internal-tools-640.avif?v=20260903 640w, ../assets/images/service-visuals/epic-service-internal-tools-1200.avif?v=20260903 1200w, ../assets/images/service-visuals/epic-service-internal-tools-1920.avif?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <source type="image/webp" srcset="../assets/images/service-visuals/epic-service-internal-tools-640.webp?v=20260903 640w, ../assets/images/service-visuals/epic-service-internal-tools-1200.webp?v=20260903 1200w, ../assets/images/service-visuals/epic-service-internal-tools-1920.webp?v=20260903 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 34vw">
+            <img src="../assets/images/service-visuals/epic-service-internal-tools-1200.webp?v=20260903" width="1200" height="750" alt="" loading="lazy" decoding="async">
+          </picture>
+          <div>
+            <span class="eyebrow">Simple tools</span>
+            <h2>Forms & Internal Tools</h2>
+            <p>Lightweight forms, calculators, dashboards, and static tools without overbuilding.</p>
+            <span aria-hidden="true">View internal tool services →</span>
+          </div>
+        </a>
       </div>
-      <div class="grid-2">
-        <a class="card" href="virtualization.html"><span class="tag">Labs</span><h3>Virtualization Labs</h3><p class="muted">VM test labs and isolated environments for learning, demos, and safe testing.</p></a>
-        <a class="card" href="software.html"><span class="tag">Simple tools</span><h3>Forms &amp; Internal Tools</h3><p class="muted">Lightweight forms, calculators, dashboards, and static tools without overbuilding.</p></a>
+
+      <div class="notice" aria-label="Monthly support">
+        <span class="eyebrow">Ongoing</span>
+        <p><strong>Monthly Support</strong> <span class="muted">Website, firewall, and app care plans for after a project launches.</span></p>
+        <a href="../pricing.html#care-plans"><strong>View care plans →</strong></a>
       </div>
     </div>
   </section>
@@ -79,7 +230,7 @@
       <span class="fine">© <span data-year></span> EPIC TECH LLC</span>
     </div>
     <div class="mini-links">
-      <a href="index.html">Services</a>
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>

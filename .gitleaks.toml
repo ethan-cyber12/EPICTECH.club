@@ -1,0 +1,32 @@
+title = "EPICTECH secret detection policy"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "epictech-scanner-canary"
+description = "Synthetic marker used only to verify the secret gate fails closed"
+regex = '''EPIC_CANARY_[A-Za-z0-9]{24}'''
+keywords = ["EPIC_CANARY_"]
+
+[[allowlists]]
+description = "Generated dependencies, tool binaries, and local evidence are not first-party source"
+paths = [
+  '''(?i)(^|[\\/])\.tools([\\/]|$)''',
+  '''(?i)(^|[\\/])\.venv([\\/]|$)''',
+  '''(?i)(^|[\\/])node_modules([\\/]|$)''',
+  '''(?i)(^|[\\/])artifacts([\\/]|$)''',
+  '''(?i)(^|[\\/])_site([\\/]|$)'''
+]
+
+[[allowlists]]
+description = "Known synthetic values used to prove the case-study leakage gate fails closed"
+condition = "AND"
+regexTarget = "line"
+paths = ['''(?i)(^|[\\/])tests[\\/]test_case_studies\.py$''']
+regexes = [
+  '''AKIA(ABCDEFGHIJKLMNOP)''',
+  '''sk_(live)_1234567890abcdef123456''',
+  '''xoxb-(1234567890)-abcdefghij''',
+  '''eyJhbGciOiJIUzI1NiJ9\.(eyJzdWIiOiIxMjM0In0)\.signature123'''
+]

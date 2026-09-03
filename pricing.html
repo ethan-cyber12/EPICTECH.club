@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/webp" href="assets/images/logo/epic-tech-logo-final.webp">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; form-action 'self' mailto:; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
   <meta name="description" content="Flat-rate IT pricing for Orlando and Central Florida small businesses. Assessments, secure networks, websites, firewall care, and monthly IT support plans.">
   <title>IT Pricing for Small Business | EPIC TECH LLC, Orlando</title>
@@ -18,18 +19,54 @@
   <meta name="twitter:title" content="IT Pricing for Small Business | EPIC TECH LLC, Orlando">
   <meta name="twitter:description" content="Flat-rate IT pricing for Orlando and Central Florida small businesses. Assessments, secure networks, websites, firewall care, and monthly IT support plans.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260903">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://epictech.club/pricing.html#webpage",
+        "url": "https://epictech.club/pricing.html",
+        "name": "Simple packages. No guessing",
+        "isPartOf": {"@id": "https://epictech.club/#website"},
+        "about": {"@id": "https://epictech.club/#business"},
+        "breadcrumb": {"@id": "https://epictech.club/pricing.html#breadcrumb"}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://epictech.club/pricing.html#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://epictech.club/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Pricing",
+            "item": "https://epictech.club/pricing.html"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="container nav">
-    <a class="brand" href="index.html">
+    <a class="brand" href="/" aria-label="EPIC TECH home">
       <img src="assets/images/logo/epic-tech-logo-final.webp"
            alt="EPIC TECH LLC"
+           width="787" height="904"
            class="site-logo">
     </a>
-    <button class="menu-btn" data-menu-button aria-expanded="false">Menu</button>
-    <nav class="nav-links" data-nav-links>
+    <button class="menu-btn" data-menu-button aria-expanded="false" aria-controls="nav-links">Menu</button>
+    <nav class="nav-links" data-nav-links id="nav-links" aria-label="Primary navigation">
       <a href="services/">Services</a>
       <a href="pricing.html">Pricing</a>
       <a href="about.html">About</a>
@@ -38,7 +75,7 @@
     </nav>
   </div>
 </header>
-<main>
+<main id="main">
   <section class="page-hero">
     <div class="container">
       <span class="eyebrow">Clear launch pricing</span>
@@ -49,6 +86,7 @@
 
   <section class="section">
     <div class="container grid-3">
+      <h2 class="visually-hidden">Core project packages</h2>
       <div class="price-card">
         <span class="tag">Start here</span>
         <h3>Technology Assessment</h3>
@@ -92,6 +130,7 @@
 
   <section class="section">
     <div class="container">
+      <h2 class="visually-hidden">E-commerce packages</h2>
       <div class="grid-3">
 
   <div class="price-card">
@@ -245,7 +284,7 @@
           <a class="btn btn-secondary" href="contact.html">Start app care</a>
         </div>
       </div>
-      <p class="muted">See the full service page for examples and details: <a href="services/app-building.html">Business Apps & Dashboards →</a></p>
+      <p class="muted">See the full service page for examples and details: <a class="inline-link" href="services/app-building.html">Business Apps & Dashboards →</a></p>
     </div>
   </section>
 

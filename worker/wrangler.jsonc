@@ -1,0 +1,56 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "epictech-emailer-ae75",
+  "account_id": "39b21ae616af6a94dfdaab87019260ce",
+  "main": "src/index.js",
+  "compatibility_date": "2025-05-23",
+  "workers_dev": false,
+  "preview_urls": false,
+  "keep_vars": true,
+  "send_metrics": false,
+
+  "vars": {
+    "ENVIRONMENT": "production"
+  },
+
+  // This configuration intentionally does not manage the dashboard-owned
+  // intake.epictech.club custom domain.
+  "secrets": {
+    "required": [
+      "CRM_INGEST_SECRET",
+      "GOOGLE_PLACES_API_KEY",
+      "INTAKE_HMAC_SECRET",
+      "RESEND_API_KEY",
+      "REVIEW_APPROVAL_SECRET",
+      "TURNSTILE_SECRET_KEY"
+    ]
+  },
+
+  "kv_namespaces": [
+    {
+      "binding": "REVIEWS_KV",
+      "id": "e9e13edf393c4b0cafac17999279031f"
+    }
+  ],
+
+  // These IDs are distinct from each other. Recheck account-wide active
+  // bindings immediately before every production deployment.
+  "ratelimits": [
+    {
+      "name": "LEAD_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 6,
+        "period": 60
+      }
+    },
+    {
+      "name": "REVIEW_RATE_LIMITER",
+      "namespace_id": "1002",
+      "simple": {
+        "limit": 3,
+        "period": 60
+      }
+    }
+  ]
+}
