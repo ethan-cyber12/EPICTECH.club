@@ -1,6 +1,6 @@
 # Intake Worker security contract
 
-Status: client-side action binding is implemented in this branch. Worker changes, rate controls, live submissions, and production deployment are not authorized or completed by this document.
+Status: client-side action binding is implemented in this branch. The deployed Worker source was imported into `worker/src/index.js`, and the local candidate now enforces the exact hostname/action contract. Rate controls, live submissions, production configuration changes, and deployment are not authorized or completed by this document.
 
 ## Read-only production evidence
 
@@ -11,8 +11,10 @@ The Cloudflare dashboard was reviewed on 2026-09-02 without changing configurati
 - The intake Worker calls Siteverify, but the reviewed implementation accepted the result by checking `success` only. It did not also require the expected `hostname` and endpoint-specific `action`.
 - Production and preview `workers.dev` routes are disabled; the Worker is exposed through its custom domain.
 - No intake-specific rate limit was identified during the review.
+- `ALLOWED_ORIGINS` is configured for the apex and `www` origins, and the required secret values are stored as encrypted variables.
+- Production defines `CRN_INGEST_URL`, while the deployed source reads `CRM_INGEST_URL`. The mismatch prevents the optional CRM branch from being enabled as intended and has not been changed in production.
 
-These observations are a point-in-time dashboard review, not a source-controlled backend attestation. The deployed Worker source must be imported into a repository before it is changed.
+These observations are point-in-time dashboard evidence. Deployment `f022c249` was copied without secret values into `worker/src/index.js` on 2026-09-03, fingerprinted as SHA-256 `688fc976e0c63598148e56da4e62bd8ee09d87dbb601c6ac0cb3ff278e945bf7` after LF normalization, then patched locally. The local source is not yet a production attestation because it has not been staged or deployed.
 
 ## Required Turnstile boundary
 
@@ -50,7 +52,8 @@ Any IP-based edge rule must allow for shared networks and accessibility tools. T
 
 ## Deployment gates
 
-- [ ] Export the exact deployed Worker source and bindings into a private, access-controlled repository without secret values.
+- [x] Export deployed Worker version `f022c249` into source control without secret values.
+- [ ] Add a reviewed deployment configuration that maps the existing KV namespace and encrypted variables without committing secret values.
 - [ ] Add unit tests for accepted action/hostname pairs and rejections for a wrong action, look-alike hostname, expired or duplicate token, oversized body, malformed JSON, disallowed origin, and unavailable Siteverify.
 - [ ] Add route-specific rate-limit bindings and verify their namespace IDs do not collide with unrelated Workers.
 - [ ] Review storage, moderation access, deletion/retention operations, observability redaction, and secret rotation.
