@@ -9,6 +9,10 @@
   "keep_vars": true,
   "send_metrics": false,
 
+  "vars": {
+    "ENVIRONMENT": "production"
+  },
+
   // This configuration intentionally does not manage the dashboard-owned
   // intake.epictech.club custom domain.
   "secrets": {

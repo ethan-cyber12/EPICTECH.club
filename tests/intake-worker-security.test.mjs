@@ -11,6 +11,8 @@ const siteverifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify
 const resendUrl = 'https://api.resend.com/emails';
 const legacyCrmUrl = 'https://intake-crm.epictech.club/api/leads/ingest';
 const canonicalCrmUrl = 'https://crm.epictech.club/api/leads/ingest';
+const stagingBaseUrl = 'https://epictech-emailer-staging.ethanplatt0120.workers.dev';
+const stagingAccessToken = 'a'.repeat(64);
 
 test.afterEach(() => {
   globalThis.fetch = originalFetch;
@@ -70,6 +72,26 @@ function makeEnv() {
   };
 }
 
+function makeStagingEnv() {
+  const current = makeEnv();
+  const events = makeKv();
+  const queue = makeKv();
+  Object.assign(current.env, {
+    ALLOWED_ORIGINS: 'http://localhost:4173,http://127.0.0.1:4173',
+    ENVIRONMENT: 'staging',
+    INTAKE_HMAC_SECRET: 'h'.repeat(32),
+    LEAD_QUEUE: queue,
+    REVIEW_APPROVAL_SECRET: 'r'.repeat(32),
+    STAGING_ACCESS_TOKEN: stagingAccessToken,
+    STAGING_BASE_URL: stagingBaseUrl,
+    STAGING_EVENTS: events,
+    STAGING_TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA',
+    STAGING_TURNSTILE_TEST_MODE: 'true',
+  });
+  delete current.env.RESEND_API_KEY;
+  return { ...current, events, queue };
+}
+
 function bodyFor(path, token = 'test-token') {
   if (path === '/lead-intake') {
     return {
@@ -94,6 +116,7 @@ function requestFor(path, body = bodyFor(path), origin = 'https://epictech.club'
   const headers = {
     'Content-Type': options.contentType || 'application/json',
   };
+  if (options.stagingKey) headers['X-Epictech-Staging-Key'] = options.stagingKey;
   if (options.cfConnectingIp !== null) {
     headers['CF-Connecting-IP'] = options.cfConnectingIp || '203.0.113.9';
   }
@@ -103,7 +126,7 @@ function requestFor(path, body = bodyFor(path), origin = 'https://epictech.club'
   if (origin !== null) headers.Origin = origin;
   if (options.contentLength) headers['Content-Length'] = options.contentLength;
 
-  return new Request('https://intake.epictech.club' + path, {
+  return new Request((options.baseUrl || 'https://intake.epictech.club') + path, {
     method: 'POST',
     headers,
     body: options.rawBody === undefined ? JSON.stringify(body) : options.rawBody,
@@ -346,6 +369,7 @@ test('CORS preflights succeed only for exact approved origins', async () => {
       response.headers.get('Access-Control-Allow-Origin'),
       expectedStatus === 204 ? origin : null,
     );
+    assert.equal(response.headers.get('Access-Control-Allow-Headers'), 'Content-Type');
   }
 });
 
@@ -487,6 +511,200 @@ test('missing review-approval secret cannot create an unmoderatable pending reco
   assert.equal(response.status, 503);
   assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl]);
   assert.equal(current.kv.operations.length, 0);
+});
+
+test('staging is private and fails closed before parsing or outbound work', async () => {
+  const current = makeStagingEnv();
+  const calls = installFetch({
+    success: true,
+    hostname: 'example.com',
+    action: null,
+  });
+
+  for (const stagingKey of [undefined, 'wrong-staging-key']) {
+    const response = await worker.fetch(
+      requestFor('/lead-intake', undefined, undefined, {
+        baseUrl: stagingBaseUrl,
+        stagingKey,
+      }),
+      current.env,
+    );
+    assert.equal(response.status, 404);
+    assert.equal(response.headers.get('Cache-Control'), 'no-store');
+  }
+
+  assert.equal(calls.length, 0);
+  assert.equal(current.leadLimiter.calls.length, 0);
+  assert.equal(current.events.operations.length, 0);
+});
+
+test('staging configuration and hostname must be exact before any work', async () => {
+  for (const mutate of [
+    (env) => { env.STAGING_BASE_URL = 'https://other.example.workers.dev'; },
+    (env) => { delete env.STAGING_EVENTS; },
+    (env) => { env.STAGING_TURNSTILE_TEST_MODE = 'false'; },
+  ]) {
+    const current = makeStagingEnv();
+    mutate(current.env);
+    const calls = installFetch({ success: true, hostname: 'example.com', action: null });
+    const response = await worker.fetch(
+      requestFor('/lead-intake', undefined, 'http://localhost:4173', {
+        baseUrl: stagingBaseUrl,
+        stagingKey: stagingAccessToken,
+      }),
+      current.env,
+    );
+
+    assert.equal(response.status, 503);
+    assert.equal(calls.length, 0);
+    assert.equal(current.leadLimiter.calls.length, 0);
+    assert.equal(current.events.operations.length, 0);
+  }
+});
+
+test('a copied staging environment cannot activate on the production origin', async () => {
+  const current = makeStagingEnv();
+  current.env.STAGING_BASE_URL = 'https://intake.epictech.club';
+  const calls = installFetch({ success: true, hostname: 'example.com', action: null });
+  const response = await worker.fetch(
+    requestFor('/lead-intake', undefined, 'https://epictech.club', {
+      stagingKey: stagingAccessToken,
+    }),
+    current.env,
+  );
+
+  assert.equal(response.status, 503);
+  assert.equal(calls.length, 0);
+  assert.equal(current.events.operations.length, 0);
+});
+
+test('staging preflight permits only an exact local QA origin and names the access header', async () => {
+  const current = makeStagingEnv();
+  const accepted = await worker.fetch(
+    new Request(stagingBaseUrl + '/lead-intake', {
+      method: 'OPTIONS',
+      headers: {
+        Origin: 'http://localhost:4173',
+        'Access-Control-Request-Headers': 'content-type,x-epictech-staging-key',
+        'Access-Control-Request-Method': 'POST',
+      },
+    }),
+    current.env,
+  );
+  assert.equal(accepted.status, 204);
+  assert.equal(accepted.headers.get('Access-Control-Allow-Origin'), 'http://localhost:4173');
+  assert.match(accepted.headers.get('Access-Control-Allow-Headers'), /X-Epictech-Staging-Key/);
+
+  const rejected = await worker.fetch(
+    new Request(stagingBaseUrl + '/lead-intake', {
+      method: 'OPTIONS',
+      headers: { Origin: 'https://epictech.club' },
+    }),
+    current.env,
+  );
+  assert.equal(rejected.status, 403);
+});
+
+test('production ignores staging credentials and never accepts the dummy validation identity', async () => {
+  const current = makeEnv();
+  Object.assign(current.env, {
+    STAGING_ACCESS_TOKEN: stagingAccessToken,
+    STAGING_BASE_URL: stagingBaseUrl,
+    STAGING_EVENTS: makeKv(),
+    STAGING_TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA',
+    STAGING_TURNSTILE_TEST_MODE: 'true',
+  });
+  const calls = installFetch({ success: true, hostname: 'localhost', action: 'test' });
+  const response = await worker.fetch(
+    requestFor('/lead-intake', undefined, 'https://epictech.club', {
+      stagingKey: stagingAccessToken,
+    }),
+    current.env,
+  );
+
+  assert.equal(response.status, 403);
+  assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl]);
+  assert.equal(current.kv.operations.length, 0);
+});
+
+test('staging accepts only the pinned dummy Turnstile identity and captures synthetic lead side effects', async () => {
+  const current = makeStagingEnv();
+  const calls = installFetch({
+    success: true,
+    hostname: 'example.com',
+    action: null,
+  });
+
+  const response = await worker.fetch(
+    requestFor('/lead-intake', undefined, 'http://localhost:4173', {
+      baseUrl: stagingBaseUrl,
+      stagingKey: stagingAccessToken,
+    }),
+    current.env,
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl]);
+  const captures = current.events.operations.filter((entry) => entry.type === 'put');
+  assert.equal(captures.length, 2);
+  assert.deepEqual(captures.map((entry) => JSON.parse(entry.value).type).sort(), ['crm', 'email']);
+  assert.ok(captures.every((entry) => entry.options.expirationTtl === 3600));
+});
+
+test('staging never calls or caches Google Places even if production variables are injected', async () => {
+  const current = makeStagingEnv();
+  current.env.GOOGLE_PLACES_API_KEY = 'must-not-be-used';
+  current.env.GOOGLE_PLACE_ID = 'must-not-be-used';
+  const calls = installFetch({});
+  const response = await worker.fetch(
+    new Request(stagingBaseUrl + '/reviews', {
+      headers: {
+        Origin: 'http://localhost:4173',
+        'X-Epictech-Staging-Key': stagingAccessToken,
+      },
+    }),
+    current.env,
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).google, null);
+  assert.equal(calls.length, 0);
+  assert.equal(
+    current.kv.operations.filter((entry) => entry.type === 'put' && entry.key === 'google:reviews').length,
+    0,
+  );
+});
+
+test('staging review records and captured moderation links expire quickly and stay on staging', async () => {
+  const current = makeStagingEnv();
+  const calls = installFetch({
+    success: true,
+    hostname: 'example.com',
+    action: null,
+  });
+
+  const response = await worker.fetch(
+    requestFor('/review-intake', undefined, 'http://localhost:4173', {
+      baseUrl: stagingBaseUrl,
+      stagingKey: stagingAccessToken,
+    }),
+    current.env,
+  );
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl]);
+  const pending = current.kv.operations.find(
+    (entry) => entry.type === 'put' && entry.key.startsWith('review:pending:'),
+  );
+  assert.equal(pending.options.expirationTtl, 3600);
+  const capturedEmail = current.events.operations.find(
+    (entry) => entry.type === 'put' && JSON.parse(entry.value).type === 'email',
+  );
+  const captured = JSON.parse(capturedEmail.value);
+  assert.match(
+    captured.payload.text,
+    /https:\/\/epictech-emailer-staging\.ethanplatt0120\.workers\.dev\/review-approve/,
+  );
 });
 
 test('lead sync supports the deployed legacy CRM variable name without weakening signing', async () => {

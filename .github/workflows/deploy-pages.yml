@@ -1,0 +1,148 @@
+name: Deploy site to GitHub Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact 40-character main commit SHA approved for publication
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-production
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      publication_digest: ${{ steps.manifest.outputs.digest }}
+    steps:
+      - name: Require the approved main commit
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          ACTUAL_SHA: ${{ github.sha }}
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" != "refs/heads/main" ]; then
+            echo "Refusing to publish a non-main ref: $REF" >&2
+            exit 1
+          fi
+          if ! printf '%s' "$EXPECTED_SHA" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "expected_sha must be an exact lowercase 40-character commit SHA" >&2
+            exit 1
+          fi
+          if [ "$EXPECTED_SHA" != "$ACTUAL_SHA" ]; then
+            echo "Approved SHA does not match the selected main revision" >&2
+            exit 1
+          fi
+
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Verify the checked-out revision
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          if [ "$(git rev-parse HEAD)" != "$EXPECTED_SHA" ]; then
+            echo "Checked-out revision does not match the approved SHA" >&2
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.13"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Audit Node dependencies
+        run: npm audit --audit-level=high
+
+      - name: Run JavaScript contracts, including Worker security
+        run: npm run test:media
+
+      - name: Verify published media and provenance
+        run: |
+          npm run media:verify
+          npm run media:originality
+
+      - name: Validate production and staging Worker bundles
+        run: |
+          npm run worker:check
+          npm run worker:check:staging
+
+      - name: Install PDF inspection dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends poppler-utils
+
+      - name: Install hash-locked Python dependencies
+        run: python -m pip install --require-hashes --requirement requirements-dev.txt
+
+      - name: Run site contracts
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Build allowlisted publication artifact
+        run: npm run site:build
+
+      - name: Record the publication artifact digest
+        id: manifest
+        shell: bash
+        run: |
+          find _site -type f -print0 \
+            | LC_ALL=C sort -z \
+            | xargs -0 sha256sum > "$RUNNER_TEMP/publication-files.sha256"
+          digest="$(sha256sum "$RUNNER_TEMP/publication-files.sha256" | cut -d ' ' -f 1)"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "### Publication evidence" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: \`$GITHUB_SHA\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- File-manifest SHA-256: \`$digest\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Record approved deployment evidence
+        env:
+          PUBLICATION_DIGEST: ${{ needs.build.outputs.publication_digest }}
+        run: |
+          echo "Deploying commit \`$GITHUB_SHA\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "File-manifest SHA-256: \`$PUBLICATION_DIGEST\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

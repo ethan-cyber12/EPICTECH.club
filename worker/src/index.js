@@ -8,9 +8,12 @@ const REVIEW_REJECT_PATH = "/review-reject";
 
 const MAX_REVIEW_BODY_BYTES = 16000;
 const REVIEW_TTL_SECONDS = 30 * 24 * 3600;
+const STAGING_TTL_SECONDS = 60 * 60;
 const GOOGLE_CACHE_TTL_SECONDS = 24 * 3600;
 const MAX_TURNSTILE_TOKEN_LENGTH = 2048;
 const TURNSTILE_HOSTNAMES = new Set(["epictech.club", "www.epictech.club"]);
+const STAGING_TURNSTILE_HOSTNAMES = new Set(["example.com"]);
+const STAGING_WORKER_ORIGIN = "https://epictech-emailer-staging.ethanplatt0120.workers.dev";
 const TURNSTILE_ACTIONS = Object.freeze({
   [INTAKE_PATH]: "lead_intake",
   [REVIEW_INTAKE_PATH]: "review_intake",
@@ -30,6 +33,21 @@ const ALLOWED_SERVICES = [
 
 export default {
   async fetch(request, env) {
+    if (isStaging(env)) {
+      if (!hasValidStagingConfiguration(request, env)) {
+        return new Response("Service unavailable", {
+          status: 503,
+          headers: { "Cache-Control": "no-store" },
+        });
+      }
+      if (request.method !== "OPTIONS" && !hasStagingAccess(request, env)) {
+        return new Response("Not found", {
+          status: 404,
+          headers: { "Cache-Control": "no-store" },
+        });
+      }
+    }
+
     const url = new URL(request.url);
     switch (url.pathname) {
       case INTAKE_PATH:
@@ -63,7 +81,10 @@ async function handleLeadIntake(request, env) {
     if (!allowed.includes(origin)) {
       return json({ error: "Forbidden" }, 403, origin, allowed);
     }
-    return new Response(null, { status: 204, headers: cors(origin, allowed) });
+    return new Response(null, {
+      status: 204,
+      headers: cors(origin, allowed, undefined, isStaging(env)),
+    });
   }
 
   if (request.method !== "POST") {
@@ -128,10 +149,11 @@ async function handleLeadIntake(request, env) {
   }
 
   if (!(await verifyTurnstile(
-    env.TURNSTILE_SECRET_KEY,
+    turnstileSecret(env),
     token,
     ip,
-    TURNSTILE_ACTIONS[INTAKE_PATH]
+    turnstileExpectedAction(env, INTAKE_PATH),
+    turnstileHostnames(env)
   ))) {
     return json({ error: "Verification failed" }, 403, origin, allowed);
   }
@@ -206,7 +228,10 @@ async function handleReviewIntake(request, env) {
     if (!allowed.includes(origin)) {
       return json({ error: "Forbidden" }, 403, origin, allowed, methods);
     }
-    return new Response(null, { status: 204, headers: cors(origin, allowed, methods) });
+    return new Response(null, {
+      status: 204,
+      headers: cors(origin, allowed, methods, isStaging(env)),
+    });
   }
   if (request.method !== "POST") {
     return json({ error: "Method not allowed" }, 405, origin, allowed, methods);
@@ -270,10 +295,11 @@ async function handleReviewIntake(request, env) {
   }
 
   if (!(await verifyTurnstile(
-    env.TURNSTILE_SECRET_KEY,
+    turnstileSecret(env),
     token,
     ip,
-    TURNSTILE_ACTIONS[REVIEW_INTAKE_PATH]
+    turnstileExpectedAction(env, REVIEW_INTAKE_PATH),
+    turnstileHostnames(env)
   ))) {
     return json({ error: "Verification failed" }, 403, origin, allowed, methods);
   }
@@ -285,7 +311,8 @@ async function handleReviewIntake(request, env) {
 
   const id = crypto.randomUUID();
   const submittedAt = new Date().toISOString();
-  const expiresAt = Math.floor(Date.now() / 1000) + REVIEW_TTL_SECONDS;
+  const reviewTtl = isStaging(env) ? STAGING_TTL_SECONDS : REVIEW_TTL_SECONDS;
+  const expiresAt = Math.floor(Date.now() / 1000) + reviewTtl;
   const pendingKey = "review:pending:" + id;
   let approveSig;
   let rejectSig;
@@ -309,14 +336,16 @@ async function handleReviewIntake(request, env) {
 
   try {
     await env.REVIEWS_KV.put(pendingKey, JSON.stringify(record), {
-      expirationTtl: REVIEW_TTL_SECONDS,
+      expirationTtl: reviewTtl,
     });
   } catch (err) {
     console.log("Failed to store pending review:", err && err.message);
     return json({ error: "Could not save review" }, 500, origin, allowed, methods);
   }
 
-  const base = "https://intake.epictech.club";
+  const base = isStaging(env)
+    ? new URL(request.url).origin
+    : "https://intake.epictech.club";
   const approveUrl = base + REVIEW_APPROVE_PATH + "?id=" + id + "&sig=" + approveSig;
   const rejectUrl = base + REVIEW_REJECT_PATH + "?id=" + id + "&sig=" + rejectSig;
 
@@ -362,7 +391,10 @@ async function handleReviewsFeed(request, env) {
   const methods = "GET, OPTIONS";
 
   if (request.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: cors(origin, allowed, methods) });
+    return new Response(null, {
+      status: 204,
+      headers: cors(origin, allowed, methods, isStaging(env)),
+    });
   }
   if (request.method !== "GET") {
     return json({ error: "Method not allowed" }, 405, origin, allowed, methods);
@@ -393,6 +425,8 @@ async function handleReviewsFeed(request, env) {
 }
 
 async function getGoogleReviews(env) {
+  if (isStaging(env)) return null;
+
   const cacheKey = "google:reviews";
   let cached = null;
   try {
@@ -502,7 +536,11 @@ async function handleReviewAction(request, env, action) {
       submittedAt: record.submittedAt,
     };
     try {
-      await env.REVIEWS_KV.put("review:published:" + id, JSON.stringify(published));
+      await env.REVIEWS_KV.put(
+        "review:published:" + id,
+        JSON.stringify(published),
+        isStaging(env) ? { expirationTtl: STAGING_TTL_SECONDS } : undefined
+      );
     } catch (err) {
       console.log("Failed to publish review:", err && err.message);
       return htmlPage("Error", "<p>Could not publish this review. Please try again.</p>", 500);
@@ -558,11 +596,13 @@ function htmlPage(title, bodyHtml, status) {
   });
 }
 
-function cors(origin, allowed, methods) {
+function cors(origin, allowed, methods, allowStagingHeader) {
   const h = {
     "Vary": "Origin",
     "Access-Control-Allow-Methods": methods || "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": allowStagingHeader
+      ? "Content-Type, X-Epictech-Staging-Key"
+      : "Content-Type",
     "Access-Control-Max-Age": "86400",
   };
   if (allowed.length && allowed.includes(origin)) {
@@ -715,15 +755,92 @@ function isEmail(v) {
   return /^[^\s@]{1,64}@[^\s@]{1,253}\.[^\s@]{2,63}$/.test(v);
 }
 
-async function verifyTurnstile(secret, token, ip, expectedAction) {
+function isStaging(env) {
+  return env && env.ENVIRONMENT === "staging";
+}
+
+function hasValidStagingConfiguration(request, env) {
+  let base;
+  try {
+    base = new URL(env.STAGING_BASE_URL);
+  } catch {
+    return false;
+  }
+
+  return (
+    base.protocol === "https:" &&
+    base.username === "" &&
+    base.password === "" &&
+    base.pathname === "/" &&
+    base.search === "" &&
+    base.hash === "" &&
+    base.origin === env.STAGING_BASE_URL &&
+    base.origin === STAGING_WORKER_ORIGIN &&
+    new URL(request.url).origin === base.origin &&
+    env.STAGING_TURNSTILE_TEST_MODE === "true" &&
+    typeof env.INTAKE_HMAC_SECRET === "string" &&
+    env.INTAKE_HMAC_SECRET.length >= 32 &&
+    typeof env.REVIEW_APPROVAL_SECRET === "string" &&
+    env.REVIEW_APPROVAL_SECRET.length >= 32 &&
+    typeof env.STAGING_TURNSTILE_SECRET_KEY === "string" &&
+    env.STAGING_TURNSTILE_SECRET_KEY.length > 0 &&
+    typeof env.STAGING_ACCESS_TOKEN === "string" &&
+    /^[0-9a-f]{64}$/.test(env.STAGING_ACCESS_TOKEN) &&
+    env.REVIEWS_KV &&
+    env.LEAD_QUEUE &&
+    env.STAGING_EVENTS &&
+    env.LEAD_RATE_LIMITER &&
+    env.REVIEW_RATE_LIMITER
+  );
+}
+
+function hasStagingAccess(request, env) {
+  const expected = env.STAGING_ACCESS_TOKEN;
+  const provided = request.headers.get("X-Epictech-Staging-Key") || "";
+  return /^[0-9a-f]{64}$/.test(provided) && constantTimeEqual(provided, expected);
+}
+
+function constantTimeEqual(left, right) {
+  const leftBytes = new TextEncoder().encode(String(left));
+  const rightBytes = new TextEncoder().encode(String(right));
+  const length = Math.max(leftBytes.length, rightBytes.length);
+  let difference = leftBytes.length ^ rightBytes.length;
+  for (let i = 0; i < length; i++) {
+    difference |= (leftBytes[i] || 0) ^ (rightBytes[i] || 0);
+  }
+  return difference === 0;
+}
+
+function turnstileHostnames(env) {
+  return isStaging(env) && env.STAGING_TURNSTILE_TEST_MODE === "true"
+    ? STAGING_TURNSTILE_HOSTNAMES
+    : TURNSTILE_HOSTNAMES;
+}
+
+function turnstileSecret(env) {
+  return isStaging(env) && env.STAGING_TURNSTILE_TEST_MODE === "true"
+    ? env.STAGING_TURNSTILE_SECRET_KEY
+    : env.TURNSTILE_SECRET_KEY;
+}
+
+function turnstileExpectedAction(env, path) {
+  return isStaging(env) && env.STAGING_TURNSTILE_TEST_MODE === "true"
+    ? null
+    : TURNSTILE_ACTIONS[path];
+}
+
+async function verifyTurnstile(secret, token, ip, expectedAction, allowedHostnames) {
   if (
     typeof secret !== "string" ||
     !secret ||
     typeof token !== "string" ||
     !token ||
     token.length > MAX_TURNSTILE_TOKEN_LENGTH ||
-    typeof expectedAction !== "string" ||
-    !expectedAction
+    !(
+      expectedAction === null ||
+      (typeof expectedAction === "string" && expectedAction.length > 0)
+    ) ||
+    !(allowedHostnames instanceof Set)
   ) {
     return false;
   }
@@ -744,8 +861,8 @@ async function verifyTurnstile(secret, token, ip, expectedAction) {
       out &&
       out.success === true &&
       typeof out.hostname === "string" &&
-      TURNSTILE_HOSTNAMES.has(out.hostname) &&
-      out.action === expectedAction
+      allowedHostnames.has(out.hostname) &&
+      (expectedAction === null ? out.action == null : out.action === expectedAction)
     );
   } catch {
     return false;
@@ -840,6 +957,11 @@ function buildReviewEmailHtml(r) {
 }
 
 async function postToCRM(env, payload) {
+  if (isStaging(env)) {
+    await captureStagingEvent(env, "crm", payload);
+    return true;
+  }
+
   const crmIngestUrl = env.CRM_INGEST_URL || env.CRN_INGEST_URL;
   const hasUrl = typeof crmIngestUrl === "string" && crmIngestUrl.length > 0;
   const hasSecret =
@@ -926,6 +1048,11 @@ async function drainQueue(env) {
 }
 
 async function sendEmail(env, opts) {
+  if (isStaging(env)) {
+    await captureStagingEvent(env, "email", opts);
+    return "staging-capture";
+  }
+
   if (!env.RESEND_API_KEY) {
     throw new Error("RESEND_API_KEY is not configured");
   }
@@ -972,4 +1099,19 @@ async function sendEmail(env, opts) {
   const id = data && data.id ? data.id : "(no id returned)";
   console.log("Email send completed. Resend id:", id);
   return id;
+}
+
+async function captureStagingEvent(env, type, payload) {
+  if (!isStaging(env) || !env.STAGING_EVENTS) {
+    throw new Error("Staging event capture is not configured");
+  }
+
+  const capturedAt = new Date().toISOString();
+  const key = "staging:" + type + ":" + Date.now() + ":" + crypto.randomUUID();
+  await env.STAGING_EVENTS.put(
+    key,
+    JSON.stringify({ type: type, capturedAt: capturedAt, payload: payload }),
+    { expirationTtl: STAGING_TTL_SECONDS }
+  );
+  return key;
 }

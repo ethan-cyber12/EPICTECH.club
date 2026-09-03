@@ -10,6 +10,7 @@
     "test:media": "node --test tests/*.test.mjs",
     "test:worker": "node --test tests/intake-worker-security.test.mjs",
     "worker:check": "wrangler deploy --config worker/wrangler.jsonc --dry-run",
+    "worker:check:staging": "wrangler deploy --config worker/wrangler.staging.jsonc --dry-run",
     "media:founder": "node scripts/build-media.mjs --group founder",
     "media:workshop": "node scripts/build-media.mjs --group workshop",
     "media:social": "node scripts/build-media.mjs --group social",

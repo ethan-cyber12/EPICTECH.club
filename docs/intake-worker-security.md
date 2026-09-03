@@ -1,6 +1,6 @@
 # Intake Worker security contract
 
-Status: client-side action binding is implemented in this branch. The deployed Worker source was imported into `worker/src/index.js`, and the local candidate now enforces the exact hostname/action contract, strict request-origin and JSON boundaries, bounded streaming reads, route-specific rate-limit bindings, and hardened moderation responses. Live submissions, production configuration changes, and deployment are not authorized or completed by this document.
+Status: client-side action binding is implemented in this branch. The deployed Worker source was imported into `worker/src/index.js`, and the candidate now enforces the exact hostname/action contract, strict request-origin and JSON boundaries, bounded streaming reads, route-specific rate-limit bindings, and hardened moderation responses. An isolated staging Worker passed synthetic validation on 2026-09-03. No production configuration change, submission, or deployment was performed.
 
 ## Read-only production evidence
 
@@ -16,7 +16,7 @@ The Cloudflare dashboard was reviewed on 2026-09-02 without changing configurati
 - The account showed one Worker application and one active KV binding on 2026-09-03. The local Wrangler configuration uses distinct rate-limit namespace IDs `1001` and `1002`; because Cloudflare does not expose a namespace registry, active bindings must be rechecked immediately before deployment.
 - The dashboard confirms compatibility date `2025-05-23`, no compatibility flags, no cron triggers, and no queue consumers. The committed configuration preserves that compatibility date and declares no triggers.
 
-These observations are point-in-time dashboard evidence. Deployment `f022c249` was copied without secret values into `worker/src/index.js` on 2026-09-03, fingerprinted as SHA-256 `688fc976e0c63598148e56da4e62bd8ee09d87dbb601c6ac0cb3ff278e945bf7` after LF normalization, then patched locally. The local source is not yet a production attestation because it has not been pushed or deployed.
+These observations are point-in-time dashboard evidence. Deployment `f022c249` was copied without secret values into `worker/src/index.js` on 2026-09-03, fingerprinted as SHA-256 `688fc976e0c63598148e56da4e62bd8ee09d87dbb601c6ac0cb3ff278e945bf7` after LF normalization, then patched. The first hardened candidate was pushed to the feature branch as commit `f2dda4f`; none of these changes are a production attestation because production has not been deployed or verified.
 
 ## Required Turnstile boundary
 
@@ -53,17 +53,26 @@ The local candidate calls a route-scoped Worker rate-limit binding before Siteve
 
 Any IP-based edge rule must allow for shared networks and accessibility tools. Turnstile validation, the honeypot, strict schemas, body limits, bounded upstream work, and monitoring remain required even when an edge rate rule is present.
 
+## Staging evidence
+
+The isolated Worker `epictech-emailer-staging` is exposed only on its own `workers.dev` URL and has no production route or custom domain. It binds three newly created staging KV namespaces and rate-limit namespaces `2001` and `2002`; production's review namespace and local production rate IDs are not referenced by the staging configuration.
+
+Staging requires an encrypted 64-hex-character access token on every substantive request, an exact source-pinned Worker URL match, complete staging bindings, and exact local QA CORS origins. It uses Cloudflare's public dummy Turnstile secret only under explicit staging test mode. Resend and CRM are not bound: their would-be payloads are captured to staging KV for one hour, while Google Places is disabled outright in staging even if production variables are injected. Staging review records expire after one hour. The production configuration pins `ENVIRONMENT=production`, ignores all staging credentials, and continues to enforce the real site hostname/action pairs.
+
+Live synthetic checks on 2026-09-03 used only `example.test` identities and Cloudflare's public dummy token. Missing credentials returned 404, the production Origin was blocked, and lead/review success paths returned 200. Metadata-only KV inspection found three expiring capture keys, one expiring pending-review key, and no queued lead. Payload values and secrets were not read. Cloudflare's live dummy response contained `hostname: example.com` and no `action`, which differs from the current documentation example; this exception is pinned to explicit staging mode and does not weaken production validation.
+
 ## Deployment gates
 
 - [x] Derive the source-controlled candidate from deployed Worker version `f022c249` without secret values and record the retrieved source fingerprint.
 - [x] Add a reviewed deployment configuration that maps the existing review KV namespace, preserves dashboard-managed variables, and commits no secret values.
 - [x] Add unit tests for accepted action/hostname pairs and fail-closed handling of wrong actions, look-alike hostnames, failed Siteverify responses, conflicting or oversized tokens, oversized or malformed bodies, disallowed origins, and unavailable dependencies.
 - [x] Add route-specific rate-limit bindings with distinct local namespace IDs.
+- [x] Provision an isolated non-production Worker, three staging KV namespaces, separate rate-limit IDs, staging-only encrypted secrets, and an environment-specific Wrangler configuration.
+- [x] Deploy the non-production Worker and verify authentication, origin blocking, dummy Turnstile validation, lead/review success responses, staging-only writes, and one-hour expiration metadata.
 - [ ] Immediately before deployment, recheck every active Worker binding and confirm namespace IDs `1001` and `1002` do not share counters with another binding.
 - [ ] Review storage, moderation access, deletion/retention operations, observability redaction, and secret rotation.
-- [ ] Provision a non-production Worker, KV namespace, rate-limit namespaces, hostname, and separate Turnstile widget/secret; then create its environment-specific Wrangler configuration.
-- [ ] Deploy to that non-production environment and complete the staged checks.
-- [ ] After owner authorization, run one synthetic Contact submission and one synthetic Review submission, confirm storage/moderation behavior, and remove the synthetic records.
+- [x] After owner authorization, run one synthetic staging Contact submission and one synthetic staging Review submission and confirm storage behavior; the records self-delete after one hour.
+- [ ] After a separate production authorization, run one synthetic production Contact submission and one synthetic production Review submission, confirm delivery/storage/moderation behavior, and remove the synthetic records.
 - [ ] Deploy production only after the staged tests pass, then verify the exact custom-domain routes and Turnstile Analytics.
 
 Until every gate above that applies to production is satisfied, the intake backend remains a publication blocker even though the static site build is green.

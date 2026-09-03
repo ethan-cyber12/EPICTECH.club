@@ -43,6 +43,9 @@ jobs:
       - name: Validate Cloudflare Worker bundle and bindings
         run: npm run worker:check
 
+      - name: Validate isolated Cloudflare staging bundle and bindings
+        run: npm run worker:check:staging
+
       - name: Verify published media
         run: npm run media:verify
 
