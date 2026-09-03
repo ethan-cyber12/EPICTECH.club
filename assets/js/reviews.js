@@ -29,7 +29,7 @@
   }
 
   // google is always an object (never null) with a status field:
-  //   "ok"             -> rating/snippets loaded, googleReviewUrl set
+  //   "ok"             -> rating/snippets loaded
   //   "degraded"       -> Google Business Profile is connected (a review URL
   //                       exists) but the rating/snippet fetch failed or
   //                       isn't fully set up yet
@@ -40,10 +40,8 @@
     var linkEl = document.querySelector('[data-google-link]');
     if (summaryEl) summaryEl.textContent = '';
     if (listEl) listEl.textContent = '';
-    // linkEl already has a known-correct href baked into the static HTML
-    // (the business's actual Google review link). It's left alone here —
-    // never hidden, never cleared — and only upgraded below if the worker
-    // returns a different one from a connected Places API integration.
+    // linkEl has the business's reviewed Google destination baked into the
+    // static HTML. Backend data must never replace that trusted link.
 
     var status = google && google.status;
 
@@ -64,12 +62,6 @@
         summary.appendChild(el('span', 'muted', 'Based on ' + google.totalRatings + ' Google review' + (google.totalRatings === 1 ? '' : 's')));
       }
       summaryEl.appendChild(summary);
-    }
-
-    // If the worker has a live Places API integration configured, prefer
-    // its googleReviewUrl over the static fallback already in the HTML.
-    if (linkEl && google.googleReviewUrl) {
-      linkEl.href = google.googleReviewUrl;
     }
 
     var list = google.reviews || [];

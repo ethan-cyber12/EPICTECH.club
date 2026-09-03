@@ -94,11 +94,11 @@ These viewport and local-browser observations are not field performance measurem
 
 | Protected surface | SHA-256 |
 | --- | --- |
-| `contact.html` normalized `<main>` content | `7d920e1f2bde274aae8637a1a2694fee1422072472049314a6b732c0a4da2d9b` |
-| `reviews.html` normalized `<main>` content | `fc682564abc4b465820e7b9f754c24d6cce4b8efdfa7b3a10c53bfb87323323e` |
+| `contact.html` normalized `<main>` content | `8487e5667cf353d6c3960426efd8680b87b621b1067c8479cd00d509744b0c50` |
+| `reviews.html` normalized `<main>` content | `e52cc64e5f63e076a8d2f53f49c69924d13ed0cc539da6fafa625cc801946676` |
 | `assets/js/main.js` | `2ed431d84934dc2cbafb487a4339012f013ac3e429066fd77e8a82893d29e394` |
 | `assets/js/qualification.js` | `21212f804b1a40c749da732bbf43f9919d4b38099a5812bbac6cf6976f6b9303` |
-| `assets/js/reviews.js` | `80bc60394ec295f371dc5afbe84b3b99697b69795aa33de619d5851e274149e6` |
+| `assets/js/reviews.js` | `2f81e2d8ab918f6bbb26963367f00fcb4a23a1cb70806cd0e4e436f42782f865` |
 
 The local checks confirm that the Contact and Reviews endpoints, Turnstile origins, WhatsApp link, scripts, and shared accessible shell remain present. They do not exercise any external side effect.
 
@@ -129,6 +129,12 @@ The standard Codex Security scan completed against the stabilized source snapsho
 The scan found no source-backed injection, traversal, unsafe parsing, upload, secret-exposure, or dependency vulnerability. The direct assignment of a backend-provided Google review URL remains an external trust-boundary hardening item because the intake implementation is not in this repository; it is not reported as a confirmed vulnerability.
 
 The scan cannot verify the out-of-repository intake Worker's server-side Turnstile validation, hostname/action binding, token freshness/replay handling, schemas and body limits, rate controls, CORS, storage, logging, moderation, or retention. No separate intake/Turnstile repository was visible in the authenticated GitHub account during this review. These are production-readiness checks, not assumed failures.
+
+### Cloudflare intake review and local hardening
+
+A read-only Cloudflare dashboard review on 2026-09-02 established a narrower production finding without changing configuration or sending a live submission. The Turnstile widget is in Managed mode, is restricted to `epictech.club` and `www.epictech.club`, and uses an encrypted Worker secret. The custom-domain Worker calls Siteverify, but the reviewed implementation accepted a result by checking `success` only; it did not also require the expected `hostname` and endpoint-specific `action`. Production and preview `workers.dev` routes were disabled, and no intake-specific rate limit was identified.
+
+This branch now supplies `lead_intake` and `review_intake` actions from the two widgets so the Worker can enforce an exact endpoint binding. It also makes the reviewed static EPIC TECH Google review destination immutable: backend response data cannot replace it with an arbitrary external, look-alike, proxy, redirect, or different-business URL. The production Worker is not fixed by these client changes; its source, bindings, Siteverify hostname/action checks, rate controls, schemas, storage, logging, and retention still require the rollout in [the intake Worker security contract](intake-worker-security.md).
 
 ### Authenticated GitHub repository evidence
 
@@ -169,7 +175,7 @@ Relevant task-sized commit sequence from case studies through the security runbo
 - [ ] **Cloudflare Stage 3 — meta-CSP deduplication:** only after verified enforcement, make a separate code/deployment change for non-protected pages; Contact and Reviews remain protected.
 - [ ] **Live response evidence:** production HTML security headers, PDF `X-Robots-Tag: noindex, follow`, Cloudflare Trace, and verified-bot logs remain unchecked because live Cloudflare/network work was outside this task.
 - [ ] **Contact/Reviews integrations:** contact submission, review retrieval, review submission, Turnstile, intake endpoints, and WhatsApp external-side-effect checks require specific live-test authorization and were not exercised.
-- [ ] **Intake backend controls:** inspect or independently attest the deployed Worker for server-side Siteverify, hostname/action checks, schemas and request limits, rate controls, CORS, safe storage/logging, moderation, access control, and the stated retention/deletion practice.
+- [ ] **Intake backend controls:** the deployed Worker is confirmed to call Siteverify but currently checks only `success`. Import its exact source, implement and test the hostname/action checks and remaining controls in [the intake Worker security contract](intake-worker-security.md), then deploy and verify them before publication.
 - [ ] **External schema/search validation:** Schema.org Validator, Google Rich Results, Search Console, Bing Webmaster Tools, sitemap submission, and index inspection were not contacted. Local schema parsing is not a substitute.
 - [x] **Local performance:** Lighthouse 13.4.1 passed the generated homepage at 100 Performance, 100 Accessibility, 96 Best Practices, and 100 SEO. This is reproducible lab evidence only; live PageSpeed and field Core Web Vitals remain production follow-ups.
 - [x] **Final representative browser rerun:** current-head desktop and mobile checks completed locally for homepage, pricing, Contact, Reviews, and a representative case study without overflow, broken images, or form submissions.

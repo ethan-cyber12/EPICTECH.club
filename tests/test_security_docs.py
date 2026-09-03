@@ -164,6 +164,8 @@ class SecurityDocumentationTests(unittest.TestCase):
             "owner separately approves the lockout risk",
             "https://challenges.cloudflare.com",
             "https://intake.epictech.club",
+            "`lead_intake` on Contact and `review_intake` on Reviews",
+            "returned `action` does not exactly match the requested endpoint",
         ):
             with self.subTest(safeguard=safeguard):
                 self.assertIn(safeguard, runbook)

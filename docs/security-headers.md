@@ -73,6 +73,7 @@ PDF `noindex, follow` is a response-header policy, not a PDF content edit.
 - Do not add Cloudflare Web Analytics, external fonts, trackers, review widgets, or CDNs.
 - Do not expand HSTS to `includeSubDomains` or `preload` until `epictech.club`, `intake.epictech.club`, and every other subdomain are confirmed permanently HTTPS-capable and the owner separately approves the lockout risk.
 - Do not whitelist bots by User-Agent alone; use Cloudflare verified-bot classifications or provider-published networks.
+- Preserve the Turnstile action bindings: `lead_intake` on Contact and `review_intake` on Reviews. The intake Worker must reject a Siteverify result whose returned `action` does not exactly match the requested endpoint.
 - Preserve the Contact and Reviews endpoint origins, form behavior, meta CSP, and protected-source hashes recorded below.
 
 ## Stage 0 — inventory and baseline
@@ -129,10 +130,10 @@ Run the full local suite, obtain deployment approval, deploy that separate code 
 
 These normalized source hashes must remain unchanged throughout the rollout:
 
-- `contact.html` main: `7d920e1f2bde274aae8637a1a2694fee1422072472049314a6b732c0a4da2d9b`
-- `reviews.html` main: `fc682564abc4b465820e7b9f754c24d6cce4b8efdfa7b3a10c53bfb87323323e`
+- `contact.html` main: `8487e5667cf353d6c3960426efd8680b87b621b1067c8479cd00d509744b0c50`
+- `reviews.html` main: `e52cc64e5f63e076a8d2f53f49c69924d13ed0cc539da6fafa625cc801946676`
 - `assets/js/main.js`: `2ed431d84934dc2cbafb487a4339012f013ac3e429066fd77e8a82893d29e394`
 - `assets/js/qualification.js`: `21212f804b1a40c749da732bbf43f9919d4b38099a5812bbac6cf6976f6b9303`
-- `assets/js/reviews.js`: `80bc60394ec295f371dc5afbe84b3b99697b69795aa33de619d5851e274149e6`
+- `assets/js/reviews.js`: `2f81e2d8ab918f6bbb26963367f00fcb4a23a1cb70806cd0e4e436f42782f865`
 
 Any hash mismatch stops the rollout until the change is explained and separately approved.

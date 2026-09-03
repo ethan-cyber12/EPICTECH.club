@@ -28,6 +28,8 @@ class ContactReviewsRegressionTests(unittest.TestCase):
         self.assertIn('data-endpoint="https://intake.epictech.club/review-intake"', reviews)
         self.assertIn('src="https://challenges.cloudflare.com/turnstile/v0/api.js"', contact)
         self.assertIn('src="https://challenges.cloudflare.com/turnstile/v0/api.js"', reviews)
+        self.assertIn('data-action="lead_intake"', contact)
+        self.assertIn('data-action="review_intake"', reviews)
         self.assertIn('src="assets/js/qualification.js"', contact)
         self.assertIn('src="assets/js/reviews.js"', reviews)
 
