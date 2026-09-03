@@ -25,8 +25,8 @@ condition = "AND"
 regexTarget = "line"
 paths = ['''(?i)(^|[\\/])tests[\\/]test_case_studies\.py$''']
 regexes = [
-  '''AKIAABCDEFGHIJKLMNOP''',
-  '''sk_live_1234567890abcdef123456''',
-  '''xoxb-1234567890-abcdefghij''',
-  '''eyJhbGciOiJIUzI1NiJ9\.eyJzdWIiOiIxMjM0In0\.signature123'''
+  '''AKIA(ABCDEFGHIJKLMNOP)''',
+  '''sk_(live)_1234567890abcdef123456''',
+  '''xoxb-(1234567890)-abcdefghij''',
+  '''eyJhbGciOiJIUzI1NiJ9\.(eyJzdWIiOiIxMjM0In0)\.signature123'''
 ]
