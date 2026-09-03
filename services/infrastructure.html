@@ -19,16 +19,53 @@
   <meta name="twitter:description" content="Business Wi-Fi and network cleanup for Orlando small offices. Device inventory, guest Wi-Fi separation, AP placement, and network documentation from $249.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
   <link rel="stylesheet" href="../assets/css/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://epictech.club/services/infrastructure.html#webpage",
+        "url": "https://epictech.club/services/infrastructure.html",
+        "name": "Clean Wi-Fi and network setups that make sense",
+        "isPartOf": {"@id": "https://epictech.club/#website"},
+        "about": {"@id": "https://epictech.club/services/infrastructure.html#service"},
+        "mainEntity": {"@id": "https://epictech.club/services/infrastructure.html#service"},
+        "breadcrumb": {"@id": "https://epictech.club/services/infrastructure.html#breadcrumb"}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://epictech.club/services/infrastructure.html#breadcrumb",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://epictech.club/"},
+          {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://epictech.club/services/"},
+          {"@type": "ListItem", "position": 3, "name": "Network & Wi-Fi", "item": "https://epictech.club/services/infrastructure.html"}
+        ]
+      },
+      {
+        "@type": "Service",
+        "@id": "https://epictech.club/services/infrastructure.html#service",
+        "name": "Network & Wi-Fi",
+        "serviceType": "Network & Wi-Fi",
+        "url": "https://epictech.club/services/infrastructure.html",
+        "provider": {"@id": "https://epictech.club/#business"},
+        "areaServed": {"@type": "AdministrativeArea", "name": "Central Florida"},
+        "mainEntityOfPage": {"@id": "https://epictech.club/services/infrastructure.html#webpage"}
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="container nav">
-    <a class="brand" href="../index.html">
-      <img src="../assets/images/logo/epic-tech-logo-final.webp" alt="EPIC TECH LLC" class="site-logo">
+    <a class="brand" href="/" aria-label="EPIC TECH home">
+      <img src="../assets/images/logo/epic-tech-logo-final.webp" alt="EPIC TECH LLC" width="787" height="904" class="site-logo">
     </a>
-    <button class="menu-btn" data-menu-button aria-expanded="false">Menu</button>
-    <nav class="nav-links" data-nav-links>
-      <a href="index.html">Services</a>
+    <button class="menu-btn" data-menu-button aria-expanded="false" aria-controls="nav-links">Menu</button>
+    <nav class="nav-links" data-nav-links id="nav-links" aria-label="Primary navigation">
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
@@ -36,24 +73,40 @@
     </nav>
   </div>
 </header>
-<main>
+<main id="main">
   <section class="page-hero">
     <div class="container">
-      <span class="eyebrow">Reliable networks</span>
-      <h1>Clean Wi-Fi and network setups that make sense</h1>
-      <p class="lead">We help small offices, shops, and home businesses clean up unreliable Wi-Fi, messy device layouts, and undocumented networks.</p>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li><a href="/services/">Services</a></li>
+          <li aria-current="page">Network &amp; Wi-Fi</li>
+        </ol>
+      </nav>
+      <div class="service-hero">
+        <div>
+          <span class="eyebrow">Reliable networks</span>
+          <h1>Clean Wi-Fi and network setups that make sense</h1>
+          <p class="lead">We help small offices, shops, and home businesses clean up unreliable Wi-Fi, messy device layouts, and undocumented networks.</p>
+        </div>
+        <picture class="service-hero__visual">
+          <source type="image/avif" srcset="../assets/images/service-visuals/epic-service-network-wifi-640.avif 640w, ../assets/images/service-visuals/epic-service-network-wifi-1200.avif 1200w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
+          <source type="image/webp" srcset="../assets/images/service-visuals/epic-service-network-wifi-640.webp 640w, ../assets/images/service-visuals/epic-service-network-wifi-1200.webp 1200w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
+          <img src="../assets/images/service-visuals/epic-service-network-wifi-1200.webp" width="1200" height="750" alt="" loading="eager" fetchpriority="high" decoding="async">
+        </picture>
+      </div>
     </div>
   </section>
   <section class="section">
-    <div class="container service-layout">
-      <aside class="side-nav card">
-        <strong>Service menu</strong>
+    <div class="container service-flow">
+      <aside class="side-nav" aria-label="On this page">
+        <strong>On this page</strong>
         <a href="#packages">Packages</a>
         <a href="#included">What is included</a>
         <a href="#proof">Proof assets</a>
         <a href="../contact.html">Request quote</a>
       </aside>
-      <div>
+      <div class="service-flow__content">
         <section id="packages">
           <h2>Packages</h2>
           <div class="grid-3">
@@ -100,6 +153,14 @@
             <h3>Business Network Infrastructure Design</h3>
             <p class="muted">Secure small-business network planning covering routing, switching, wireless, server access, endpoint planning, and documentation.</p>
             <a class="btn btn-primary" href="../assets/projects/epic-network-infrastructure-public-sample.pdf" target="_blank" rel="noopener noreferrer">View Case Study</a>
+            <a class="service-destination" href="/case-studies/network-infrastructure.html">Read the HTML case study: Business Network Infrastructure Design</a>
+          </div>
+        </section>
+        <section class="section" id="related-services">
+          <h2>Related services</h2>
+          <div class="service-destinations">
+            <a class="service-destination" href="firewalls.html">Firewalls &amp; Security</a>
+            <a class="service-destination" href="virtualization.html">Virtualization Labs</a>
           </div>
         </section>
         <div class="notice">We keep the scope clear before touching a client system. Hardware, licenses, cloud bills, travel, and after-hours work are separate unless the signed Statement of Work says otherwise.</div>
@@ -115,7 +176,7 @@
       <span class="fine">© <span data-year></span> EPIC TECH LLC</span>
     </div>
     <div class="mini-links">
-      <a href="index.html">Services</a>
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>

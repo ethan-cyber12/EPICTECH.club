@@ -1,0 +1,139 @@
+{
+  "page_boxes": {
+    "mediabox": [0.0, 0.0, 612.0, 792.0],
+    "cropbox": [0.0, 0.0, 612.0, 792.0],
+    "bleedbox": [0.0, 0.0, 612.0, 792.0],
+    "trimbox": [0.0, 0.0, 612.0, 792.0],
+    "artbox": [0.0, 0.0, 612.0, 792.0]
+  },
+  "pdfs": {
+    "epic-cloud-security-automation-public-sample.pdf": {
+      "page_count": 2,
+      "normalized_text_sha256": "961579d946e99abc0d42338e6b9de6cbee28d8c27e99b9cd07841289e855db18",
+      "content_stream_sha256": [
+        "10d8566aad45cf6238affc11875b01253c7fb19c05e52e56611f754d7d3197a1",
+        "0a05e1ed0cc9142ef9ab4d7b1b3c2ec2e47d12db68dca159ad95a6922f52e487"
+      ],
+      "resource_sha256": [
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62",
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62"
+      ],
+      "rotations": [0, 0],
+      "annotations": [[], []],
+      "attachments": [],
+      "acroform": null
+    },
+    "epic-cybersecurity-compliance-public-sample.pdf": {
+      "page_count": 2,
+      "normalized_text_sha256": "573fe95796f8063f51a9baf7e351440eb7f44cd051a8ae3badd868d5627e2192",
+      "content_stream_sha256": [
+        "adb28c6dda42047ed5da0d3ee2f8fa8f445f89857b063e9ec4b8dcda0676f6e0",
+        "66c193e9c1e6d10acd1dd7826adf48b233d8a56db6b2df205b135671652b7f51"
+      ],
+      "resource_sha256": [
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62",
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62"
+      ],
+      "rotations": [0, 0],
+      "annotations": [[], []],
+      "attachments": [],
+      "acroform": null
+    },
+    "epic-disa-stig-hardening-public-sample.pdf": {
+      "page_count": 2,
+      "normalized_text_sha256": "07b936aecdbfd32bf98dc5692276322650de95090cb9b42b40ceae25e62e9bc3",
+      "content_stream_sha256": [
+        "2029fe31b31447551d762cbfa0257a29afb91d9c2ff0fb5a05440764b934bb80",
+        "4bcbb5fa5c1a38ca3616cd55a320d3fb71787b329da4d08f59b9c4178c045c9e"
+      ],
+      "resource_sha256": [
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62",
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62"
+      ],
+      "rotations": [0, 0],
+      "annotations": [[], []],
+      "attachments": [],
+      "acroform": null
+    },
+    "epic-managed-it-patch-management-public-sample.pdf": {
+      "page_count": 2,
+      "normalized_text_sha256": "a98041c45b1794ee8dded178f7af4a276aede260c04e8f617492c3c2c015d622",
+      "content_stream_sha256": [
+        "0c9bcbff59130c9710f5ede41f38ecf5289adb775a1d8b14c145e60196fda5aa",
+        "6fc4d85ebb3d26b7ab1450196740eaad14ff354f781927ba13523552731553ab"
+      ],
+      "resource_sha256": [
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62",
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62"
+      ],
+      "rotations": [0, 0],
+      "annotations": [[], []],
+      "attachments": [],
+      "acroform": null
+    },
+    "epic-network-infrastructure-public-sample.pdf": {
+      "page_count": 2,
+      "normalized_text_sha256": "52224193b100e4ecff51a54e4d9243a05c6bc44a96a614065a3ebdd2ebf77cfd",
+      "content_stream_sha256": [
+        "dd2a8e9f188b6562b3af208c64d0cd6370d10d954ec4c170618dbd3a1e42f2cf",
+        "23c728a99f180c7e4d4ad08c3a963a8a0f226ccec1d91e4401a63eb7d9c67781"
+      ],
+      "resource_sha256": [
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62",
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62"
+      ],
+      "rotations": [0, 0],
+      "annotations": [[], []],
+      "attachments": [],
+      "acroform": null
+    },
+    "epic-secure-web-and-sdlc-public-sample.pdf": {
+      "page_count": 2,
+      "normalized_text_sha256": "df44226e1059b8cd616f1c680c9dcac07bfdfb12962ed4131760c4f8a1600028",
+      "content_stream_sha256": [
+        "68dbd8f14dd6707cddc6bb1d12160d06b42e7b42e64d18f075f9f69543721769",
+        "b7be03cf15db03562b9e6b0fae2e657f24a2925aa520f3e9507a69c6de75a8f7"
+      ],
+      "resource_sha256": [
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62",
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62"
+      ],
+      "rotations": [0, 0],
+      "annotations": [[], []],
+      "attachments": [],
+      "acroform": null
+    },
+    "epic-vulnerability-remediation-public-sample.pdf": {
+      "page_count": 2,
+      "normalized_text_sha256": "56f505a6a43e6a6d73be42d2251bc518f98825bd4c7a99efa36fecad97175629",
+      "content_stream_sha256": [
+        "e1de79bf7e1b2583f7b851da9afbdf7e35ee83110e865a141c7802c0fd90f8dd",
+        "59d375325465dfeb846ff5edc83548b1a78081f2eef2de01a1ef239056f142b6"
+      ],
+      "resource_sha256": [
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62",
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62"
+      ],
+      "rotations": [0, 0],
+      "annotations": [[], []],
+      "attachments": [],
+      "acroform": null
+    },
+    "epic-zero-trust-access-control-public-sample.pdf": {
+      "page_count": 2,
+      "normalized_text_sha256": "8a3efba5ad3bc98ba50b84c47ce79a609c6d787ba9eb9a6d3d5b627748cf9548",
+      "content_stream_sha256": [
+        "46ef2e4aa0ae5cd9a492843414418c036d08f90c479980f9a782b3e557515498",
+        "81643e563488764e85883396783bb131ed020eb8bc93fbcc1bded193c5afebd7"
+      ],
+      "resource_sha256": [
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62",
+        "b007bdc7e7de27ecbb5fd328e5add5a7e0076ea5a1d52c564e0e1696ed990f62"
+      ],
+      "rotations": [0, 0],
+      "annotations": [[], []],
+      "attachments": [],
+      "acroform": null
+    }
+  }
+}

@@ -19,16 +19,53 @@
   <meta name="twitter:description" content="Small automation scripts for Orlando small businesses. Bash, PowerShell, and Ansible-style scripts with testing notes, from $249.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
   <link rel="stylesheet" href="../assets/css/styles.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://epictech.club/services/automation.html#webpage",
+        "url": "https://epictech.club/services/automation.html",
+        "name": "Small automation that saves time and reduces mistakes",
+        "isPartOf": {"@id": "https://epictech.club/#website"},
+        "about": {"@id": "https://epictech.club/services/automation.html#service"},
+        "mainEntity": {"@id": "https://epictech.club/services/automation.html#service"},
+        "breadcrumb": {"@id": "https://epictech.club/services/automation.html#breadcrumb"}
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://epictech.club/services/automation.html#breadcrumb",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://epictech.club/"},
+          {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://epictech.club/services/"},
+          {"@type": "ListItem", "position": 3, "name": "Automation", "item": "https://epictech.club/services/automation.html"}
+        ]
+      },
+      {
+        "@type": "Service",
+        "@id": "https://epictech.club/services/automation.html#service",
+        "name": "Automation",
+        "serviceType": "Automation",
+        "url": "https://epictech.club/services/automation.html",
+        "provider": {"@id": "https://epictech.club/#business"},
+        "areaServed": {"@type": "AdministrativeArea", "name": "Central Florida"},
+        "mainEntityOfPage": {"@id": "https://epictech.club/services/automation.html#webpage"}
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="container nav">
-    <a class="brand" href="../index.html">
-      <img src="../assets/images/logo/epic-tech-logo-final.webp" alt="EPIC TECH LLC" class="site-logo">
+    <a class="brand" href="/" aria-label="EPIC TECH home">
+      <img src="../assets/images/logo/epic-tech-logo-final.webp" alt="EPIC TECH LLC" width="787" height="904" class="site-logo">
     </a>
-    <button class="menu-btn" data-menu-button aria-expanded="false">Menu</button>
-    <nav class="nav-links" data-nav-links>
-      <a href="index.html">Services</a>
+    <button class="menu-btn" data-menu-button aria-expanded="false" aria-controls="nav-links">Menu</button>
+    <nav class="nav-links" data-nav-links id="nav-links" aria-label="Primary navigation">
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
@@ -36,24 +73,40 @@
     </nav>
   </div>
 </header>
-<main>
+<main id="main">
   <section class="page-hero">
     <div class="container">
-      <span class="eyebrow">Repeatable work</span>
-      <h1>Small automation that saves time and reduces mistakes</h1>
-      <p class="lead">We build simple scripts and repeatable setup steps for small technical tasks. The goal is not to overbuild; it is to make repeated work safer and faster.</p>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/">Home</a></li>
+          <li><a href="/services/">Services</a></li>
+          <li aria-current="page">Automation</li>
+        </ol>
+      </nav>
+      <div class="service-hero">
+        <div>
+          <span class="eyebrow">Repeatable work</span>
+          <h1>Small automation that saves time and reduces mistakes</h1>
+          <p class="lead">We build simple scripts and repeatable setup steps for small technical tasks. The goal is not to overbuild; it is to make repeated work safer and faster.</p>
+        </div>
+        <picture class="service-hero__visual">
+          <source type="image/avif" srcset="../assets/images/service-visuals/epic-service-automation-640.avif 640w, ../assets/images/service-visuals/epic-service-automation-1200.avif 1200w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
+          <source type="image/webp" srcset="../assets/images/service-visuals/epic-service-automation-640.webp 640w, ../assets/images/service-visuals/epic-service-automation-1200.webp 1200w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
+          <img src="../assets/images/service-visuals/epic-service-automation-1200.webp" width="1200" height="750" alt="" loading="eager" fetchpriority="high" decoding="async">
+        </picture>
+      </div>
     </div>
   </section>
   <section class="section">
-    <div class="container service-layout">
-      <aside class="side-nav card">
-        <strong>Service menu</strong>
+    <div class="container service-flow">
+      <aside class="side-nav" aria-label="On this page">
+        <strong>On this page</strong>
         <a href="#packages">Packages</a>
         <a href="#included">What is included</a>
         <a href="#proof">Proof assets</a>
         <a href="../contact.html">Request quote</a>
       </aside>
-      <div>
+      <div class="service-flow__content">
         <section id="packages">
           <h2>Packages</h2>
           <div class="grid-3">
@@ -100,6 +153,14 @@
             <h3>Cloud Infrastructure Hardening with Ansible</h3>
             <p class="muted">Automated Linux cloud infrastructure deployment using Ansible, repeatable setup steps, and security hardening concepts.</p>
             <a class="btn btn-primary" href="../assets/projects/epic-cloud-security-automation-public-sample.pdf" target="_blank" rel="noopener noreferrer">View Case Study</a>
+            <a class="service-destination" href="/case-studies/cloud-security-automation.html">Read the HTML case study: Cloud Security &amp; Automation</a>
+          </div>
+        </section>
+        <section class="section" id="related-services">
+          <h2>Related services</h2>
+          <div class="service-destinations">
+            <a class="service-destination" href="app-building.html">Business Apps &amp; Dashboards</a>
+            <a class="service-destination" href="software.html">Forms &amp; Internal Tools</a>
           </div>
         </section>
         <div class="notice">We keep the scope clear before touching a client system. Hardware, licenses, cloud bills, travel, and after-hours work are separate unless the signed Statement of Work says otherwise.</div>
@@ -115,7 +176,7 @@
       <span class="fine">© <span data-year></span> EPIC TECH LLC</span>
     </div>
     <div class="mini-links">
-      <a href="index.html">Services</a>
+      <a href="/services/">Services</a>
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>

@@ -66,15 +66,18 @@
   </script>
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
   <header class="site-header">
     <div class="container nav">
-      <a class="brand" href="index.html">
+      <a class="brand" href="index.html" aria-label="EPIC TECH home">
         <img src="assets/images/logo/epic-tech-logo-final.webp"
              alt="EPIC TECH LLC"
+             width="787" height="904"
              class="site-logo">
       </a>
-      <button class="menu-btn" data-menu-button aria-expanded="false">Menu</button>
-      <nav class="nav-links" data-nav-links>
+      <button class="menu-btn" data-menu-button aria-expanded="false" aria-controls="nav-links">Menu</button>
+      <nav class="nav-links" data-nav-links id="nav-links" aria-label="Primary navigation">
         <a href="services/">Services</a>
         <a href="pricing.html">Pricing</a>
         <a href="about.html">About</a>
@@ -84,18 +87,36 @@
     </div>
   </header>
 
-  <main>
-    <section class="page-hero">
-      <div class="container">
-        <span class="eyebrow">Start here</span>
-        <h1>Schedule a technology assessment</h1>
-        <p class="lead">Tell us what is going on and we will reply with the right next step. The more detail you include, the more useful our reply will be.</p>
+  <main id="main">
+    <section class="page-hero contact-hero">
+      <div class="container contact-hero__layout">
+        <div class="contact-hero__copy">
+          <span class="eyebrow">Start here</span>
+          <h1>Schedule a technology assessment</h1>
+          <p class="lead">Tell us what is going on and we will reply with the right next step. The more detail you include, the more useful our reply will be.</p>
+        </div>
+        <div class="assessment-path" aria-label="Assessment process">
+          <div class="assessment-path__step">
+            <span>01</span>
+            <strong>Tell us what is going on</strong>
+          </div>
+          <span class="assessment-path__connector" aria-hidden="true"></span>
+          <div class="assessment-path__step">
+            <span>02</span>
+            <strong>Assessment</strong>
+          </div>
+          <span class="assessment-path__connector" aria-hidden="true"></span>
+          <div class="assessment-path__step">
+            <span>03</span>
+            <strong>Written plan</strong>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section">
-      <div class="container grid-2">
-        <form class="card" data-intake-form method="post" action="contact.html" data-endpoint="https://intake.epictech.club/lead-intake" novalidate>
+    <section class="section intake-section">
+      <div class="container intake-layout">
+        <form class="form-surface" data-intake-form method="post" action="contact.html" data-endpoint="https://intake.epictech.club/lead-intake" novalidate>
           <div class="hp-field" aria-hidden="true">
             <label for="hp-field">Website</label>
             <input type="text" id="hp-field" name="_hp" tabindex="-1" autocomplete="off" maxlength="100">
@@ -147,26 +168,26 @@
           <p class="fine">Your message is sent securely to EPIC TECH. We do not store submissions on this website, and nothing here is shared publicly.</p>
         </form>
 
-        <div class="card">
+        <aside class="intake-guide">
           <h2>What happens next?</h2>
           <p class="fine">We work with small businesses in Orlando, Winter Park, and Central Florida.</p>
-          <div class="steps">
-            <div class="step">
-              <span class="step-number">1</span>
+          <div class="intake-guide__steps">
+            <div class="intake-guide__step">
+              <span>01</span>
               <div>
                 <strong>Quick reply</strong>
                 <p class="muted">We confirm the problem, location, rough timeline, and whether it fits EPIC TECH, usually within 1 business day.</p>
               </div>
             </div>
-            <div class="step">
-              <span class="step-number">2</span>
+            <div class="intake-guide__step">
+              <span>02</span>
               <div>
                 <strong>Assessment</strong>
                 <p class="muted">We review the network, website, firewall, app idea, or setup and define the actual scope and risk.</p>
               </div>
             </div>
-            <div class="step">
-              <span class="step-number">3</span>
+            <div class="intake-guide__step">
+              <span>03</span>
               <div>
                 <strong>Written plan</strong>
                 <p class="muted">You get a clear plan, exact scope, and price before implementation starts. Nothing begins without your approval.</p>
@@ -176,36 +197,47 @@
           <div class="notice contact-notice">
             <strong>What not to include:</strong> Do not send passwords, network credentials, API keys, payment details, or client data. EPIC TECH will provide a secure way to share anything sensitive if the project requires it.
           </div>
-        </div>
+        </aside>
       </div>
     </section>
 
-    <section class="section">
+    <section class="section contact-channel-section">
       <div class="container">
-        <div class="card">
-          <span class="eyebrow">Prefer to chat?</span>
-          <h2>Message us on WhatsApp</h2>
-          <p class="muted">For a quicker back-and-forth, message EPIC TECH directly on WhatsApp instead of using the form above.</p>
+        <div class="contact-channel">
+          <div>
+            <span class="eyebrow">Prefer to chat?</span>
+            <h2>Message us on WhatsApp</h2>
+            <p>For a quicker back-and-forth, message EPIC TECH directly on WhatsApp instead of using the form above.</p>
+          </div>
           <a class="btn btn-secondary" href="https://wa.me/message/GO4FEQZBZN3VG1" target="_blank" rel="noopener noreferrer">Open WhatsApp</a>
         </div>
       </div>
     </section>
 
     <section class="section">
-      <div class="container">
+      <div class="container faq-layout">
+        <div>
+          <span class="eyebrow">Before you schedule</span>
         <h2>Common questions</h2>
-
-        <h3>What areas does EPIC TECH serve?</h3>
-        <p>EPIC TECH LLC serves small businesses in Orlando, Winter Park, Maitland, Oviedo, Lake Mary, and the wider Central Florida area, on-site and remotely.</p>
-
-        <h3>What is a technology assessment?</h3>
-        <p>A technology assessment is a paid review of your network, website, firewall, or IT setup. You get a plain-English written plan with exact scope and pricing before any larger project begins.</p>
-
-        <h3>Do I need an ongoing IT contract?</h3>
-        <p>No. Most small businesses start with a single assessment or project. Monthly care plans are optional and only added if ongoing support makes sense for you.</p>
-
-        <h3>How much does a technology assessment cost?</h3>
-        <p>A Technology Assessment is $249 and covers a network, website, or firewall review with a written plan. If you only need a written plan for a custom business app, that's a separate $150 App Development Plan. See the <a href="pricing.html">pricing page</a> for current packages.</p>
+        </div>
+        <div class="faq-list">
+          <article>
+            <h3>What areas does EPIC TECH serve?</h3>
+            <p>EPIC TECH LLC serves small businesses in Orlando, Winter Park, Maitland, Oviedo, Lake Mary, and the wider Central Florida area, on-site and remotely.</p>
+          </article>
+          <article>
+            <h3>What is a technology assessment?</h3>
+            <p>A technology assessment is a paid review of your network, website, firewall, or IT setup. You get a plain-English written plan with exact scope and pricing before any larger project begins.</p>
+          </article>
+          <article>
+            <h3>Do I need an ongoing IT contract?</h3>
+            <p>No. Most small businesses start with a single assessment or project. Monthly care plans are optional and only added if ongoing support makes sense for you.</p>
+          </article>
+          <article>
+            <h3>How much does a technology assessment cost?</h3>
+            <p>A Technology Assessment is $249 and covers a network, website, or firewall review with a written plan. If you only need a written plan for a custom business app, that's a separate $150 App Development Plan. See the <a href="pricing.html">pricing page</a> for current packages.</p>
+          </article>
+        </div>
       </div>
     </section>
   </main>

@@ -1,1 +1,4 @@
 .worktrees/
+.private-media/
+.media-review/
+node_modules/
