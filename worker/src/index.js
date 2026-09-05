@@ -1,3 +1,5 @@
+import { cachedReviews, invalidateReviews, reviewState } from './reviews-cache.js';
+
 const INTAKE_PATH = "/lead-intake";
 const MAX_BODY_BYTES = 10000;
 
@@ -32,7 +34,7 @@ const ALLOWED_SERVICES = [
 ];
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     if (isStaging(env)) {
       if (!hasValidStagingConfiguration(request, env)) {
         return new Response("Service unavailable", {
@@ -55,7 +57,7 @@ export default {
       case REVIEW_INTAKE_PATH:
         return handleReviewIntake(request, env);
       case REVIEWS_PATH:
-        return handleReviewsFeed(request, env);
+        return handleReviewsFeed(request, env, ctx);
       case REVIEW_APPROVE_PATH:
         return handleReviewAction(request, env, "approve");
       case REVIEW_REJECT_PATH:
@@ -65,9 +67,6 @@ export default {
     }
   },
 
-  async scheduled(event, env, ctx) {
-    ctx.waitUntil(drainQueue(env));
-  },
 };
 
 async function handleLeadIntake(request, env) {
@@ -159,17 +158,6 @@ async function handleLeadIntake(request, env) {
   }
 
   const submittedAt = new Date().toISOString();
-  const lead = {
-    name: name,
-    business_name: business,
-    email: email,
-    phone: phone,
-    service_requested: service,
-    message: message,
-    source_page: sourcePage,
-    submitted_at: submittedAt,
-  };
-
   const text =
     "New lead from the EPIC TECH website.\n\n" +
     "Name:     " + name + "\n" +
@@ -180,11 +168,7 @@ async function handleLeadIntake(request, env) {
     "Page:     " + (sourcePage || "-") + "\n" +
     "Time:     " + submittedAt + "\n" +
     "Client:   " + clientHash + "\n\n" +
-    "Message:\n" + message + "\n\n" +
-    "--- Paste the block below into the CRM Intake Import ---\n" +
-    "LEAD_INTAKE_START\n" +
-    JSON.stringify(lead, null, 2) + "\n" +
-    "LEAD_INTAKE_END\n";
+    "Message:\n" + message + "\n";
 
   try {
     await sendEmail(env, {
@@ -198,20 +182,6 @@ async function handleLeadIntake(request, env) {
     console.log("intake email failed:", err && err.message);
     return json({ error: "Could not deliver message" }, 500, origin, allowed);
   }
-
-  const crmPayload = {
-    idempotency_key: crypto.randomUUID(),
-    name: name,
-    business_name: business,
-    email: email,
-    phone: phone,
-    service: service,
-    message: message,
-    source_page: sourcePage,
-    submitted_at: submittedAt,
-  };
-  const synced = await postToCRM(env, crmPayload);
-  if (!synced) await enqueueLead(env, crmPayload);
 
   return json({ ok: true }, 200, origin, allowed);
 }
@@ -382,7 +352,7 @@ async function handleReviewIntake(request, env) {
   return json({ ok: true }, 200, origin, allowed, methods);
 }
 
-async function handleReviewsFeed(request, env) {
+async function handleReviewsFeed(request, env, ctx) {
   const origin = request.headers.get("Origin") || "";
   const allowed = (env.ALLOWED_ORIGINS || "")
     .split(",")
@@ -400,6 +370,30 @@ async function handleReviewsFeed(request, env) {
     return json({ error: "Method not allowed" }, 405, origin, allowed, methods);
   }
 
+  const ip = request.headers.get("CF-Connecting-IP") || "";
+  let key;
+  try {
+    if (!ip) throw new Error("Missing trusted client IP");
+    key = await hmac(env.INTAKE_HMAC_SECRET, "reviews-feed|" + ip);
+  } catch {
+    return json({ error: "Service unavailable" }, 503, origin, allowed, methods);
+  }
+  const decision = await checkRateLimit(env.REVIEWS_FEED_RATE_LIMITER, key);
+  if (decision !== "allowed") return rateLimitError(decision, origin, allowed, methods);
+
+  try {
+    const data = isStaging(env) || !env.REVIEWS_KV
+      ? await buildReviewsFeed(env)
+      : await cachedReviews(env, ctx, () => buildReviewsFeed(env));
+    const response = json(data, 200, origin, allowed, methods);
+    if (!isStaging(env)) response.headers.set("Cache-Control", "public, max-age=60, stale-while-revalidate=240");
+    return response;
+  } catch {
+    return json({ error: "Reviews are temporarily unavailable" }, 503, origin, allowed, methods);
+  }
+}
+
+async function buildReviewsFeed(env) {
   const onsite = [];
   if (env.REVIEWS_KV) {
     try {
@@ -408,24 +402,35 @@ async function handleReviewsFeed(request, env) {
         const raw = await env.REVIEWS_KV.get(k.name);
         if (!raw) continue;
         try {
-          onsite.push(JSON.parse(raw));
+          const item = JSON.parse(raw);
+          if (!item || typeof item !== "object") continue;
+          onsite.push({ id: item.id, name: item.name, rating: item.rating, text: item.text, submittedAt: item.submittedAt });
         } catch {
           /* skip corrupt entry */
         }
       }
       onsite.sort((a, b) => String(b.submittedAt || "").localeCompare(String(a.submittedAt || "")));
     } catch (err) {
-      console.log("Failed to list published reviews:", err && err.message);
+      // Do not cache an incomplete list as a successful fresh feed.
+      throw new Error("Published reviews unavailable");
     }
   }
 
   const google = env.REVIEWS_KV ? await getGoogleReviews(env) : null;
 
-  return json({ google: google, onsite: onsite }, 200, origin, allowed, methods);
+  return { google: google, onsite: onsite };
 }
 
 async function getGoogleReviews(env) {
   if (isStaging(env)) return null;
+
+  const state = reviewState(env);
+  if (state.googlePending) return state.googlePending;
+  state.googlePending = refreshGoogleReviews(env, state).finally(() => { state.googlePending = null; });
+  return state.googlePending;
+}
+
+async function refreshGoogleReviews(env, state) {
 
   const cacheKey = "google:reviews";
   let cached = null;
@@ -445,13 +450,28 @@ async function getGoogleReviews(env) {
     return cached ? cached.data : null;
   }
 
+  if (state.googleRetryAt > Date.now()) return state.googleData || (cached ? cached.data : null);
+  try {
+    const retryAt = Number(await env.REVIEWS_KV.get("google:reviews:retry"));
+    if (retryAt > Date.now()) {
+      state.googleRetryAt = retryAt;
+      return cached ? cached.data : null;
+    }
+  } catch { /* A shared refresh budget and local backoff still bound retries. */ }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 3000);
+  // Retain this local backoff even if all KV writes fail.
+  state.googleRetryAt = Date.now() + 300_000;
+
   try {
     const apiUrl =
       "https://maps.googleapis.com/maps/api/place/details/json" +
       "?place_id=" + encodeURIComponent(env.GOOGLE_PLACE_ID) +
       "&fields=rating,user_ratings_total,reviews" +
       "&key=" + encodeURIComponent(env.GOOGLE_PLACES_API_KEY);
-    const res = await fetch(apiUrl);
+    const res = await fetch(apiUrl, { signal: controller.signal });
+    if (!res.ok) throw new Error("Places API unavailable");
     const out = await res.json();
     if (out.status !== "OK" || !out.result) {
       throw new Error("Places API status: " + out.status);
@@ -469,15 +489,21 @@ async function getGoogleReviews(env) {
       googleReviewUrl:
         "https://search.google.com/local/writereview?placeid=" + encodeURIComponent(env.GOOGLE_PLACE_ID),
     };
+    state.googleData = data;
     try {
       await env.REVIEWS_KV.put(cacheKey, JSON.stringify({ fetchedAt: now, data: data }));
     } catch (err) {
-      console.log("Failed to cache Google reviews:", err && err.message);
+      console.log("Failed to cache Google reviews");
     }
     return data;
   } catch (err) {
-    console.log("Google Places fetch failed, serving cache if any:", err && err.message);
-    return cached ? cached.data : null;
+    try {
+      await env.REVIEWS_KV.put("google:reviews:retry", String(state.googleRetryAt), { expirationTtl: 300 });
+    } catch { /* Local backoff remains active if KV is unavailable. */ }
+    console.log("Google Places unavailable; serving existing cache");
+    return state.googleData || (cached ? cached.data : null);
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -541,6 +567,7 @@ async function handleReviewAction(request, env, action) {
         JSON.stringify(published),
         isStaging(env) ? { expirationTtl: STAGING_TTL_SECONDS } : undefined
       );
+      if (!isStaging(env)) await invalidateReviews(env);
     } catch (err) {
       console.log("Failed to publish review:", err && err.message);
       return htmlPage("Error", "<p>Could not publish this review. Please try again.</p>", 500);
@@ -787,10 +814,10 @@ function hasValidStagingConfiguration(request, env) {
     typeof env.STAGING_ACCESS_TOKEN === "string" &&
     /^[0-9a-f]{64}$/.test(env.STAGING_ACCESS_TOKEN) &&
     env.REVIEWS_KV &&
-    env.LEAD_QUEUE &&
     env.STAGING_EVENTS &&
     env.LEAD_RATE_LIMITER &&
-    env.REVIEW_RATE_LIMITER
+    env.REVIEW_RATE_LIMITER &&
+    env.REVIEWS_FEED_RATE_LIMITER
   );
 }
 
@@ -954,97 +981,6 @@ function buildReviewEmailHtml(r) {
     "or rejected until you click Confirm there.</p>" +
     "</div>"
   );
-}
-
-async function postToCRM(env, payload) {
-  if (isStaging(env)) {
-    await captureStagingEvent(env, "crm", payload);
-    return true;
-  }
-
-  const crmIngestUrl = env.CRM_INGEST_URL || env.CRN_INGEST_URL;
-  const hasUrl = typeof crmIngestUrl === "string" && crmIngestUrl.length > 0;
-  const hasSecret =
-    typeof env.CRM_INGEST_SECRET === "string" && env.CRM_INGEST_SECRET.length > 0;
-  if (!hasUrl && !hasSecret) return true;
-  if (!hasUrl || !hasSecret) {
-    console.log("CRM sync unavailable because its configuration is incomplete.");
-    return false;
-  }
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 3000);
-  try {
-    const body = JSON.stringify(payload);
-    const ts = Math.floor(Date.now() / 1000).toString();
-    const signature = await hmac(env.CRM_INGEST_SECRET, ts + "." + body);
-
-    const res = await fetch(crmIngestUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Timestamp": ts,
-        "X-Signature": "sha256=" + signature,
-      },
-      body: body,
-      signal: controller.signal,
-    });
-    console.log(res.ok ? "CRM sync ok" : "CRM sync non-OK: " + res.status);
-    return res.ok;
-  } catch (err) {
-    console.log("CRM sync failed (email already sent):", err && err.message);
-    return false;
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-const QUEUE_PREFIX = "pending:";
-const QUEUE_MAX_ATTEMPTS = 12;
-const QUEUE_TTL_SECONDS = 3 * 24 * 3600;
-
-async function enqueueLead(env, payload) {
-  if (!env.LEAD_QUEUE) {
-    console.log("CRM sync failed and no LEAD_QUEUE bound — lead not queued.");
-    return;
-  }
-  const key = QUEUE_PREFIX + Date.now() + ":" + (payload.idempotency_key || crypto.randomUUID());
-  const item = { payload: payload, attempts: 0, firstFailedAt: new Date().toISOString() };
-  try {
-    await env.LEAD_QUEUE.put(key, JSON.stringify(item), { expirationTtl: QUEUE_TTL_SECONDS });
-    console.log("Lead queued for retry:", key);
-  } catch (err) {
-    console.log("Failed to queue lead:", err && err.message);
-  }
-}
-
-async function drainQueue(env) {
-  if (!env.LEAD_QUEUE) return;
-  const list = await env.LEAD_QUEUE.list({ prefix: QUEUE_PREFIX, limit: 100 });
-  for (const k of list.keys) {
-    const raw = await env.LEAD_QUEUE.get(k.name);
-    if (!raw) continue;
-    let item;
-    try {
-      item = JSON.parse(raw);
-    } catch {
-      await env.LEAD_QUEUE.delete(k.name);
-      continue;
-    }
-    const ok = await postToCRM(env, item.payload);
-    if (ok) {
-      await env.LEAD_QUEUE.delete(k.name);
-      console.log("Replayed queued lead:", k.name);
-    } else {
-      item.attempts = (item.attempts || 0) + 1;
-      if (item.attempts >= QUEUE_MAX_ATTEMPTS) {
-        await env.LEAD_QUEUE.delete(k.name);
-        console.log("Giving up on queued lead after", item.attempts, "attempts:", k.name);
-      } else {
-        await env.LEAD_QUEUE.put(k.name, JSON.stringify(item), { expirationTtl: QUEUE_TTL_SECONDS });
-        console.log("Retry still failing, re-queued:", k.name, "attempt", item.attempts);
-      }
-    }
-  }
 }
 
 async function sendEmail(env, opts) {

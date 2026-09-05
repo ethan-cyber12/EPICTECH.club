@@ -9,6 +9,24 @@
   "keep_vars": true,
   "send_metrics": false,
 
+  // Preserve the existing dashboard logging and tracing configuration.
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "redact_query_string": false,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true
+    },
+    "traces": {
+      "enabled": false,
+      "persist": true,
+      "head_sampling_rate": 1
+    }
+  },
+
   "vars": {
     "ENVIRONMENT": "production"
   },
@@ -17,7 +35,6 @@
   // intake.epictech.club custom domain.
   "secrets": {
     "required": [
-      "CRM_INGEST_SECRET",
       "GOOGLE_PLACES_API_KEY",
       "INTAKE_HMAC_SECRET",
       "RESEND_API_KEY",
@@ -36,6 +53,12 @@
   // These IDs are distinct from each other. Recheck account-wide active
   // bindings immediately before every production deployment.
   "ratelimits": [
+    {
+      // Verified unused across both account Workers on 2026-09-04.
+      "name": "REVIEWS_FEED_RATE_LIMITER",
+      "namespace_id": "1003",
+      "simple": { "limit": 30, "period": 60 }
+    },
     {
       "name": "LEAD_RATE_LIMITER",
       "namespace_id": "1001",

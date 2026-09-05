@@ -66,6 +66,7 @@ function makeEnv() {
       RESEND_API_KEY: 'test-resend-key',
       REVIEW_APPROVAL_SECRET: 'test-review-approval-secret',
       REVIEW_RATE_LIMITER: reviewLimiter,
+      REVIEWS_FEED_RATE_LIMITER: makeRateLimiter(),
       REVIEWS_KV: kv,
       TURNSTILE_SECRET_KEY: 'test-turnstile-secret',
     },
@@ -75,12 +76,10 @@ function makeEnv() {
 function makeStagingEnv() {
   const current = makeEnv();
   const events = makeKv();
-  const queue = makeKv();
   Object.assign(current.env, {
     ALLOWED_ORIGINS: 'http://localhost:4173,http://127.0.0.1:4173',
     ENVIRONMENT: 'staging',
     INTAKE_HMAC_SECRET: 'h'.repeat(32),
-    LEAD_QUEUE: queue,
     REVIEW_APPROVAL_SECRET: 'r'.repeat(32),
     STAGING_ACCESS_TOKEN: stagingAccessToken,
     STAGING_BASE_URL: stagingBaseUrl,
@@ -89,7 +88,7 @@ function makeStagingEnv() {
     STAGING_TURNSTILE_TEST_MODE: 'true',
   });
   delete current.env.RESEND_API_KEY;
-  return { ...current, events, queue };
+  return { ...current, events };
 }
 
 function bodyFor(path, token = 'test-token') {
@@ -646,8 +645,8 @@ test('staging accepts only the pinned dummy Turnstile identity and captures synt
   assert.equal(response.status, 200);
   assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl]);
   const captures = current.events.operations.filter((entry) => entry.type === 'put');
-  assert.equal(captures.length, 2);
-  assert.deepEqual(captures.map((entry) => JSON.parse(entry.value).type).sort(), ['crm', 'email']);
+  assert.equal(captures.length, 1);
+  assert.deepEqual(captures.map((entry) => JSON.parse(entry.value).type), ['email']);
   assert.ok(captures.every((entry) => entry.options.expirationTtl === 3600));
 });
 
@@ -659,6 +658,7 @@ test('staging never calls or caches Google Places even if production variables a
   const response = await worker.fetch(
     new Request(stagingBaseUrl + '/reviews', {
       headers: {
+        'CF-Connecting-IP': '203.0.113.9',
         Origin: 'http://localhost:4173',
         'X-Epictech-Staging-Key': stagingAccessToken,
       },
@@ -707,86 +707,30 @@ test('staging review records and captured moderation links expire quickly and st
   );
 });
 
-test('lead sync supports the deployed legacy CRM variable name without weakening signing', async () => {
-  const current = makeEnv();
-  current.env.CRN_INGEST_URL = legacyCrmUrl;
-  current.env.CRM_INGEST_SECRET = 'test-crm-ingest-secret';
-  const calls = installFetch({
-    success: true,
-    hostname: 'epictech.club',
-    action: 'lead_intake',
-  });
-  const response = await worker.fetch(requestFor('/lead-intake'), current.env);
-
-  assert.equal(response.status, 200);
-  assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl, resendUrl, legacyCrmUrl]);
-  const crmCall = calls[2];
-  assert.equal(crmCall.init.method, 'POST');
-  assert.match(crmCall.init.headers['X-Signature'], /^sha256=[0-9a-f]{64}$/);
-  assert.match(crmCall.init.headers['X-Timestamp'], /^\d+$/);
-  assert.equal(crmCall.init.headers['Content-Type'], 'application/json');
-
-  const canonical = makeEnv();
-  canonical.env.CRM_INGEST_URL = canonicalCrmUrl;
-  canonical.env.CRN_INGEST_URL = legacyCrmUrl;
-  canonical.env.CRM_INGEST_SECRET = 'test-crm-ingest-secret';
-  const canonicalCalls = installFetch({
-    success: true,
-    hostname: 'epictech.club',
-    action: 'lead_intake',
-  });
-  const canonicalResponse = await worker.fetch(requestFor('/lead-intake'), canonical.env);
-  assert.equal(canonicalResponse.status, 200);
-  assert.deepEqual(
-    canonicalCalls.map((call) => call.url),
-    [siteverifyUrl, resendUrl, canonicalCrmUrl],
-  );
-});
-
-test('partial CRM configuration queues the emailed lead instead of reporting a false sync', async () => {
-  for (const partial of [
-    { CRM_INGEST_SECRET: 'test-crm-ingest-secret' },
+test('retired CRM bindings cannot forward or retain emailed lead data', async () => {
+  for (const legacy of [
     { CRN_INGEST_URL: legacyCrmUrl },
+    { CRM_INGEST_URL: canonicalCrmUrl },
+    { CRN_INGEST_URL: legacyCrmUrl, CRM_INGEST_URL: canonicalCrmUrl },
+    {},
   ]) {
     const current = makeEnv();
     const queue = makeKv();
-    Object.assign(current.env, partial, { LEAD_QUEUE: queue });
-    const calls = installFetch({
-      success: true,
-      hostname: 'epictech.club',
-      action: 'lead_intake',
-    });
-    const response = await worker.fetch(requestFor('/lead-intake'), current.env);
-
-    assert.equal(response.status, 200);
-    assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl, resendUrl]);
-    assert.equal(queue.operations.filter((entry) => entry.type === 'put').length, 1);
-    assert.match(queue.operations[0].key, /^pending:/);
-  }
-});
-
-test('CRM non-OK and network failures queue the emailed lead', async () => {
-  for (const fetchOptions of [
-    { crmStatus: 503 },
-    { crmError: new Error('CRM network unavailable') },
-  ]) {
-    const current = makeEnv();
-    const queue = makeKv();
-    Object.assign(current.env, {
-      CRN_INGEST_URL: legacyCrmUrl,
-      CRM_INGEST_SECRET: 'test-crm-ingest-secret',
+    Object.assign(current.env, legacy, {
+      CRM_INGEST_SECRET: 'retired-test-secret-must-not-be-used',
       LEAD_QUEUE: queue,
     });
-    const calls = installFetch(
-      { success: true, hostname: 'epictech.club', action: 'lead_intake' },
-      fetchOptions,
-    );
+    const calls = installFetch({ success: true, hostname: 'epictech.club', action: 'lead_intake' });
     const response = await worker.fetch(requestFor('/lead-intake'), current.env);
-
     assert.equal(response.status, 200);
-    assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl, resendUrl, legacyCrmUrl]);
-    assert.equal(queue.operations.filter((entry) => entry.type === 'put').length, 1);
+    assert.deepEqual(calls.map((call) => call.url), [siteverifyUrl, resendUrl]);
+    assert.equal(queue.operations.length, 0);
+    const email = JSON.parse(calls[1].init.body);
+    assert.match(email.text, /Test Person/);
+    assert.match(email.text, /This is a legitimate test message/);
+    assert.doesNotMatch(email.text, /CRM|LEAD_INTAKE_START|LEAD_INTAKE_END/);
   }
+  assert.equal(worker.scheduled, undefined);
 });
 
 test('expected action comes from the route and the honeypot remains side-effect free', async () => {

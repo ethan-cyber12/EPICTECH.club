@@ -1,0 +1,12 @@
+{
+  "description": "EPIC TECH enforced anti-framing for public website",
+  "expression": "http.host in {\"epictech.club\" \"www.epictech.club\"}",
+  "action": "rewrite",
+  "action_parameters": {
+    "headers": {
+      "content-security-policy": { "operation": "add", "value": "frame-ancestors 'none'" },
+      "x-frame-options": { "operation": "set", "value": "DENY" }
+    }
+  },
+  "enabled": true
+}

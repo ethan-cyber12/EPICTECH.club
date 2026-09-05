@@ -6,10 +6,11 @@
   "compatibility_date": "2025-05-23",
   "workers_dev": true,
   "preview_urls": false,
+  "keep_vars": true,
   "send_metrics": false,
 
   // Staging accepts only authenticated synthetic requests from a local QA page.
-  // It captures outbound messages and CRM payloads in STAGING_EVENTS for one hour.
+  // It captures outbound email messages in STAGING_EVENTS for one hour.
   "vars": {
     "ENVIRONMENT": "staging",
     "ALLOWED_ORIGINS": "http://localhost:4173,http://127.0.0.1:4173",
@@ -34,10 +35,6 @@
       "id": "f3539b9c01f84c6498e0800e8f25162f"
     },
     {
-      "binding": "LEAD_QUEUE",
-      "id": "6942ed5c35b644ef84f4601f61fe496d"
-    },
-    {
       "binding": "STAGING_EVENTS",
       "id": "886f75c19d714468b18a078fbf3d5f45"
     }
@@ -46,10 +43,16 @@
   // Staging namespaces are distinct from production's 1001 and 1002.
   "ratelimits": [
     {
+      // Verified unused across both account Workers on 2026-09-04.
+      "name": "REVIEWS_FEED_RATE_LIMITER",
+      "namespace_id": "2003",
+      "simple": { "limit": 30, "period": 60 }
+    },
+    {
       "name": "LEAD_RATE_LIMITER",
       "namespace_id": "2001",
       "simple": {
-        "limit": 6,
+        "limit": 10,
         "period": 60
       }
     },
@@ -57,7 +60,7 @@
       "name": "REVIEW_RATE_LIMITER",
       "namespace_id": "2002",
       "simple": {
-        "limit": 3,
+        "limit": 30,
         "period": 60
       }
     }
