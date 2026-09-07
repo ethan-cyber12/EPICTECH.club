@@ -270,10 +270,12 @@ p:last-child{margin-bottom:0}
 
 .hero{padding:0}
 
+/* The copy column carries three calls to action, so it gets an even split
+   with the image rather than the narrower share it had with two. */
 .visual-hero{
   display:grid;
-  grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);
-  gap:clamp(30px,5.5vw,76px);
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:clamp(30px,5vw,64px);
   align-items:center;
   padding-block:clamp(52px,7vw,92px);
 }
