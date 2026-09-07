@@ -20,6 +20,7 @@
   <meta name="twitter:description" content="Small VM lab setup for Orlando small businesses: isolated test networks, baseline VMs, and rebuild documentation, from $249.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
   <link rel="stylesheet" href="../assets/css/styles.css?v=20260903">
+  <link rel="stylesheet" href="../assets/css/service-motion.css?v=20260903">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -70,6 +71,7 @@
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
+      <a href="/services/app-building.html#demo-workspace">Live demos</a>
       <a class="btn btn-primary" href="../contact.html">Schedule Assessment</a>
     </nav>
   </div>
@@ -98,10 +100,64 @@
       </div>
     </div>
   </section>
+  <section class="section svc-motion" id="how-it-works" aria-labelledby="motion-title">
+    <div class="container svc-motion__layout">
+      <div class="svc-motion__copy">
+        <h2 id="motion-title">Isolated from the live network</h2>
+        <p>A lab is where you try the update, the new tool, or the migration before it touches anything customers depend on. The machines run on their own segment, so a mistake stays inside the lab instead of reaching the business network.</p>
+      </div>
+      <figure class="svc-motion__figure">
+        <svg viewBox="0 0 480 240" class="dgm-lab" role="img" aria-labelledby="dgm-lab-t dgm-lab-d">
+          <title id="dgm-lab-t">Test machines running inside an isolated lab</title>
+          <desc id="dgm-lab-d">Three virtual machines start inside a lab boundary while the live business network sits outside it, and traffic attempting to cross the boundary is stopped.</desc>
+          <rect x="6" y="10" width="468" height="220" rx="14" class="dgm-plate"/>
+
+          <rect x="30" y="44" width="256" height="156" rx="12" class="dgm-dash"/>
+          <text x="46" y="36" class="dgm-label dgm-label--ink">Lab segment</text>
+
+          <g>
+            <rect x="50" y="76" width="66" height="60" rx="10" class="dgm-box"/>
+            <rect class="vm-on dgm-cycle" x="50" y="76" width="66" height="60" rx="10" fill="var(--brand-tint)" stroke="var(--brand)" stroke-width="1.5"/>
+            <circle class="vm-on dgm-cycle dgm-accent" cx="83" cy="150" r="4"/>
+            <text x="83" y="170" text-anchor="middle" class="dgm-label">VM 1</text>
+          </g>
+          <g>
+            <rect x="126" y="76" width="66" height="60" rx="10" class="dgm-box"/>
+            <rect class="vm-on vm-on--2 dgm-cycle" x="126" y="76" width="66" height="60" rx="10" fill="var(--brand-tint)" stroke="var(--brand)" stroke-width="1.5"/>
+            <circle class="vm-on vm-on--2 dgm-cycle dgm-accent" cx="159" cy="150" r="4"/>
+            <text x="159" y="170" text-anchor="middle" class="dgm-label">VM 2</text>
+          </g>
+          <g>
+            <rect x="202" y="76" width="66" height="60" rx="10" class="dgm-box"/>
+            <rect class="vm-on vm-on--3 dgm-cycle" x="202" y="76" width="66" height="60" rx="10" fill="var(--brand-tint)" stroke="var(--brand)" stroke-width="1.5"/>
+            <circle class="vm-on vm-on--3 dgm-cycle dgm-accent" cx="235" cy="150" r="4"/>
+            <text x="235" y="170" text-anchor="middle" class="dgm-label">VM 3</text>
+          </g>
+
+          <rect x="292" y="60" width="16" height="124" rx="8" class="dgm-ink"/>
+          <rect class="boundary-flash dgm-cycle" x="288" y="56" width="24" height="132" rx="10" fill="var(--danger)"/>
+
+          <rect x="336" y="76" width="112" height="88" rx="12" class="dgm-box"/>
+          <rect x="354" y="98" width="76" height="6" rx="3" class="dgm-muted"/>
+          <rect x="354" y="114" width="56" height="6" rx="3" class="dgm-muted"/>
+          <rect x="354" y="130" width="68" height="6" rx="3" class="dgm-muted"/>
+          <text x="392" y="184" text-anchor="middle" class="dgm-label dgm-label--ink">Live network</text>
+
+          <rect class="escape dgm-cycle" x="236" y="112" width="42" height="16" rx="8" fill="var(--danger)"/>
+        </svg>
+        <figcaption class="svc-motion__caption">
+          <span>Break things in the lab, not on the network people rely on.</span>
+          <span class="svc-motion__badge">Concept diagram</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
   <section class="section">
     <div class="container service-flow">
       <aside class="side-nav" aria-label="On this page">
         <strong>On this page</strong>
+        <a href="#how-it-works">Isolated from the live network</a>
         <a href="#packages">Packages</a>
         <a href="#included">What is included</a>
         <a href="#proof">Public proof</a>
@@ -175,8 +231,9 @@
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
+      <a href="/services/app-building.html#demo-workspace">Live demos</a>
       <a href="../contact.html">Contact</a>
-      <a href="../privacy.html">Privacy</a>
+      <a href="../privacy.html">Privacy</a><a href="../privacy.html#accessibility">Accessibility</a>
       <a href="mailto:info@epictech.club">info@epictech.club</a>
     </div>
   </div>

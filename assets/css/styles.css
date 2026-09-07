@@ -28,6 +28,14 @@
   --brand-tint:#f2f7ff;
   --ink-soft:#3c4753;
 
+  /* --accent is the approved brand green, but at 2.6:1 on white it is too
+     light to carry meaning on its own. --accent-ink is the same hue darkened
+     to 5.4:1, used wherever green marks a state a person has to be able to
+     see: status dots, confirmation glyphs, progress. Plain --accent stays for
+     decoration and for use on the dark panels, where it already has contrast.
+     WCAG 2.1 AA: 1.4.11 non-text contrast, 1.4.3 text contrast. */
+  --accent-ink:#0a7a52;
+
   /* Radius scale. */
   --r-input:12px;
   --r-card:16px;
@@ -792,7 +800,7 @@ tbody tr:last-child td{border-bottom:0}
   flex:0 0 24px;
   width:24px;height:24px;
   border-radius:var(--r-pill);
-  background:var(--accent);
+  background:var(--accent-ink);
   color:#fff;
   font-size:.8rem;
   font-weight:600;
