@@ -21,6 +21,7 @@
   <meta name="twitter:description" content="Custom apps and dashboards for small businesses in Orlando and Central Florida. Lead trackers, CRM tools, quote systems, and internal dashboards. From $150.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
   <link rel="stylesheet" href="../assets/css/styles.css?v=20260903">
+  <link rel="stylesheet" href="../assets/css/demo-workspace.css?v=20260903">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -74,6 +75,7 @@
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
+      <a href="/services/app-building.html#demo-workspace">Live demos</a>
       <a class="btn btn-primary" href="../contact.html">Schedule Assessment</a>
     </nav>
   </div>
@@ -95,6 +97,9 @@
           <span class="eyebrow">Business apps</span>
           <h1>Business Apps &amp; Internal Dashboards</h1>
           <p class="lead">Not every business needs a giant software platform. Sometimes you need a clean dashboard that tracks leads, clients, quotes, invoices, follow-ups, and reports in one place.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#demo-workspace">Explore the live demos</a>
+          </div>
         </div>
         <picture class="service-hero__visual">
             <source type="image/avif" srcset="../assets/images/service-visuals/epic-detail-business-apps-640.avif?v=20260903-detail 640w, ../assets/images/service-visuals/epic-detail-business-apps-1200.avif?v=20260903-detail 1200w, ../assets/images/service-visuals/epic-detail-business-apps-1920.avif?v=20260903-detail 1920w" sizes="(max-width: 920px) calc(100vw - 32px), 50vw">
@@ -105,10 +110,105 @@
     </div>
   </section>
 
+  <section class="section demo-section" id="demo-workspace" aria-labelledby="demo-title">
+    <div class="container">
+      <div class="demo-intro">
+        <div>
+          <span class="eyebrow">Interactive examples</span>
+          <h2 id="demo-title">Choose a workflow to explore</h2>
+        </div>
+        <p>These are working interface concepts, not live client systems. Switch tabs, filter the records, and open a row to see how a purpose-built tool makes work easier to follow. Every name, date and amount is invented.</p>
+      </div>
+
+      <div class="demo-workspace" data-demo-workspace data-demo-idle>
+        <p class="demo-fallback">These examples are interactive when JavaScript is enabled. Each one is a self-contained demo built from invented sample records, with no data collected and no connection to any production system.</p>
+
+        <div class="demo-frame">
+          <div class="demo-sidebar">
+            <div class="demo-brand">
+              <span class="demo-brand__icon" aria-hidden="true">ET</span>
+              <div>
+                <strong>EPIC Workspace</strong>
+                <span>Sample environment</span>
+              </div>
+            </div>
+
+            <div class="demo-switcher" role="tablist" aria-label="Business app examples">
+              <button class="demo-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="demo-panel" data-demo-tab="leads">
+                <strong>Lead Desk</strong>
+                <small>Follow-up pipeline</small>
+              </button>
+              <button class="demo-tab" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" tabindex="-1" data-demo-tab="jobs">
+                <strong>Job Board</strong>
+                <small>Work in motion</small>
+              </button>
+              <button class="demo-tab" type="button" role="tab" aria-selected="false" aria-controls="demo-panel" tabindex="-1" data-demo-tab="quotes">
+                <strong>Quote Tracker</strong>
+                <small>Decisions and totals</small>
+              </button>
+            </div>
+
+            <div class="demo-sidebar__note">
+              <strong>Public-safe demo</strong>
+              <span>All names and numbers are invented. Nothing is stored or sent.</span>
+            </div>
+          </div>
+
+          <div class="demo-panel" id="demo-panel" role="tabpanel">
+            <div class="demo-header">
+              <div>
+                <span class="demo-kicker" data-demo-kicker>Pipeline overview</span>
+                <h3 data-demo-title>Lead Desk</h3>
+                <p data-demo-description>See every inquiry, owner, and next step without searching across inboxes.</p>
+              </div>
+              <div class="demo-header__actions">
+                <span class="demo-badge">Sample data</span>
+                <button class="demo-reset" type="button" data-demo-reset>Reset</button>
+              </div>
+            </div>
+
+            <div class="demo-metrics" data-demo-metrics aria-label="Workspace summary"></div>
+
+            <div class="demo-toolbar">
+              <div class="demo-filters" data-demo-filters aria-label="Filter records"></div>
+              <label class="demo-search">
+                <span class="visually-hidden">Search sample records</span>
+                <input type="search" data-demo-search placeholder="Search sample records" autocomplete="off">
+              </label>
+            </div>
+
+            <div class="demo-records">
+              <div class="demo-table-card">
+                <div class="demo-table-wrap" data-demo-table-wrap>
+                  <table>
+                    <thead><tr data-demo-head></tr></thead>
+                    <tbody data-demo-body></tbody>
+                  </table>
+                </div>
+                <div class="demo-empty" data-demo-empty hidden>
+                  <strong>No sample records match</strong>
+                  <span>Try another filter or clear the search.</span>
+                </div>
+              </div>
+
+              <aside class="demo-detail" data-demo-detail aria-live="polite">
+                <div class="demo-detail__placeholder">
+                  <strong>Select a record</strong>
+                  <p>Details and the next useful action appear here.</p>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="section">
     <div class="container service-flow">
       <aside class="side-nav" aria-label="On this page">
         <strong>On this page</strong>
+        <a href="#demo-workspace">Interactive examples</a>
         <a href="#solutions">Solutions we build</a>
         <a href="#packages">Pricing</a>
         <a href="#good-for">What this is good for</a>
@@ -331,12 +431,14 @@
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
+      <a href="/services/app-building.html#demo-workspace">Live demos</a>
       <a href="../contact.html">Contact</a>
-      <a href="../privacy.html">Privacy</a>
+      <a href="../privacy.html">Privacy</a><a href="../privacy.html#accessibility">Accessibility</a>
       <a href="mailto:info@epictech.club">info@epictech.club</a>
     </div>
   </div>
 </footer>
 <script src="../assets/js/main.js" defer></script>
+<script src="../assets/js/demo-workspace.js" defer></script>
 </body>
 </html>

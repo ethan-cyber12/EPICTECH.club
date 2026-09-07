@@ -21,6 +21,24 @@
   <meta name="twitter:description" content="Read what small businesses in Orlando and Central Florida say about working with EPIC TECH LLC, and leave your own review.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
   <link rel="stylesheet" href="assets/css/styles.css?v=20260903">
+
+  <!-- Page-level structured data only. Ratings and individual reviews are
+       loaded at runtime and vary per visitor, so no AggregateRating or Review
+       markup is declared here: structured data must match what a visitor can
+       actually see on the page.
+       JSON-LD is non-executable data and is NOT restricted by script-src. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": "https://epictech.club/reviews.html#webpage",
+    "url": "https://epictech.club/reviews.html",
+    "name": "Reviews | EPIC TECH LLC",
+    "description": "Read what small businesses in Orlando and Central Florida say about working with EPIC TECH LLC, and leave your own review.",
+    "isPartOf": {"@id": "https://epictech.club/#website"},
+    "about": {"@id": "https://epictech.club/#business"}
+  }
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -39,6 +57,7 @@
         <a href="pricing.html">Pricing</a>
         <a href="about.html">About</a>
         <a href="reviews.html">Reviews</a>
+        <a href="/services/app-building.html#demo-workspace">Live demos</a>
         <a class="btn btn-primary" href="contact.html">Schedule Assessment</a>
       </nav>
     </div>
@@ -122,6 +141,40 @@
       </div>
     </section>
 
+    <section class="section" id="review-policy">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">Review policy</span>
+            <h2>How reviews are handled</h2>
+          </div>
+          <p class="muted">The rules that check follows, so you know what happens to a review before you write one.</p>
+        </div>
+        <div class="faq-list">
+          <article>
+            <h3>What the check is for</h3>
+            <p>Submissions are checked for spam, abuse, and reviews that are not about work EPIC TECH actually performed. That is the whole list.</p>
+          </article>
+          <article>
+            <h3>Critical reviews are published</h3>
+            <p>A review is never withheld, edited, or removed because it is critical or gives a low rating. If your experience was poor, that review goes live the same as any other.</p>
+          </article>
+          <article>
+            <h3>Nothing is bought or incentivised</h3>
+            <p>EPIC TECH does not write reviews about itself, does not pay for reviews, and does not offer discounts, gifts, or anything else in exchange for a review or for a particular rating.</p>
+          </article>
+          <article>
+            <h3>Where these reviews come from</h3>
+            <p>Reviews on this page come from two places: the public Google Business Profile for EPIC TECH LLC, and reviews submitted directly through the form below.</p>
+          </article>
+          <article>
+            <h3>If your review did not appear</h3>
+            <p>Email <a href="mailto:info@epictech.club">info@epictech.club</a> and you will be told why.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="section alt">
       <div class="container review-form-layout">
         <form class="form-surface review-form" data-review-form method="post" action="reviews.html" data-endpoint="https://intake.epictech.club/review-intake" novalidate>
@@ -183,8 +236,9 @@
       <a href="pricing.html">Pricing</a>
       <a href="about.html">About</a>
       <a href="reviews.html">Reviews</a>
+      <a href="/services/app-building.html#demo-workspace">Live demos</a>
       <a href="contact.html">Contact</a>
-      <a href="privacy.html">Privacy</a>
+      <a href="privacy.html">Privacy</a><a href="privacy.html#accessibility">Accessibility</a>
       <a href="mailto:info@epictech.club">info@epictech.club</a>
     </div>
   </div>

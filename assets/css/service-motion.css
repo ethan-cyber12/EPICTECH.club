@@ -1,0 +1,334 @@
+/* Animated concept diagrams for the service pages.
+   These sit alongside the photographic service art, they do not replace it.
+
+   Rules followed here:
+   - Each diagram explains one mechanism. Nothing animates for decoration.
+   - Only transform and opacity animate, so the work stays on the compositor.
+   - The static, un-animated state is the finished diagram. Keyframes replay the
+     build-up from an empty start, which means the global reduced-motion rule
+     (it collapses every duration to 0.01ms) leaves a complete, readable
+     picture rather than a half-drawn one.
+   - Drawn as inline SVG so nothing new lands in assets/images, where the
+     media gates allow published photography only. */
+
+/* ------------------------------------------------------------- Scaffolding */
+
+.svc-motion{background:var(--soft)}
+
+.svc-motion__layout{
+  display:grid;
+  grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);
+  gap:clamp(26px,5vw,72px);
+  align-items:center;
+}
+
+.svc-motion__copy{max-width:34rem}
+.svc-motion__copy h2{margin-bottom:12px}
+.svc-motion__copy p{margin:0;color:var(--ink-soft)}
+
+.svc-motion__figure{
+  margin:0;
+  padding:clamp(16px,2.5vw,26px);
+  border:1px solid var(--line);
+  border-radius:var(--r-card);
+  background:var(--bg);
+  box-shadow:var(--shadow-soft);
+}
+
+.svc-motion__figure svg{display:block;width:100%;height:auto}
+
+.svc-motion__caption{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:.85rem;
+}
+
+.svc-motion__badge{
+  padding:3px 10px;
+  border:1px solid var(--line);
+  border-radius:var(--r-pill);
+  background:var(--soft);
+  color:var(--ink-soft);
+  font-size:.72rem;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+/* Shared drawing primitives. Colour comes from the site tokens so the
+   diagrams stay on palette. */
+.dgm-plate{fill:var(--soft)}
+.dgm-box{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.dgm-box--soft{fill:var(--soft);stroke:var(--line);stroke-width:1.5}
+.dgm-box--active{fill:var(--brand-tint);stroke:var(--brand);stroke-width:1.5}
+.dgm-line{stroke:var(--line);stroke-width:1.5;fill:none}
+.dgm-rule{stroke:var(--muted);stroke-width:1.5;fill:none}
+.dgm-dash{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 5;fill:none}
+.dgm-ink{fill:var(--ink)}
+.dgm-muted{fill:var(--muted)}
+.dgm-brand{fill:var(--brand)}
+.dgm-accent{fill:var(--accent-ink)}
+.dgm-danger{fill:var(--danger)}
+.dgm-label{
+  fill:var(--muted);
+  font-family:ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size:11px;
+  font-weight:600;
+}
+.dgm-label--ink{fill:var(--ink)}
+
+/* Every diagram loops on the same slow cadence so the pages feel related. */
+.dgm-cycle{animation-duration:6s;animation-iteration-count:infinite;animation-timing-function:ease-in-out}
+
+/* ------------------------------------------ 1. Network and Wi-Fi coverage */
+/* Signal rings leave the access point and each device connects as the
+   coverage reaches it. */
+
+.dgm-network .ring{
+  fill:none;
+  stroke:var(--brand);
+  stroke-width:2;
+  transform-origin:76px 130px;
+  animation-name:dgm-ring;
+}
+.dgm-network .ring--2{animation-delay:1.1s}
+.dgm-network .ring--3{animation-delay:2.2s}
+
+@keyframes dgm-ring{
+  0%   {transform:scale(.18);opacity:0}
+  12%  {opacity:.55}
+  70%  {transform:scale(1);opacity:0}
+  100% {transform:scale(1);opacity:0}
+}
+
+.dgm-network .device-on{animation-name:dgm-connect}
+.dgm-network .device-on--2{animation-delay:.5s}
+.dgm-network .device-on--3{animation-delay:1s}
+
+@keyframes dgm-connect{
+  0%,18%   {opacity:0}
+  34%,100% {opacity:1}
+}
+
+/* --------------------------------------------- 2. Firewall rule checking */
+/* Packets travel toward the rule column. Allowed traffic passes and turns
+   green, blocked traffic stops at the boundary and fades out. */
+
+.dgm-firewall .packet{animation-name:dgm-pass}
+.dgm-firewall .packet--b{animation-delay:1.5s}
+.dgm-firewall .packet--c{animation-delay:3.6s}
+
+@keyframes dgm-pass{
+  0%   {transform:translateX(0);opacity:0}
+  8%   {opacity:1}
+  46%  {transform:translateX(150px);opacity:1}
+  62%  {transform:translateX(190px);opacity:1}
+  90%  {transform:translateX(266px);opacity:1}
+  100% {transform:translateX(280px);opacity:0}
+}
+
+.dgm-firewall .packet-blocked{animation-name:dgm-blocked}
+.dgm-firewall .packet-blocked--b{animation-delay:2.6s}
+
+@keyframes dgm-blocked{
+  0%   {transform:translateX(0);opacity:0}
+  10%  {opacity:1}
+  44%  {transform:translateX(148px);opacity:1}
+  52%  {transform:translateX(140px);opacity:1}
+  70%  {transform:translateX(146px);opacity:.7}
+  100% {transform:translateX(146px);opacity:0}
+}
+
+.dgm-firewall .gate-pulse{
+  transform-origin:246px 130px;
+  animation-name:dgm-gate;
+}
+
+@keyframes dgm-gate{
+  0%,40%   {opacity:0;transform:scaleY(1)}
+  50%      {opacity:.5;transform:scaleY(1.04)}
+  60%,100% {opacity:0;transform:scaleY(1)}
+}
+
+/* ------------------------------------------------- 3. Website page load */
+/* Blocks paint in reading order while the progress bar fills, which is what
+   a fast first render actually looks like. */
+
+.dgm-website .block{animation-name:dgm-paint}
+.dgm-website .block--2{animation-delay:.35s}
+.dgm-website .block--3{animation-delay:.7s}
+.dgm-website .block--4{animation-delay:1.05s}
+.dgm-website .block--5{animation-delay:1.4s}
+
+@keyframes dgm-paint{
+  0%,6%    {opacity:0;transform:translateY(6px)}
+  22%,100% {opacity:1;transform:translateY(0)}
+}
+
+.dgm-website .meter-fill{
+  transform-origin:left center;
+  animation-name:dgm-meter;
+}
+
+@keyframes dgm-meter{
+  0%   {transform:scaleX(0)}
+  30%  {transform:scaleX(1)}
+  100% {transform:scaleX(1)}
+}
+
+/* ------------------------------------------------- 4. E-commerce order */
+/* A single order advances through the four stages a customer actually
+   passes through. */
+
+.dgm-commerce .stage-on{animation-name:dgm-stage}
+.dgm-commerce .stage-on--2{animation-delay:.9s}
+.dgm-commerce .stage-on--3{animation-delay:1.8s}
+.dgm-commerce .stage-on--4{animation-delay:2.7s}
+
+@keyframes dgm-stage{
+  0%,10%   {opacity:0}
+  22%,88%  {opacity:1}
+  100%     {opacity:1}
+}
+
+.dgm-commerce .token{animation-name:dgm-token}
+
+@keyframes dgm-token{
+  0%   {transform:translateX(0);opacity:0}
+  6%   {opacity:1}
+  25%  {transform:translateX(104px)}
+  50%  {transform:translateX(208px)}
+  75%  {transform:translateX(312px)}
+  88%  {transform:translateX(312px);opacity:1}
+  100% {transform:translateX(312px);opacity:0}
+}
+
+/* --------------------------------------------------- 5. Automation chain */
+/* One trigger, then each step runs in order without anyone re-entering data. */
+
+.dgm-automation .pulse{animation-name:dgm-pulse-run}
+
+@keyframes dgm-pulse-run{
+  0%   {transform:translateX(0);opacity:0}
+  8%   {opacity:1}
+  30%  {transform:translateX(96px)}
+  55%  {transform:translateX(192px)}
+  80%  {transform:translateX(288px)}
+  92%  {transform:translateX(288px);opacity:1}
+  100% {transform:translateX(288px);opacity:0}
+}
+
+.dgm-automation .step-on{animation-name:dgm-step}
+.dgm-automation .step-on--2{animation-delay:.85s}
+.dgm-automation .step-on--3{animation-delay:1.7s}
+.dgm-automation .step-on--4{animation-delay:2.55s}
+
+@keyframes dgm-step{
+  0%,8%    {opacity:0}
+  20%,90%  {opacity:1}
+  100%     {opacity:1}
+}
+
+/* ------------------------------------------------ 6. Form becomes record */
+/* Fields are completed, checked, then the entry lands in the list as a row
+   somebody can actually work from. */
+
+.dgm-forms .field-fill{
+  transform-origin:left center;
+  animation-name:dgm-typing;
+}
+.dgm-forms .field-fill--2{animation-delay:.5s}
+.dgm-forms .field-fill--3{animation-delay:1s}
+
+@keyframes dgm-typing{
+  0%,4%    {transform:scaleX(0)}
+  20%,100% {transform:scaleX(1)}
+}
+
+.dgm-forms .tick{
+  transform-origin:center;
+  animation-name:dgm-tick;
+}
+
+@keyframes dgm-tick{
+  0%,26%   {opacity:0;transform:scale(.6)}
+  36%,100% {opacity:1;transform:scale(1)}
+}
+
+.dgm-forms .row-new{animation-name:dgm-row}
+
+@keyframes dgm-row{
+  0%,34%   {opacity:0;transform:translateY(-10px)}
+  48%,100% {opacity:1;transform:translateY(0)}
+}
+
+/* ------------------------------------------------- 7. Virtualization lab */
+/* Machines start inside the lab boundary while the live network is left
+   untouched, and anything crossing the boundary is stopped. */
+
+.dgm-lab .vm-on{animation-name:dgm-boot}
+.dgm-lab .vm-on--2{animation-delay:.6s}
+.dgm-lab .vm-on--3{animation-delay:1.2s}
+
+@keyframes dgm-boot{
+  0%,10%   {opacity:0;transform:translateY(5px)}
+  26%,100% {opacity:1;transform:translateY(0)}
+}
+
+.dgm-lab .escape{animation-name:dgm-escape}
+
+@keyframes dgm-escape{
+  0%,45%   {transform:translateX(0);opacity:0}
+  55%      {opacity:1}
+  72%      {transform:translateX(52px);opacity:1}
+  80%      {transform:translateX(46px);opacity:1}
+  100%     {transform:translateX(46px);opacity:0}
+}
+
+.dgm-lab .boundary-flash{
+  transform-origin:300px 128px;
+  animation-name:dgm-boundary;
+}
+
+@keyframes dgm-boundary{
+  0%,68%   {opacity:0}
+  76%      {opacity:.85}
+  90%,100% {opacity:0}
+}
+
+/* ---------------------------------------------------------- Breakpoints */
+
+@media (max-width: 920px) {
+  .svc-motion__layout{grid-template-columns:1fr}
+  .svc-motion__copy{max-width:none}
+}
+
+@media (max-width: 560px) {
+  .svc-motion__figure{padding:14px}
+  .svc-motion__caption{font-size:.8rem}
+}
+
+/* The global reduced-motion rule already collapses these animations. This
+   block stops them outright so nothing is left mid-transform, and the
+   finished diagram stays on screen. */
+@media (prefers-reduced-motion: reduce) {
+  .svc-motion [class*="dgm-"] *,
+  .svc-motion svg * {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+  .svc-motion .ring,
+  .svc-motion .packet-blocked,
+  .svc-motion .escape,
+  .svc-motion .gate-pulse,
+  .svc-motion .boundary-flash {
+    opacity: 0;
+  }
+}

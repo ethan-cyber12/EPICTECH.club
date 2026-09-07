@@ -20,6 +20,7 @@
   <meta name="twitter:description" content="Firewall and network security setup for Orlando small businesses. Ubiquiti gateways, secure Wi-Fi, VLAN basics, VPN, and firewall documentation from $249.">
   <meta name="twitter:image" content="https://epictech.club/assets/images/logo/epic-tech-logo-final.webp">
   <link rel="stylesheet" href="../assets/css/styles.css?v=20260903">
+  <link rel="stylesheet" href="../assets/css/service-motion.css?v=20260903">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -70,6 +71,7 @@
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
+      <a href="/services/app-building.html#demo-workspace">Live demos</a>
       <a class="btn btn-primary" href="../contact.html">Schedule Assessment</a>
     </nav>
   </div>
@@ -98,10 +100,62 @@
       </div>
     </div>
   </section>
+  <section class="section svc-motion" id="how-it-works" aria-labelledby="motion-title">
+    <div class="container svc-motion__layout">
+      <div class="svc-motion__copy">
+        <h2 id="motion-title">How traffic gets checked</h2>
+        <p>A firewall is a set of decisions about what is allowed to reach your network. Expected traffic passes through. Anything that does not match a rule is stopped at the edge and logged, so you can see what was refused and why.</p>
+      </div>
+      <figure class="svc-motion__figure">
+        <svg viewBox="0 0 480 240" class="dgm-firewall" role="img" aria-labelledby="dgm-fw-t dgm-fw-d">
+          <title id="dgm-fw-t">Traffic checked against firewall rules</title>
+          <desc id="dgm-fw-d">Incoming traffic travels toward a rule boundary. Traffic matching a rule passes through to the business network, and traffic that does not is stopped at the boundary.</desc>
+          <rect x="6" y="10" width="468" height="220" rx="14" class="dgm-plate"/>
+
+          <text x="66" y="42" text-anchor="middle" class="dgm-label">Internet</text>
+          <text x="246" y="42" text-anchor="middle" class="dgm-label dgm-label--ink">Rules</text>
+          <text x="404" y="42" text-anchor="middle" class="dgm-label">Your network</text>
+
+          <rect x="234" y="58" width="24" height="144" rx="8" class="dgm-ink"/>
+          <rect class="gate-pulse dgm-cycle" x="230" y="54" width="32" height="152" rx="10" fill="var(--brand)"/>
+
+          <rect x="352" y="88" width="104" height="84" rx="10" class="dgm-box"/>
+          <rect x="368" y="106" width="72" height="6" rx="3" class="dgm-muted"/>
+          <rect x="368" y="122" width="52" height="6" rx="3" class="dgm-muted"/>
+          <rect x="368" y="138" width="62" height="6" rx="3" class="dgm-muted"/>
+
+          <g class="packet dgm-cycle">
+            <rect x="40" y="76" width="52" height="18" rx="9" fill="var(--accent-ink)"/>
+          </g>
+          <g class="packet packet--b dgm-cycle">
+            <rect x="40" y="166" width="52" height="18" rx="9" fill="var(--accent-ink)"/>
+          </g>
+          <g class="packet packet--c dgm-cycle">
+            <rect x="40" y="121" width="52" height="18" rx="9" fill="var(--accent-ink)"/>
+          </g>
+
+          <g class="packet-blocked dgm-cycle">
+            <rect x="40" y="121" width="52" height="18" rx="9" fill="var(--danger)"/>
+          </g>
+          <g class="packet-blocked packet-blocked--b dgm-cycle">
+            <rect x="40" y="76" width="52" height="18" rx="9" fill="var(--danger)"/>
+          </g>
+
+          <text x="66" y="216" text-anchor="middle" class="dgm-label">Allowed and refused</text>
+        </svg>
+        <figcaption class="svc-motion__caption">
+          <span>Expected traffic passes. Everything else stops at the edge.</span>
+          <span class="svc-motion__badge">Concept diagram</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
   <section class="section">
     <div class="container service-flow">
       <aside class="side-nav" aria-label="On this page">
         <strong>On this page</strong>
+        <a href="#how-it-works">How traffic gets checked</a>
         <a href="#packages">Packages</a>
         <a href="#included">What is included</a>
         <a href="#proof">Proof assets</a>
@@ -195,8 +249,9 @@
       <a href="../pricing.html">Pricing</a>
       <a href="../about.html">About</a>
       <a href="../reviews.html">Reviews</a>
+      <a href="/services/app-building.html#demo-workspace">Live demos</a>
       <a href="../contact.html">Contact</a>
-      <a href="../privacy.html">Privacy</a>
+      <a href="../privacy.html">Privacy</a><a href="../privacy.html#accessibility">Accessibility</a>
       <a href="mailto:info@epictech.club">info@epictech.club</a>
     </div>
   </div>
